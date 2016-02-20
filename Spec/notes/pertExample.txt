@@ -1,0 +1,31 @@
+I have about 1/2 of an application written to implement PERT, which is something management types study for doing project cost estimation, but usually don't use in reality. It has a nice container hierarchy (Project > Phase > Task > Task > ... > Task). I have part of the UI written in Glamour and part in Spec, but it isn't finished. I'm using this as a tutorial to teach my wife Pharo—although I'm probably not so great at it that I should be teaching anybody. :) The tutorial isn't as far along as the application and is probably wrongly titled at this point.
+
+I'm happy to give away the code and the tutorial but I'm a little stuck now since we have just had a baby and are now preparing to move in three weeks. So I apologize for the rough state of affairs, but since you asked I only hope it may be better than nothing.
+
+The tutorial can be read here: http://st.7gf.org/PERT/ <http://st.7gf.org/PERT/>
+PDF: http://st.7gf.org/PERT/PERT.pdf <http://st.7gf.org/PERT/PERT.pdf>
+Markdown source: http://st.7gf.org/PERT/PERT.md <http://st.7gf.org/PERT/PERT.md>
+
+Additionally I have a whiteboard capture of the interface I envision with Glamour (which may or may not be appropriate). The size is quite large despite the low quality, my apologies:
+
+http://st.7gf.org/PERT/project-window <http://st.7gf.org/PERT/project-window>.jpg
+http://st.7gf.org/PERT/simulation-window.jpg <http://st.7gf.org/PERT/simulation-window.jpg>
+http://st.7gf.org/PERT/project-graph-diagram.jpg
+
+It would be hard to come up with a more "boring" and "business" application domain than this… but for management people the problem is pretty well-known and for my wife, her only prior programming experience (not counting Excel) is C and the experience has been positive for her so far. She's also greatly enjoying going through my paper copy of Pharo by Example and the built-in tutorial.
+
+The basic concept, in case anyone is interested, is that you can form a directed acyclic graph between subtasks and then using min/max cost estimates, determine which tasks are "critical" and which tasks can be late without affecting the deadline or budget. The "project window" above uses a GLFinder-like approach to allow drilling down into subtasks from projects and phases. This means you're stuck with a tree instead of a DAG. 
+
+The target level of sophistication for the final application is one that can use expected costs and a beta distribution to simulate thousands of different possible outcomes and then aggregate from there to see which tasks are likely to be troublesome or have bad estimates. This is what is pictured in the simulation-window mockup.
+
+The project graph diagram is just a sketch of something that would be trivial to do with Roassal. 
+
+The project and task/activity objects should be fairly obvious. Phase is just recognition of the idea that projects are usually implemented in phases, and you usually have to complete one phase before starting the next: e.g., you must have made the prototype before you can put it into production. This layer is unnecessary from a computational point of view (there's nothing like it in the wiki page for PERT either) but it's a helpful organizational tool, plus it lets you create a nice boundary to get back some of the nice things about having a DAG that you lose with a tree representation.
+
+I don't know if this is what you're looking for or not but here it is.
+
+All the best,
+
+— 
+Daniel Lyons
+
