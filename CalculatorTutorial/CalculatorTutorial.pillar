@@ -4,7 +4,7 @@ Written by Ignacio Sniechowski
 
 Spec is a new way to build user interfaces with Pharo.With Spec you define an application model that glue together widgets and your model. In this chapter we will develop a simple calculator to get started with Spec.Our focus will be on building the GUI to come up with a simple but good-looking calculator.
 After designing the GUI we will move on to render this nice, but hollow interface operational (let's say we will focus first on the VC part of MVC, and later on the M). This chapter uses the version 2 of Spec that is available in Pharo 3.0.
-Once it's finished, our calculator will look like Figure *specalc*.
+Once it's finished, our calculator will look like Figure *@specalc*.
 +The Spec Calculator>file://figures/Specalc.png|width=40|label=specalc+
 
 !!Introduction
@@ -372,7 +372,7 @@ Specalc class>>defaultSpec
 
 ]]]
 
-The following Figure *layout*, will help us clarify how a ==Speclayout== works.  
+The following Figure *@layout*, will help us clarify how a ==Speclayout== works.  
 
 +Composed Layout>file://figures/layoutDiagram.png|width=110|label=layout+
 
@@ -411,19 +411,19 @@ So let's go ahead and execute our calculator. Open a Workspace, type and do: ==S
 
 The debugger will complain with a: ==MessageNotUnderstood :Specalc>>display==
 
-The following Figure *messagewrong* shows the Workspace with ==Specalc new openWithSpec== and the outcome of the debugger after execution. 
+The following Figure *@messagewrong* shows the Workspace with ==Specalc new openWithSpec== and the outcome of the debugger after execution. 
 +The debugger>file://figures/messagewrong.png|width=95|label=messagewrong+
 
 
 
 What is happening is that we didn't add yet the accessing methods to our widgets. Therefore, ==SpecInterpreter== has no access to them. The easiest way to solve this is to select the 'Create' option which will automatically create that method for us. Go ahead and select 'Create' and when prompted choose to define ==display== in Specalc class. For the moment do not waste time categorizing the method and just select 'OK'.
 
-The debugger will now present you the automatically created method as shown in figure *addingmethod*.
+The debugger will now present you the automatically created method as shown in figure *@addingmethod*.
 +Creating a method in the debugger>file://figures/addingmethod.png|width=95|label=addingmethod+
 
 Select the code, accept it and then check 'Proceed' the same will happen again but with another of our widgets; therefore you must proceed exactly as previously explained until all our widgets have a proper accessor method. Once you're finished with these sequences, the GUI of our calculator should appear!
 
-Finally, the GUI of our calculator *firstrun*.
+Finally, the GUI of our calculator *@firstrun*.
 +Specalc's first run>file://figures/firstrun.png|width=50|label=firstrun+
 
 But something looks awkward and not quiet well. Especially if we compare what we are seeing with the figure at the beginning of this chapter. We are almost there thou, categorize the methods so they appear under the 'accessing' protocol and let's fix this.
