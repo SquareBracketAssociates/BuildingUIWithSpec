@@ -1,5 +1,7 @@
 ! Building a small Login Dialog
 
+""Not sure that we will keep this chapter. ""
+
 We will show you how with only three methods and some boilerplate code we can build a simple login dialog.
 
 !! Subclass of ComposableModel
@@ -86,11 +88,12 @@ the extent and width should be calculated values.
 
 That would change the example code to something like
 
+[[[
 LoginModel class>>defaultSpec
-<spec: #default>
-^SpecLayout composed
-      newColumn: [ :col | 
-        col 
+	<spec: #default>
+	^SpecLayout composed
+   	   newColumn: [ :col | 
+      	  col 
           newRow: [ :row | 
             row 
               add: #usernameLabel width: self labelWidth; 
@@ -102,23 +105,32 @@ LoginModel class>>defaultSpec
               add: #passwordField ] 
           height: self inputTextHeight ]; 
        yourself 
+]]]
 
+[[[
 LoginModel class>>labelWidth
-^((StandardFonts defaultFont widthOfString: 'Password') max: 
-(StandardFonts defaultFont widthOfString: 'Username'))+12
+	^((StandardFonts defaultFont widthOfString: 'Password') max: 
+		(StandardFonts defaultFont widthOfString: 'Username')) + 12
+]]]
 
 Please note that there are still several places in Spec where 
 hardcoded values like 12 are used instead of semantic values.
 This value should actually be dependent on font size.
 Having the label texts twice in the code should also be avoided.
 
+[[[
 LoginModel class>>textFieldWidth
-^(StandardFonts defaultFont widthOfString: 'longest.email@addressThatShould.fit')+12
+	^(StandardFonts defaultFont widthOfString: 'longest.email@addressThatShould.fit')+12
+]]]
 
+[[[
 LoginModel>>initialExtent
-^(3*12+self class labelWidth+ self class textFieldWidth) @ (5*self class buttonHeight)
+	^(3*12+self class labelWidth+ self class textFieldWidth) @ (5*self class buttonHeight)
+]]]
+
 
 There are several calculated values missing:
+[[[
 width = outside border + labelWidth + label field separator+fieldWidth+outside border
 height = dialog title + textInput height + separator + textInput height+ separator+button height + outside border
-
+]]]
