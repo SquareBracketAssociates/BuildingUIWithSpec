@@ -1,3 +1,14 @@
 ! Tips and Tricks
 
 This chapter will present some little examples that may help you for building interfaces with Spec. 
+
+!! Create a non-editable text field
+
+To create a non-editable text field you need to use ==TextInputFieldModel== and use ==#enabled:== as in the following code snippet:
+[[[language=Smalltalk|
+inputField := TextInputFieldModel new.
+inputField
+    enabled: false;
+    text: 'Hello Spec!'.
+inputField openWithSpec.
+]]]
