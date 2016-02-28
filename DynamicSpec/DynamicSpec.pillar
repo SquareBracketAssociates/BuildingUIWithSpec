@@ -1,10 +1,11 @@
 ! Dynamic Spec: Parties, a dynamic example
 
 In an address book we find addresses of both people and organizations. 
-The generalization of both is called a party ('Analysis Patterns', Martin Fowler). 
+The generalization of both is called a ''party'' ('Analysis Patterns', Martin Fowler). 
 In this example we'll make an address book where we can add both persons and companies.
 They will have different attributes.
 We show how to do add them with a dynamic user interface, and minimize duplication.
+
 
 !! The party model
 In the party model, party is a superclass of person and company. 
