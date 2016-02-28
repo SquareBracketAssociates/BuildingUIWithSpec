@@ -3,13 +3,13 @@
 This document presents the Spec UI builder framework. ''Spec'' has been originally developed by B. Van Ryseghem based on an idea of S. Ducasse. It is now maintained by the community and the Pharo core team.
 Spec is based on the idea that UI building should support UI logic reuse. Spec is influenced by VisualWorks and Dolphin MVP in the sense that it recognizes the need for a Presenter or ApplicationModel class, in Spec called ComposableModel that manages the logic and the link between widgets and domain objects. Spec, following the tradition, uses ''value holders'', simple objects raising announcements when their values, often domain objects, change. 
 
-In this documentation, originally written by B. Van Ryseghem and J. Fabry and now maintained and massively updated by S. Ducasse and J. Fabry we will teach you how to use Spec through several examples.  We will show how to reuse a ui logic and its elements.  
+In this documentation, originally written by B. Van Ryseghem and J. Fabry and now maintained and massively updated by S. Ducasse and J. Fabry we will teach you how to use Spec through several examples.  We will show how to reuse a UI logic and its elements.  
 We will also provide an overview of the functionalities of ''Spec''.
 
 The structure of this document is as follows:
 First we give a short tutorial on how to define and reuse UIs with ''Spec''.
 Then the three axes that form the heart of ''Spec'' are explained. 
-In section four the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
+In section four, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
 The next section presents the support for dynamic UIs in ''Spec''. 
 The sixth section is dedicated to the creation of new ''Spec'' basic widgets, and in section seven the core interpreter loop of ''Spec'' is outlined.
 
@@ -37,10 +37,21 @@ To avoid possible misunderstandings due to confusion in terminology, we first de
 
 !! Example one
 
-We should have a simple example without composing 
+In this first example, we are going to build a list containing icons of the current theme and their respective selector.
 
+[[[language=smalltalk|
+iconList := IconListModel new.
+iconList
+    items: Smalltalk ui icons iconSelectors asSortedCollection;
+    displayBlock: [ :selector | selector asString ];
+    sortingBlock: [ :selectorA :selectorB | selectorA < selectorB ];
+    icons: [ :selector | Smalltalk ui icons perform: selector ];
+    title: 'Available icons for the current theme.'.
+                    
+iconList openWithSpec
+]]]
 
-
++A first widget with Spec.>file://figures/FirstExample.png|width=50|label=fig_first_example+
 
 !! Reusing UI Element by Example
 @sec_reuse_spec
