@@ -12,3 +12,16 @@ inputField
     text: 'Hello Spec!'.
 inputField openWithSpec.
 ]]]
+
+!! Change the background color of ListModel elements
+
+Here is an example of a ==ListModel== with elements having different colors. The following code shows how to build a ==ListModel== containing all registered color names. For each color, the element holding the name of the color has the color in background. To do this, the message ==#backgroundColorBlock:== is used. It takes a block with a single parameter that is the item concerned by the background color.
+[[[language=Smalltalk|
+ListModel new 
+    items: Color registeredColorNames ;
+    backgroundColorBlock: [ :item | Color named: item];
+    title: 'Registered colors';
+    openWithSpec.
+]]]
+
++ListModel with modified background colors.>file://figures/RegisteredColors.png|width=50|label=fig_first_example+
