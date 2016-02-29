@@ -25,3 +25,153 @@ ListModel new
 ]]]
 
 +ListModel with modified background colors.>file://figures/RegisteredColors.png|width=50|label=fig_modified_background+
+
+!! Manage nested focus order
+
+Spec is made for composing and reusing widgets. When it is needed to create a new widget with two subwidget that are also composed of subwidgets there is a little trick to set up the focus correctly.
+
+For this tip, we are going to implement three widgets: one composed of two ==ButtonModel==, one composed of a ==ListModel== and widget composing the two precedent and managing correctly the focus order.
+
+!!! The ==TwoButtons== widget holding the two buttons:
+
+First we create a widget to hold two buttons:
+
+[[[language=Smalltalk|
+ComposableModel subclass: #TwoButtons
+    instanceVariableNames: 'button1 button2'
+    classVariableNames: ''
+    category: 'SpecBook'
+]]]
+
+Add the buttons to the focus order in ==#initializeWidgets== message:
+
+[[[language=Smalltalk|
+initializeWidgets
+    button1 := self newButton.
+    button2 := self newButton.
+        
+    self focusOrder
+        add: button1;
+        add: button2
+]]]
+
+Then set up the label of buttons in ==#initializePresenter== message:
+
+[[[language=Smalltalk|
+initializePresenter
+    button1 label: '1'.
+    button2 label: '2'
+]]]
+
+Finally we add accessors for the buttons:
+
+[[[language=Smalltalk|
+button1
+    ^ button1
+]]]
+
+[[[language=Smalltalk|
+button2
+    ^ button2
+]]]
+
+In the class side, we describe the layout of this widget in ==#defaultSpec==:
+
+[[[language=Smalltalk|
+defaultSpec
+    ^ SpecLayout composed
+        newColumn: [ :column |
+            column
+                newRow: #button1 height: self buttonHeight;
+                newRow: #button2 height: self buttonHeight ];
+        yourself
+]]]
+
+!!! The ==AList== widget holding the list:
+The second widget simply hold a list.
+
+[[[language=Smalltalk|
+ComposableModel subclass: #AList
+    instanceVariableNames: 'list'
+    classVariableNames: ''
+    category: 'SpecBook'
+]]]
+
+Once again, ==list== is added to the focus order in ==#initializeWidgets==:
+
+[[[language=Smalltalk|
+initializeWidgets
+    list := self newList.
+        
+    self focusOrder
+        add: list
+]]]
+
+We initialize the list with the ten firsts positive integers in ==#initializePresenter== message:
+
+[[[language=Smalltalk|
+initializePresenter
+    super initializePresenter.
+    list items: (1 to: 10)
+]]]
+
+And we add an accessor message for the list.
+
+[[[language=Smalltalk|
+list
+    ^ list
+]]]
+
+In class side, the layout is really simple:
+
+[[[language=Smalltalk|
+defaultSpec
+    ^ SpecLayout composed
+        add: #list;
+        yourself
+]]]
+
+!!! Composing ==TwoButtons== and ==AList== in ==SuperWidget==
+
+This third widget will hold the two we defined in the precedent sections.
+
+[[[language=Smalltalk|
+ComposableModel subclass: #SuperWidget
+    instanceVariableNames: 'twoButtons aList'
+    classVariableNames: ''
+    category: 'SpecBook'
+]]]
+
+Here is where the trick is made. To compose the focus correctly, you must add ==aList== to the focus order of ==twoButtons== and add ==twoButtons== to the focus order of ==aList==. By doing that, you ensure that the focus is managed correctly in ==SuperWidget==.
+
+[[[language=Smalltalk|
+initializeWidgets
+    twoButtons := TwoButtons new.
+    aList := AList new.
+        
+    twoButtons focusOrder add: aList.
+    aList focusOrder add: twoButtons
+]]]
+
+Finally, we add the accessors and the default layout.
+
+[[[language=Smalltalk|
+twoButtons
+    ^ twoButtons
+]]]
+
+[[[language=Smalltalk|
+aList
+    ^ aList
+]]]
+
+[[[language=Smalltalk|
+defaultSpec
+    ^ SpecLayout composed
+        newRow: [ :row |
+            row
+                newColumn: #twoButtons;
+                newColumn: #aList ];
+        yourself
+]]]
+
