@@ -164,6 +164,9 @@ The result can be seen by executing the following snippet of code: ==ModelList n
 
 +The ModelList Element.>file://figures/List.png|width=50|label=fig_widget_list+
 
+
+
+
 !!! The ProtocolList
 
 The next user interface that we will build is the protocol list.
@@ -183,13 +186,11 @@ The ==initializeWidgets== method for this UI is quite similar to the method in M
 ProtocolList>>initializeWidgets
 
 	protocols := self newList.
-	label := self newLabel.
-	label text: 'Protocol'.
-	protocols	displayBlock: [ :m | m selector ].
+	label := self newLabel.	
+	label label: 'Protocol'.
 	self focusOrder add: protocols
 ]]]
 
-%Spirita: In the class ProtocolList in Spec-Examples on Pharo 4 and 5, the code is similar but different (line 3 and 4 are replaced by label label: 'Protocol'.)
 
 The layout method is quite different though.
 Now the sub widgets need to be placed more specifically than in the previous example.
@@ -270,8 +271,12 @@ ProtocolViewer>>initializeWidgets
 	protocols := self instantiate: ProtocolList.
 	events := self instantiate: ProtocolList.
 	
-	protocols label: 'api'.
-	events label: 'api-events'.
+	protocols
+		label: 'api';
+		displayBlock: [ :m | m selector ].
+	events
+		label: 'api-events';
+		displayBlock: [ :m | m selector ].
 		
 	self focusOrder 
 		add: models;
@@ -305,15 +310,15 @@ More details on the ==initializePresenter== method are given in *@subsec_initial
 ProtocolViewer>>initializePresenter
 
 	models whenSelectedItemChanged: [ :class |
-		self resetProtocolSelection.
-		self resetEventSelection.
+		protocols resetSelection.
+		events resetSelection.
 		class
 			ifNil: [ 
 				protocols items: #().
 				events items: #() ]
 			ifNotNil: [ 
-				protocols items: (self methodsIn: class for: 'protocol').
-				events items: (self methodsIn: class for: 'protocol-events') ] ].
+				protocols items: (self methodsIn: class for: 'api').
+				events items: (self methodsIn: class for: 'api-events') ] ].
 	
 	protocols whenSelectedItemChanged: [ :method | method ifNotNil: [ self resetEventSelection ] ].
 	events whenSelectedItemChanged: [ :method | method ifNotNil: [ self resetProtocolSelection ] ].
