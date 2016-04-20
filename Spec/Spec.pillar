@@ -360,6 +360,8 @@ Those methods are given in the code in *@ex_viewer_others*.
 
 As previously, the result can be seen by executing the following snippet of code: ==ProtocolViewer new openWithSpec==.
 
++Protocol Viewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
+
 !!! Protocol Editor
 @subsec_protocol_editor
 
