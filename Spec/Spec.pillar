@@ -162,10 +162,7 @@ can simply send the message to the list directly.
 The first UI is now done.
 The result can be seen by executing the following snippet of code: ==ModelList new openWithSpec== as shown in figure *@fig_widget_list*
 
-
-+The Widget Classes List Element.>file://figures/List.png|width=50|label=fig_widget_list+
-
-
++The ModelList Element.>file://figures/List.png|width=50|label=fig_widget_list+
 
 !!! The ProtocolList
 
@@ -360,16 +357,16 @@ Those methods are given in the code in *@ex_viewer_others*.
 
 As previously, the result can be seen by executing the following snippet of code: ==ProtocolViewer new openWithSpec==.
 
-+Protocol Viewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
++The ProtocolViewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
 
-!!! Protocol Editor
-@subsec_protocol_editor
+!!! Protocol Browser
+@subsec_protocol_browser
 
 The last user interface reuses a ""ProtocolViewer"" with a different layout and adds a text zone to edit the source code of the selected method.
 The class definition can be seen in code in *@ex_browser_definition*.
 
 [[[label=ex_browser_definition|caption=ProtocolBrowser definition|language=Smalltalk 
-ComposableModel subclass: #ProtocolEditor
+ComposableModel subclass: #ProtocolBrowser
 	instanceVariableNames: 'viewer text'
 	classVariableNames: ''
 	category: 'Spec-Examples'
@@ -377,7 +374,7 @@ ComposableModel subclass: #ProtocolEditor
 
 The ==initializeWidgets== implementation is shown in the code in *@ex_browser_initializeWidgets*.
 
-[[[label=ex_browser_initializeWidgets|caption=ProtocolEditor>>#initializeWidgets|language=Smalltalk 
+[[[label=ex_browser_initializeWidgets|caption=ProtocolBrowser>>#initializeWidgets|language=Smalltalk 
 initializeWidgets
 
 	text := self newText.
@@ -417,7 +414,7 @@ When a method is seleted, the text zone updates its contents to show the source 
 The implementation of this method is detailled in the code in *@ex_browser_presenter*.
 
 [[[label=ex_browser_presenter|caption=ProtocolBrowser interactions|language=Smalltalk 
-ProtocolEditor>>initializePresenter
+ProtocolBrowser>>initializePresenter
 
 	viewer whenClassChanged: [ :class | text behavior: class ].
 	viewer whenProtocolChangedDo: [ :item | 
@@ -434,16 +431,16 @@ The other methods are two getters, a method to set the default size, and a metho
 Their implemenations are detailled in code *@ex_browser_others*.
 
 [[[label=ex_browser_others|caption=ProtocolBrowser remaining methods|language=Smalltalk
-	ProtocolEditor>>text
+	ProtocolBrowser>>text
 		^ text
 
-	ProtocolEditor>>viewer
+	ProtocolBrowser>>viewer
 		^ viewer
 
-	ProtocolEditor>>initialExtent
+	ProtocolBrowser>>initialExtent
 		^ 750@600
 	
-	ProtocolEditor>>title
+	ProtocolBrowser>>title
 		^ 'Protocols browser'
 ]]]
 
@@ -452,7 +449,7 @@ The final user interface can be opened with the following snippet: ==ProtocolBro
 The result can be seen in figure *@fig_second_protocol_browser*.
 %spirita: an ancor named fig_protocol_browser already exists (its the same figure, give the same name create problems in reference).
 
-+Protocol Browser>file://figures/Protocol_Browser.png|width=50|label=fig_second_protocol_browser+
++The ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_second_protocol_browser+
 
 
 !!! Adding Menu and KeyBinding
@@ -600,7 +597,7 @@ To do this, instead of giving a symbol, an array with 2 symbols must
 be given.
 The first symbol identifies the UI being reused and the second the sub
 widget within this UI whose new layout position is being specified.
-We have seen an example of this reuse in *@subsec_protocol_editor*.
+We have seen an example of this reuse in *@subsec_protocol_browser*.
 
 As said above, multiple layouts can be described for the same user interface.
 In order to retrieve the correct method to apply, these methods need to be flagged with a pragma.
