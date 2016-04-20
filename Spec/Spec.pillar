@@ -1,11 +1,14 @@
 ! Spec: a framework for describing user interfaces
 
+!! Introduction
+
 This document presents the Spec UI builder framework. ''Spec'' has been originally developed by B. Van Ryseghem based on an idea of S. Ducasse. It is now maintained by the community and the Pharo core team.
 Spec is based on the idea that UI building should support UI logic reuse. Spec is influenced by VisualWorks and Dolphin MVP in the sense that it recognizes the need for a Presenter or ApplicationModel class, in Spec called ComposableModel that manages the logic and the link between widgets and domain objects. Spec, following the tradition, uses ''value holders'', simple objects raising announcements when their values, often domain objects, change. 
 
 In this documentation, originally written by B. Van Ryseghem and J. Fabry and now maintained and massively updated by S. Ducasse and J. Fabry we will teach you how to use Spec through several examples.  We will show how to reuse a UI logic and its elements.  
 We will also provide an overview of the functionalities of ''Spec''.
 
+%Spirita: The following block of text is out of date (make references at sections by their old numbers), it may be more clear on a list.
 The structure of this document is as follows:
 First we give a short tutorial on how to define and reuse UIs with ''Spec''.
 Then the three axes that form the heart of ''Spec'' are explained. 
@@ -15,13 +18,15 @@ The sixth section is dedicated to the creation of new ''Spec'' basic widgets, an
 
 We thank Sean De Nigris for his editing support. The documentation is actively maintained. Suggestions for improvements are welcome via the Pharo mailing-list. We thank Peter Uhnak for the discussions and the code exploration that led to cleaning some aspects of Spec.
 
-!! Motivation 
+!!! Motivation 
 
 Writing user interfaces is notoriously a tedious task. It often requires time and a clear understanding of the separation of concerns between the logic of the model and the logic of the user interface. Indeed, many frameworks mix domain models with widget models.
 
 ''Spec'' is a framework for describing user interfaces.  It allows for the separation of concerns between the different parts of the user interface as expressed in the MVP pattern, on which it is inspired.
 ''Spec'' emphasizes the reuse of widgets as well as their customization.
  
+
+!!! Terminology
 
 To avoid possible misunderstandings due to confusion in terminology, we first define the following four terms, which will be used frequently:
 
@@ -34,12 +39,14 @@ To avoid possible misunderstandings due to confusion in terminology, we first de
 ;Basic widgets
 :low-level widgets like a list, a button, etc. They are not composed of other Spec widgets.
 
+%Spirita: It could be logical to put all before this line in a preface.
 
 !! Example one
 
 In this first example, we are going to build a list containing icons of the current theme and their respective selector.
 
-[[[language=smalltalk|
+[[[label=ex_icon_list|caption=Code for Pharo 4|language=smalltalk|
+|iconList|
 iconList := IconListModel new.
 iconList
     items: Smalltalk ui icons iconSelectors asSortedCollection;
@@ -51,6 +58,8 @@ iconList
 iconList openWithSpec
 ]]]
 
+%Spirita: The icons' API have changed with Pharo 5 (iconSelectors don't exists anymore)
+
 +A first widget with Spec.>file://figures/FirstExample.png|width=50|label=fig_first_example+
 
 !! Reusing UI Element by Example
@@ -59,19 +68,20 @@ iconList openWithSpec
 This section introduces an example of how to define and reuse ''Spec'' user interfaces. The example UI that is built will serve to browse the 
 public API of all the basic widgets offered by ''Spec''. This API is further documented in Section *@sec_where_to_find_what_I_want*. In this section we do not detail the different parts of ''Spec'' yet,  for a more in-depth discussion on the heart of ''Spec''  we refer to Section *@sec_heart_of_spec*.
 
-The example is structured in four parts that will result in the browser shown in *@fig_protocol_browser*. 
+The example is structured in four parts that will result in the browser shown in figure *@fig_protocol_browser*.
 
 - First, a list UI named  ""WidgetClassList"" that is dedicated to render the subclasses of the ''AbstractWidgetModel'' class is created.
 - Second, a UI composed of a list and a label is defined and named ""ProtocolList"".
 - Third, a protocol viewer is defined by combining a ""WidgetClassList"" with two ""ProtocolList"" to browse the ''protocol'' and ''protocol-events'' methods.
--  Finally a protocol browser is made by reusing a protocol viewer and adding a text zone. 
+- Finally a protocol browser is made by reusing a protocol viewer and adding a text zone. 
 
 
 
 +A simple class browser composed of reusable elements.>file://figures/Protocol_Browser.png|width=80|label=fig_protocol_browser+
 
 
-!! Defining UI elements
+%!! Defining UI elements
+%Spirita: The structure is not logical if Defining UI elements is at that level.
 First we define the elements that compose the resulting browser. In the subsequent section we will add interaction between them. For example, what is happening when we select an element in the list.
 
 SD: we should show the intermediate results we will get.
@@ -97,7 +107,7 @@ ComposableModel subclass: #WidgetClassList
 
 The first required step then is to instantiate and define the sub widgets.
 This step is done in the method ==initializeWidgets== as shown in the code *@ex_WidgetClassList_initializeWidgets*. It creates the list and populates it with the required classes, in alphabetical order.
-More details on the use of the ==initializeWidgets== method are given in *@subsec_initializeWidgets*.
+More details on the use of the ==initializeWidgets== method are given in Subsection *@subsec_initializeWidgets*.
 
 [[[label=ex_WidgetClassList_initializeWidgets|caption=Implementation of WidgetClassList>>#initializeWidgets|language=Smalltalk 
 WidgetClassList>>initializeWidgets
@@ -119,9 +129,9 @@ ComposableModel>>newList
 
 
 The second required step is to define a layout, which is done on the class side.
-Since there is here only one sub widget, the layout is quite simple, as shown in the code in *@ex_WidgetClassList_layout*.
+Since there is here only one sub widget, the layout is quite simple, as shown in the code *@ex_WidgetClassList_layout*.
 It simply returns a layout that contains only the list.
-More details on the use of this method are given in *@subsec_layout*.
+More details on the use of this method are given in Subsection *@subsec_layout*.
 
 [[[label=ex_WidgetClassList_layout|caption=WidgetClassList layout|language=Smalltalk 
 WidgetClassList class>>#defaultSpec
@@ -153,10 +163,10 @@ Note that this ==whenSelectedItemChanged: aBlock== will probably be deprecated i
 can simply send the message to the list directly.
 
 The first UI is now done.
-The result can be seen by executing the following snippet of code: ==WidgetClassList new openWithSpec== as shown in Figure *@fig_protocol_browser*
+The result can be seen by executing the following snippet of code: ==WidgetClassList new openWithSpec== as shown in figure *@fig_widget_list*
 
 
-+The Widget Classes List Element.>file://figures/List.png|width=50|label=fig_protocol_browser+
++The Widget Classes List Element.>file://figures/List.png|width=50|label=fig_widget_list+
 
 
 
@@ -184,6 +194,8 @@ ProtocolList>>initializeWidgets
 	protocols	displayBlock: [ :m | m selector ].
 	self focusOrder add: protocols
 ]]]
+
+%Spirita: In the class ProtocolList in Spec-Examples on Pharo 4 and 5, the code is similar but different (line 3 and 4 are replaced by label label: 'Protocol'.)
 
 The layout method is quite different though.
 Now the sub widgets need to be placed more specifically than in the previous example.
@@ -438,9 +450,10 @@ Their implemenations are detailled in code *@ex_browser_others*.
 
 This finishes the protocol browser.
 The final user interface can be opened with the following snippet: ==ProtocolBrowser new openWithSpec==.
-The result can be seen in figure *@fig_protocol_browser*.
+The result can be seen in figure *@fig_second_protocol_browser*.
+%spirita: an ancor named fig_protocol_browser already exists (its the same figure, give the same name create problems in reference).
 
-+Protocol Browser>file://figures/Protocol_Browser.png|width=50|label=fig_protocol_browser+
++Protocol Browser>file://figures/Protocol_Browser.png|width=50|label=fig_second_protocol_browser+
 
 
 !!! Adding Menu and KeyBinding
@@ -773,6 +786,8 @@ The example *@ex_specify_layout* shows how to add an instance of ""MyWidget"" us
 
 !! Where to find what I want
 @sec_where_to_find_what_I_want
+
+%Spirita: The name of that section have confusing me when i have see it in the table of contents.
 
 All the ''Spec'' models for basic widgets have an API that is explicitly documented through the use of pragmas.
 This section explains where to find the API of a model and meaning of the meta information that is attached to the API methods.
