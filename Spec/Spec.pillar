@@ -45,17 +45,16 @@ To avoid possible misunderstandings due to confusion in terminology, we first de
 
 In this first example, we are going to build a list containing icons of the current theme and their respective selector.
 
-[[[label=ex_icon_list|caption=Code for Pharo 4|language=smalltalk|
-|iconList|
-iconList := IconListModel new.
-iconList
-    items: Smalltalk ui icons iconSelectors asSortedCollection;
-    displayBlock: [ :selector | selector asString ];
-    sortingBlock: [ :selectorA :selectorB | selectorA < selectorB ];
-    icons: [ :selector | Smalltalk ui icons perform: selector ];
-    title: 'Available icons for the current theme.'.
-                    
-iconList openWithSpec
+[[[label=ex_icon_list|caption=Icons List|language=smalltalk|
+	| iconList |
+	iconList := IconListModel new.
+	iconList
+		items: Smalltalk ui icons allIconNames asSortedCollection;
+		displayBlock: [ :selector | selector asString ];
+		sortingBlock: [ :selectorA :selectorB | selectorA < selectorB ];
+		icons: [ :each | Smalltalk ui icons iconNamed: each ];
+		title: 'Availiable icons for the current theme.'.
+	iconList openWithSpec
 ]]]
 
 %Spirita: The icons' API have changed with Pharo 5 (iconSelectors don't exists anymore)
