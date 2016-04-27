@@ -98,14 +98,14 @@ The snippet *@ex_model_list* shows the definition of this for the ==ModelList== 
 ComposableModel subclass: #ModelList
 	instanceVariableNames: 'list'
 	classVariableNames: ''
-	category: 'Spec-Examples'
+	package: 'Spec-Examples'
 ]]]
 
 The first required step then is to instantiate and define the sub widgets.
 This step is done in the method ==initializeWidgets== as shown in the code *@ex_ModelList_initializeWidgets*. It creates the list and populates it with the required classes, in alphabetical order.
 More details on the use of the ==initializeWidgets== method are given in Subsection *@subsec_initializeWidgets*.
 
-[[[label=ex_ModelList_initializeWidgets|caption=Implementation of ModelList>>#initializeWidgets|language=Smalltalk 
+[[[label=ex_ModelList_initializeWidgets|caption=Implementation of ModelList>>initializeWidgets|language=Smalltalk 
 ModelList>>initializeWidgets
 
 	list := self newList.
@@ -115,7 +115,7 @@ ModelList>>initializeWidgets
 ]]]
 
 Note that ==newList== is a shortcut because lists are really used often. Its definition is the following one
-[[[caption=Implementation of newList>>#initializeWidgets|language=Smalltalk
+[[[caption=Implementation of newList>>initializeWidgets|language=Smalltalk
 ComposableModel>>newList
 	^ self instantiate: ListModel
 ]]]
@@ -130,7 +130,7 @@ It simply returns a layout that contains only the list.
 More details on the use of this method are given in Subsection *@subsec_layout*.
 
 [[[label=ex_ModelList_layout|caption=ModelList layout|language=Smalltalk 
-ModelList class>>#defaultSpec
+ModelList class>>defaultSpec
 	<spec: #default>
 	
 	^ SpecLayout composed
@@ -176,7 +176,7 @@ The class definition is similar to the code above, as can be seen in *@ex_protoc
 ComposableModel subclass: #ProtocolList
 	instanceVariableNames: 'label protocols'
 	classVariableNames: ''
-	category: 'Spec-Examples'
+	package: 'Spec-Examples'
 ]]]
 
 The ==initializeWidgets== method for this UI is quite similar to the method in ModelList, as the code in *@ex_protocolList_init* shows.
@@ -256,14 +256,14 @@ The code in *@ex_viewer_definition* shows the definition of the class ""Protocol
 ComposableModel subclass: #ProtocolViewer
 	instanceVariableNames: 'models protocols events'
 	classVariableNames: ''
-	category: 'Spec-Examples'
+	package: 'Spec-Examples'
 ]]]
 
 The ==initializeWidgets== method now uses a different way to initialize the sub-widgets of the UI. 
 This is because it does not use basic widgets but instead reuses the user interfaces we defined previously.
 The remainder of the method is quite similar to the previous implementation, as shown in the code in *@ex_viewer_initializeWidgets*.
 
-[[[label=ex_viewer_initializeWidgets|caption=Implementation of ProtocolViewer>>#initializeWidgets|language=Smalltalk 
+[[[label=ex_viewer_initializeWidgets|caption=Implementation of ProtocolViewer>>initializeWidgets|language=Smalltalk 
 ProtocolViewer>>initializeWidgets
 
 	models := self instantiate: ModelList.
@@ -373,12 +373,12 @@ The class definition can be seen in code in *@ex_browser_definition*.
 ComposableModel subclass: #ProtocolBrowser
 	instanceVariableNames: 'viewer text'
 	classVariableNames: ''
-	category: 'Spec-Examples'
+	package: 'Spec-Examples'
 ]]]
 
 The ==initializeWidgets== implementation is shown in the code in *@ex_browser_initializeWidgets*.
 
-[[[label=ex_browser_initializeWidgets|caption=ProtocolBrowser>>#initializeWidgets|language=Smalltalk 
+[[[label=ex_browser_initializeWidgets|caption=ProtocolBrowser>>initializeWidgets|language=Smalltalk 
 initializeWidgets
 
 	text := self newText.
@@ -679,8 +679,7 @@ This example also shows the ==addSplitter== message, which adds a splitter betwe
 				 	add: #button7;
 					add: #button8;
 					add: #button9 
-			];
-	];
+			] ];
 	yourself
 ]]]
 
@@ -806,7 +805,7 @@ There are three types of public API methods: getters, setters and registration m
 The pragma for getters is always ==<api: #inspect>==.
 For example, the code in *@ex_api_getter* shows how the ''action''  method in ""ButtonModel"" is implemented.
 
-[[[label=ex_api_getter|caption=Implementation of ButtonModel>>#action|language=Smalltalk 
+[[[label=ex_api_getter|caption=Implementation of ButtonModel>>action|language=Smalltalk 
 action
 	<api: #inspect>
 	"get the block performed when the button is clicked"
@@ -836,7 +835,7 @@ The possible types are as follows:
 
 For example, the code in *@ex_api_setter* shows how ''actions:'' is implemented in ""ButtonModel"".
 
-[[[label=ex_api_setter|caption=Implementation of ButtonModel>>#action:|language=Smalltalk 
+[[[label=ex_api_setter|caption=Implementation of ButtonModel>>action:|language=Smalltalk 
 action: aBlock
 	<api: #block getter: #getAction registration: #whenActionChangedDo:>
 	"set the block performed when the button is clicked"
@@ -849,7 +848,7 @@ action: aBlock
 The pragma for registration methods information is always ''<api: #event>''.
 For example, the code in *@ex_api_registration* shows how the method ''whenActionChangedDo:'' is implemented in ""ButtonModel"".
 
-[[[label=ex_api_registration|caption=Implementation of ButtonModel>>#whenActionChangedDo|language=Smalltalk 
+[[[label=ex_api_registration|caption=Implementation of ButtonModel>>whenActionChangedDo|language=Smalltalk 
 whenActionChangedDo: aBlock 
 	<api: #event>
 	"Set the block performed when the action to perform is changed"
@@ -864,7 +863,7 @@ behavior of the widget.
 The pragma for these methods is ''<api: #do>''.
 For example,  *@ex_resetSelection* shows how ''resetSelection'' is implemented in ""ListModel"".
 
-[[[label=ex_resetSelection|caption=Implementation of ListModel>>#resetSelection|language=Smalltalk
+[[[label=ex_resetSelection|caption=Implementation of ListModel>>resetSelection|language=Smalltalk
 resetSelection
 	<api: #do>
 	"Unselect every items"
@@ -1183,7 +1182,7 @@ The message ==changed: with: == is used to send the message ''selector'' with th
 Each adapter can then convert this ''Spec'' message into a framework specific message. 
 For example, the method ==#filterWith:== sent by ""TreeModel"" via ==changed: with:== is implemented as shown in *@ex_filter_with* in MorphicTreeAdapter
 
-[[[label=ex_filter_with|caption=Implementation of MorphicTreeAdapter>>#filterWith:|language=Smalltalk 
+[[[label=ex_filter_with|caption=Implementation of MorphicTreeAdapter>>filterWith:|language=Smalltalk 
 filterWith: aFilter
 	
 	self widgetDo: [ :w || nodes |
@@ -1251,10 +1250,10 @@ This allows for the same model to be used with several UI frameworks.
 Adding the new adapter to the default binding is quite simple.
 It requires to update two methods: ==initializeBindings== in ""SpecAdapterBindings"" and ==initializeBindings== in the framework specific adapter class, e.g. ""MorphicAdapterBindings"" for Morphic.
 
-The method ==SpecAdapterBindings>>#initializeBindings== is present only to expose the whole set of adapters required.
+The method ==SpecAdapterBindings>>initializeBindings== is present only to expose the whole set of adapters required.
 It fills a dictionary, as shown in the code *@ex_adapter_init*.
 
-[[[label=ex_adapter_init|caption=Implementation of SpecAdapterBindings>>#initializeBindings|language=Smalltalk 
+[[[label=ex_adapter_init|caption=Implementation of SpecAdapterBindings>>initializeBindings|language=Smalltalk 
 initializeBindings
 	"This implementation is stupid, but it exposes all the containers which need to be bound"
 	
@@ -1343,7 +1342,7 @@ In order to create a framework specific UI element a ''Spec'' model is interpret
 The interpreter is in charge of recursively interpreting all the sub widgets of a model.
 It then combines them, according to the given layout and the given binding.
 
-The interpreter entry point is the method ==SpecInterpreter>>#interpretASpec:selector:==.
+The interpreter entry point is the method ==SpecInterpreter>>interpretASpec:selector:==.
 
 This section will explain the two main parts of the interpretation of a model: data collection and the interpretation loop.
 In addition, the flow diagram *@fig_flow_diagram* outlines the different steps of the process and their relationships.
