@@ -1,45 +1,4 @@
-! Spec: a framework for describing user interfaces
-
-!! Introduction
-
-This document presents the Spec UI builder framework. ''Spec'' has been originally developed by B. Van Ryseghem based on an idea of S. Ducasse. It is now maintained by the community and the Pharo core team.
-Spec is based on the idea that UI building should support UI logic reuse. Spec is influenced by VisualWorks and Dolphin MVP in the sense that it recognizes the need for a Presenter or ApplicationModel class, in Spec called ComposableModel that manages the logic and the link between widgets and domain objects. Spec, following the tradition, uses ''value holders'', simple objects raising announcements when their values, often domain objects, change. 
-
-In this documentation, originally written by B. Van Ryseghem and J. Fabry and now maintained and massively updated by S. Ducasse and J. Fabry we will teach you how to use Spec through several examples.  We will show how to reuse a UI logic and its elements.  
-We will also provide an overview of the functionalities of ''Spec''.
-
-The structure of this document is as follows:
-- First, in section *@sec_reuse_spec*, we give a short tutorial on how to define and reuse UIs with ''Spec''.
-- Then, in section *@sec_heart_of_spec*, the three axes that form the heart of ''Spec'' are explained. 
-- In section *@sec_where_to_find_what_I_want*, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
-- The section *@sec_spec_the_dynamic* presents the support for dynamic UIs in ''Spec''. 
-- The section *@sec_basic_widget* is dedicated to the creation of new ''Spec'' basic widgets.
-- In section *@sec_spec_interpreter* the core interpreter loop of ''Spec'' is outlined.
-
-We thank Sean De Nigris for his editing support. The documentation is actively maintained. Suggestions for improvements are welcome via the Pharo mailing-list. We thank Peter Uhnak for the discussions and the code exploration that led to cleaning some aspects of Spec.
-
-!!! Motivation 
-
-Writing user interfaces is notoriously a tedious task. It often requires time and a clear understanding of the separation of concerns between the logic of the model and the logic of the user interface. Indeed, many frameworks mix domain models with widget models.
-
-''Spec'' is a framework for describing user interfaces.  It allows for the separation of concerns between the different parts of the user interface as expressed in the MVP pattern, on which it is inspired.
-''Spec'' emphasizes the reuse of widgets as well as their customization.
- 
-
-!!! Terminology
-
-To avoid possible misunderstandings due to confusion in terminology, we first define the following four terms, which will be used frequently:
-
-;UI Element
-:an interactive graphical element displayed as part of the graphical user interface.
-;UI Model
-:an object that contains the state and behavior of one or several UI elements.
-;Widget
-:the union of a UI Element and its UI model.
-;Basic widgets
-:low-level widgets like a list, a button, etc. They are not composed of other Spec widgets.
-
-%Spirita: It could be logical to put all before this line in a preface.
+! Example and theory
 
 !! Example one
 
@@ -57,15 +16,13 @@ In this first example, we are going to build a list containing icons of the curr
 	iconList openWithSpec
 ]]]
 
-%Spirita: The icons' API have changed with Pharo 5 (iconSelectors don't exists anymore)
-
 +A first widget with Spec.>file://figures/FirstExample.png|width=50|label=fig_first_example+
 
 !! Reusing UI Element by Example
 @sec_reuse_spec
 
 This section introduces an example of how to define and reuse ''Spec'' user interfaces. The example UI that is built will serve to browse the 
-public API of all the basic widgets offered by ''Spec''. This API is further documented in Section *@sec_where_to_find_what_I_want*. In this section we do not detail the different parts of ''Spec'' yet,  for a more in-depth discussion on the heart of ''Spec''  we refer to Section *@sec_heart_of_spec*.
+public API of all the basic widgets offered by ''Spec''. This API is further documented in Section *@sec_Meta_Informations*. In this section we do not detail the different parts of ''Spec'' yet,  for a more in-depth discussion on the heart of ''Spec''  we refer to Section *@sec_heart_of_spec*.
 
 The example is structured in four parts that will result in the browser shown in figure *@fig_protocol_browser*.
 
@@ -551,7 +508,7 @@ theList whenSelectedItemChanged: [ :item |
 		ifNotNil: [ theButton text: 'An item is selected'] ]
 ]]]
 
-The whole event API of the basic widgets is described in the section *@sec_where_to_find_what_I_want*.
+The whole event API of the basic widgets is described in the section *@sec_Meta_Informations*.
 
 [[[caption:Hint|
 If a programmer wants his or her widgets to be reused,
@@ -783,8 +740,8 @@ The example *@ex_specify_layout* shows how to add an instance of ""MyWidget"" us
 !! Menus
 
 
-!! Where to find what I want
-@sec_where_to_find_what_I_want
+!! Meta Informations
+@sec_Meta_Informations
 
 %Spirita: The name of that section have confusing me when i have see it in the table of contents.
 
