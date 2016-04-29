@@ -129,5 +129,3 @@ emphasis: aTextEmphasis
 
 	self widgetDo: [ :w | w emphasis: aTextEmphasis ]
 ]]]
-
-

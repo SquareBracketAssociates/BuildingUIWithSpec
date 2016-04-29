@@ -20,7 +20,7 @@ ListModel new
 
 In this example, we are going to build a list containing icons of the current theme and their respective selector using a subclass of ListModel : IconListModel.
 
-[[[label=ex_icon_list|caption=Icons List|language=smalltalk|
+[[[label=ex_icon_list|caption=Icons List|language=Smalltalk|
 	| iconList |
 	iconList := IconListModel new.
 	iconList

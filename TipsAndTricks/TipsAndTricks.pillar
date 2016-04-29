@@ -2,19 +2,21 @@
 
 This chapter will present some little examples that may help you for building interfaces with Spec. 
 
-!! Create a non-editable text field
+!! Non-editable text field
 
-To create a non-editable text field you need to use ==TextInputFieldModel== and use ==#enabled:== as in the following code snippet:
-[[[language=Smalltalk|
-inputField := TextInputFieldModel new.
-inputField
-    enabled: false;
-    text: 'Hello Spec!'.
-inputField openWithSpec.
+To create a non-editable text field you need to use ==TextInputFieldModel== and use ==#enabled:== as in the following code snippet *ex_non_editable_textfield* :
+
+[[[label=ex_non_editable_textfield|caption=Non-Editable Textfield|language=Smalltalk|
+	| inputField |
+	inputField := TextInputFieldModel new.
+	inputField
+		enabled: false;
+		text: 'Hello Spec!'.
+	inputField openWithSpec
 ]]]
 
 
-!! Manage nested focus order
+!! Nested focus order
 
 Spec is made for composing and reusing widgets. When it is needed to create a new widget with two subwidget that are also composed of subwidgets there is a little trick to set up the focus correctly.
 
@@ -28,7 +30,7 @@ First we create a widget to hold two buttons:
 ComposableModel subclass: #TwoButtons
     instanceVariableNames: 'button1 button2'
     classVariableNames: ''
-    category: 'SpecBook'
+    package: 'SpecBook'
 ]]]
 
 Add the buttons to the focus order in ==#initializeWidgets== message:
@@ -82,7 +84,7 @@ The second widget simply hold a list.
 ComposableModel subclass: #AList
     instanceVariableNames: 'list'
     classVariableNames: ''
-    category: 'SpecBook'
+    package: 'SpecBook'
 ]]]
 
 Once again, ==list== is added to the focus order in ==#initializeWidgets==:
@@ -127,7 +129,7 @@ This third widget will hold the two we defined in the precedent sections.
 ComposableModel subclass: #SuperWidget
     instanceVariableNames: 'twoButtons aList'
     classVariableNames: ''
-    category: 'SpecBook'
+    package: 'SpecBook'
 ]]]
 
 Here is where the trick is made. To compose the focus correctly, you must add ==aList== to the focus order of ==twoButtons== and add ==twoButtons== to the focus order of ==aList==. By doing that, you ensure that the focus is managed correctly in ==SuperWidget==.
