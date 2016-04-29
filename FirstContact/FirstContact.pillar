@@ -43,6 +43,92 @@ In this example, we are going to build a list containing icons of the current th
 
 +A first widget with Spec.>file://figures/FirstExample.png|width=50|label=fig_first_example+
 
+!! ButtonModel and LabelModel
+
+In that example, we create a widget looking like a calculator with only three digits buttons and without operations.
+That example is a bit more complex and we have to create a class from which it will be instantiated. That class must be a subclass of ==ComposableModel==.
+
+[[[label=ex_speccalc_classcreation|caption=Creation of the class|language=Smalltalk|
+ComposableModel subclass: #SpecCalc
+	instanceVariableNames: 'calcScreen button0 button1 button2'
+	classVariableNames: ''
+	package: 'Specalc'
+]]]
+
+Basically, at the instance side of the class we will declare the widgets that we will be using, some aspects of these widgets like labels, actions, states, and the logic of the application and the glue between these widgets. On the other hand, at class side, we will set up the basic design of our GUI -how the widgets are laid out- and its title.
+
+Summarizing:
+- instance side: widget instantiation along with actions performed by these and application logic.
+- class side: widget layout i.e., how all our widgets will be laid out in a window.
+
+A subclass of ==ComposableModel== have responsibility to define the ==initializeWidgets== method and defaultSpec class method. In which we will instanciate buttons and the screen wiith methods provided by the superclass.
+Then, we define buttons with the label which will be display on them and the block to perform when they are acliked.
+Finally, its a good practice to define the focus order, it use for keyboard navigation.
+
+
+[[[label=ex_speccalc_initializewidgets|caption=code of Specalc>>initializeWidgets|language=Smalltalk|
+Specalc>>initializeWidgets
+	calcScreen := self newLabel.
+	button0 := self newButton.
+	button1 := self newButton.
+	button2 := self newButton.
+	button0
+		label: '0';
+		action: [ self addAtScreen: button0 label ].
+	button1
+		label: '1';
+		action: [ self addAtScreen: button1 label ].
+	button2
+		label: '2';
+		action: [ self addAtScreen: button2 label ].
+	self focusOrder
+		add: button0;
+		add: button1;
+		add: button2
+]]]
+
+We must create the accessors and the method ==Specalc>>addAtScreen:==, the methods ==asNumber asString== are used to remove not significant zeros. We set the label representing a screen with the concatenation between its previous label and the label of the button.
+
+[[[label=ex_speccalc_addatscreen|caption=code of Specalc>>addAtScreen:|language=Smalltalk|
+Specalc>>addAtScreen: aLabel
+	calcScreen label: (calcScreen label , aLabel) asNumber asString
+]]]
+
+In the following class side method ==defaultSpec==, the ==height:== is important to let enought place at the screen, note that accessor are used by their symbols.
+
+[[[label=ex_speccalc_defaultSpec|caption=code of Specalc class>>defaultSpec|language=Smalltalk|
+Specalc>>defaultSpec
+	<spec: #default>
+	^ SpecLayout composed
+		newRow: [ :row | row add: #calcScreen ];
+		newRow: [ :row | 
+			row
+				add: #button0;
+				add: #button1;
+				add: #button2 ]
+			height: 50;
+		yourself
+]]]
+
+The following ==title== method change the title of the window.
+
+[[[caption=code of Specalc class>>title|language=Smalltalk|
+Specalc>>title
+	^ 'SpecCalculator'
+]]]
+
+Now, executing the code
+
+[[[language=Smalltalk|
+SpecCalc new openWithSpec
+]]]
+
+and click the buttons : 0, 0, 1, 0, 2 should give the figure *fig_SpecCalc_FirstWidget*.
+
++First SpecCalc widget.>file://figures/SpecCalc_FirstWidget.png|width=50|label=fig_SpecCalc_FirstWidget+
+
+
+
 
 
 
