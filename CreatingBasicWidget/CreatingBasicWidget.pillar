@@ -51,7 +51,6 @@ For example, the code in *@ex_mutators* shows the methods for the example code i
 index
 	^index value
 
-"in protocol: protocol"
 index: anInteger
 	index value: anInteger
 
@@ -71,15 +70,14 @@ Each adapter can then convert this ''Spec'' message into a framework specific me
 For example, the method ==#filterWith:== sent by ""TreeModel"" via ==changed: with:== is implemented as shown in *@ex_filter_with* in MorphicTreeAdapter
 
 [[[label=ex_filter_with|caption=Implementation of MorphicTreeAdapter>>filterWith:|language=Smalltalk 
-filterWith: aFilter
-	
-	self widgetDo: [ :w || nodes |
-		nodes := w model rootNodes.
-		nodes do: [:r | r nodeModel updateAccordingTo: aFilter].
-	
-		self removeRootsSuchAs: [:n | (aFilter keepTreeNode: n) not and: [n isEmpty]].
-
-		self changed: #rootNodes ].
+MorphicTreeAdapter>>filterWith: aFilter
+	self
+		widgetDo: [ :w | 
+			| nodes |
+			nodes := w model rootNodes.
+			nodes do: [ :r | r nodeModel updateAccordingTo: aFilter ].
+			self removeRootsSuchAs: [ :n | (aFilter keepTreeNode: n) not and: [ n isEmpty ] ].
+			self changed: #rootNodes ].
 ]]]
 
 !! The Adapter
