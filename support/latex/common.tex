@@ -264,7 +264,8 @@
 \newcommand{\important}[1]{\begin{doublebox}#1\end{doublebox}}
 %=============================================================
 %:Section depth
-\setcounter{secnumdepth}{2}
+\setcounter{secnumdepth}{3}
+\renewcommand{\thechapter}{\Roman{chapter}}
 %% for this to happen start the file with
 %\ifx\wholebook\relax\else
 %\input{../common.tex}
@@ -305,7 +306,7 @@ Damien Pollet},
 	\setfoot[][][]{}{}{}}
 %=============================================================
 %:Title section setup and TOC numbering depth
-\setcounter{secnumdepth}{1}
+\setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{1}
 \titleformat{\part}[display]{\centering}{\huge\partname\ \thepart}{1em}{\Huge\textbf}[]
 \titleformat{\chapter}[display]{}{\huge\chaptertitlename\ \thechapter}{1em}{\Huge\raggedright\textbf}[]

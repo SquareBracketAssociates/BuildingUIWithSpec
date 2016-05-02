@@ -1,5 +1,7 @@
 ! Spec: a framework for describing user interfaces
 
+!! Introduction
+
 This document presents the Spec UI builder framework. ''Spec'' has been originally developed by B. Van Ryseghem based on an idea of S. Ducasse. It is now maintained by the community and the Pharo core team.
 Spec is based on the idea that UI building should support UI logic reuse. Spec is influenced by VisualWorks and Dolphin MVP in the sense that it recognizes the need for a Presenter or ApplicationModel class, in Spec called ComposableModel that manages the logic and the link between widgets and domain objects. Spec, following the tradition, uses ''value holders'', simple objects raising announcements when their values, often domain objects, change. 
 
@@ -7,21 +9,24 @@ In this documentation, originally written by B. Van Ryseghem and J. Fabry and no
 We will also provide an overview of the functionalities of ''Spec''.
 
 The structure of this document is as follows:
-First we give a short tutorial on how to define and reuse UIs with ''Spec''.
-Then the three axes that form the heart of ''Spec'' are explained. 
-In section four, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
-The next section presents the support for dynamic UIs in ''Spec''. 
-The sixth section is dedicated to the creation of new ''Spec'' basic widgets, and in section seven the core interpreter loop of ''Spec'' is outlined.
+- First, in section *@sec_reuse_spec*, we give a short tutorial on how to define and reuse UIs with ''Spec''.
+- Then, in section *@sec_heart_of_spec*, the three axes that form the heart of ''Spec'' are explained. 
+- In section *@sec_where_to_find_what_I_want*, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
+- The section *@sec_spec_the_dynamic* presents the support for dynamic UIs in ''Spec''. 
+- The section *@sec_basic_widget* is dedicated to the creation of new ''Spec'' basic widgets.
+- In section *@sec_spec_interpreter* the core interpreter loop of ''Spec'' is outlined.
 
 We thank Sean De Nigris for his editing support. The documentation is actively maintained. Suggestions for improvements are welcome via the Pharo mailing-list. We thank Peter Uhnak for the discussions and the code exploration that led to cleaning some aspects of Spec.
 
-!! Motivation 
+!!! Motivation 
 
 Writing user interfaces is notoriously a tedious task. It often requires time and a clear understanding of the separation of concerns between the logic of the model and the logic of the user interface. Indeed, many frameworks mix domain models with widget models.
 
 ''Spec'' is a framework for describing user interfaces.  It allows for the separation of concerns between the different parts of the user interface as expressed in the MVP pattern, on which it is inspired.
 ''Spec'' emphasizes the reuse of widgets as well as their customization.
  
+
+!!! Terminology
 
 To avoid possible misunderstandings due to confusion in terminology, we first define the following four terms, which will be used frequently:
 
@@ -34,22 +39,25 @@ To avoid possible misunderstandings due to confusion in terminology, we first de
 ;Basic widgets
 :low-level widgets like a list, a button, etc. They are not composed of other Spec widgets.
 
+%Spirita: It could be logical to put all before this line in a preface.
 
 !! Example one
 
 In this first example, we are going to build a list containing icons of the current theme and their respective selector.
 
-[[[language=smalltalk|
-iconList := IconListModel new.
-iconList
-    items: Smalltalk ui icons iconSelectors asSortedCollection;
-    displayBlock: [ :selector | selector asString ];
-    sortingBlock: [ :selectorA :selectorB | selectorA < selectorB ];
-    icons: [ :selector | Smalltalk ui icons perform: selector ];
-    title: 'Available icons for the current theme.'.
-                    
-iconList openWithSpec
+[[[label=ex_icon_list|caption=Icons List|language=smalltalk|
+	| iconList |
+	iconList := IconListModel new.
+	iconList
+		items: Smalltalk ui icons allIconNames asSortedCollection;
+		displayBlock: [ :selector | selector asString ];
+		sortingBlock: [ :selectorA :selectorB | selectorA < selectorB ];
+		icons: [ :each | Smalltalk ui icons iconNamed: each ];
+		title: 'Availiable icons for the current theme.'.
+	iconList openWithSpec
 ]]]
+
+%Spirita: The icons' API have changed with Pharo 5 (iconSelectors don't exists anymore)
 
 +A first widget with Spec.>file://figures/FirstExample.png|width=50|label=fig_first_example+
 
@@ -59,48 +67,46 @@ iconList openWithSpec
 This section introduces an example of how to define and reuse ''Spec'' user interfaces. The example UI that is built will serve to browse the 
 public API of all the basic widgets offered by ''Spec''. This API is further documented in Section *@sec_where_to_find_what_I_want*. In this section we do not detail the different parts of ''Spec'' yet,  for a more in-depth discussion on the heart of ''Spec''  we refer to Section *@sec_heart_of_spec*.
 
-The example is structured in four parts that will result in the browser shown in *@fig_protocol_browser*. 
+The example is structured in four parts that will result in the browser shown in figure *@fig_protocol_browser*.
 
-- First, a list UI named  ""WidgetClassList"" that is dedicated to render the subclasses of the ''AbstractWidgetModel'' class is created.
+- First, a list UI named  ""ModelList"" that is dedicated to render the subclasses of the ''AbstractWidgetModel'' class is created.
 - Second, a UI composed of a list and a label is defined and named ""ProtocolList"".
-- Third, a protocol viewer is defined by combining a ""WidgetClassList"" with two ""ProtocolList"" to browse the ''protocol'' and ''protocol-events'' methods.
--  Finally a protocol browser is made by reusing a protocol viewer and adding a text zone. 
+- Third, a protocol viewer is defined by combining a ""ModelList"" with two ""ProtocolList"" to browse the ''protocol'' and ''protocol-events'' methods.
+- Finally a protocol browser is made by reusing a protocol viewer and adding a text zone. 
 
 
 
 +A simple class browser composed of reusable elements.>file://figures/Protocol_Browser.png|width=80|label=fig_protocol_browser+
 
 
-!! Defining UI elements
+%!! Defining UI elements
+%Spirita: The structure is not logical if Defining UI elements is at that level.
 First we define the elements that compose the resulting browser. In the subsequent section we will add interaction between them. For example, what is happening when we select an element in the list.
 
 SD: we should show the intermediate results we will get.
 
-SD: we should get a better name than WidgetClassList: may be WidgetLists
-%SD: This WidgetClassList is confusing. It would be good to name it differently.
-
-!!! The WidgetClassList
+!!! The ModelList
 
 Creating a specific UI always starts with the subclassing of ""ComposableModel"".
 Each sub widget is stored into an instance variable of the newly created class.
-The snippet *@ex_model_list* shows the definition of this for the ==WidgetClassList== class.
+The snippet *@ex_model_list* shows the definition of this for the ==ModelList== class.
 
 
 
 
-[[[label=ex_model_list|caption=WidgetClassList definition|language=Smalltalk 
-ComposableModel subclass: #WidgetClassList
+[[[label=ex_model_list|caption=ModelList definition|language=Smalltalk 
+ComposableModel subclass: #ModelList
 	instanceVariableNames: 'list'
 	classVariableNames: ''
-	category: 'Spec-Examples'
+	package: 'Spec-Examples'
 ]]]
 
 The first required step then is to instantiate and define the sub widgets.
-This step is done in the method ==initializeWidgets== as shown in the code *@ex_WidgetClassList_initializeWidgets*. It creates the list and populates it with the required classes, in alphabetical order.
-More details on the use of the ==initializeWidgets== method are given in *@subsec_initializeWidgets*.
+This step is done in the method ==initializeWidgets== as shown in the code *@ex_ModelList_initializeWidgets*. It creates the list and populates it with the required classes, in alphabetical order.
+More details on the use of the ==initializeWidgets== method are given in Subsection *@subsec_initializeWidgets*.
 
-[[[label=ex_WidgetClassList_initializeWidgets|caption=Implementation of WidgetClassList>>#initializeWidgets|language=Smalltalk 
-WidgetClassList>>initializeWidgets
+[[[label=ex_ModelList_initializeWidgets|caption=Implementation of ModelList>>initializeWidgets|language=Smalltalk 
+ModelList>>initializeWidgets
 
 	list := self newList.
 	list items: (AbstractWidgetModel allSubclasses 
@@ -109,7 +115,7 @@ WidgetClassList>>initializeWidgets
 ]]]
 
 Note that ==newList== is a shortcut because lists are really used often. Its definition is the following one
-[[[caption=Implementation of newList>>#initializeWidgets|language=Smalltalk
+[[[caption=Implementation of newList>>initializeWidgets|language=Smalltalk
 ComposableModel>>newList
 	^ self instantiate: ListModel
 ]]]
@@ -119,12 +125,12 @@ ComposableModel>>newList
 
 
 The second required step is to define a layout, which is done on the class side.
-Since there is here only one sub widget, the layout is quite simple, as shown in the code in *@ex_WidgetClassList_layout*.
+Since there is here only one sub widget, the layout is quite simple, as shown in the code *@ex_ModelList_layout*.
 It simply returns a layout that contains only the list.
-More details on the use of this method are given in *@subsec_layout*.
+More details on the use of this method are given in Subsection *@subsec_layout*.
 
-[[[label=ex_WidgetClassList_layout|caption=WidgetClassList layout|language=Smalltalk 
-WidgetClassList class>>#defaultSpec
+[[[label=ex_ModelList_layout|caption=ModelList layout|language=Smalltalk 
+ModelList class>>defaultSpec
 	<spec: #default>
 	
 	^ SpecLayout composed
@@ -135,17 +141,17 @@ WidgetClassList class>>#defaultSpec
 Pay attention the argument, ==#list==, of the ==add:== message, refers to a method that we did not define yet and that should return the associated UI element (here a list). 
 
 
-The three last methods to define on WidgetClassList are a getter, a method to display the UI title and a method to register to list selection changes.
-The code *@ex_WidgetClassList_others* shows the implementation of these three methods and their protocols.
+The three last methods to define on ModelList are a getter, a method to display the UI title and a method to register to list selection changes.
+The code *@ex_ModelList_others* shows the implementation of these three methods and their protocols.
 
-[[[label=ex_WidgetClassList_others|caption=WidgetClassList other methods|language=Smalltalk 
-WidgetClassList>>list
+[[[label=ex_ModelList_others|caption=ModelList other methods|language=Smalltalk 
+ModelList>>list
 	^ list
 
-WidgetClassList>>title
+ModelList>>title
 	^ 'Widgets'
 
-WidgetClassList>>whenSelectedItemChanged: aBlock
+ModelList>>whenSelectedItemChanged: aBlock
 	list whenSelectedItemChanged: aBlock
 ]]]
 
@@ -153,10 +159,10 @@ Note that this ==whenSelectedItemChanged: aBlock== will probably be deprecated i
 can simply send the message to the list directly.
 
 The first UI is now done.
-The result can be seen by executing the following snippet of code: ==WidgetClassList new openWithSpec== as shown in Figure *@fig_protocol_browser*
+The result can be seen by executing the following snippet of code: ==ModelList new openWithSpec== as shown in figure *@fig_widget_list*
 
++The ModelList Element.>file://figures/List.png|width=50|label=fig_widget_list+
 
-+The Widget Classes List Element.>file://figures/List.png|width=50|label=fig_protocol_browser+
 
 
 
@@ -170,20 +176,20 @@ The class definition is similar to the code above, as can be seen in *@ex_protoc
 ComposableModel subclass: #ProtocolList
 	instanceVariableNames: 'label protocols'
 	classVariableNames: ''
-	category: 'Spec-Examples'
+	package: 'Spec-Examples'
 ]]]
 
-The ==initializeWidgets== method for this UI is quite similar to the method in WidgetClassList, as the code in *@ex_protocolList_init* shows.
+The ==initializeWidgets== method for this UI is quite similar to the method in ModelList, as the code in *@ex_protocolList_init* shows.
 
 [[[label=ex_protocolList_init|caption=ProtocolList implementation of initializeWidgets|language=Smalltalk 
 ProtocolList>>initializeWidgets
 
 	protocols := self newList.
-	label := self newLabel.
-	label text: 'Protocol'.
-	protocols	displayBlock: [ :m | m selector ].
+	label := self newLabel.	
+	label label: 'Protocol'.
 	self focusOrder add: protocols
 ]]]
+
 
 The layout method is quite different though.
 Now the sub widgets need to be placed more specifically than in the previous example.
@@ -240,32 +246,36 @@ the widgets is empty. This is normal since we did not initialize it.
 !!! The ProtocolViewer
 
 The third user interface is a composition of the two previous user interfaces.
-It is composed of a ""WidgetClassList"" and two ""ProtocolList"".
+It is composed of a ""ModelList"" and two ""ProtocolList"".
 When a model class is selected, the methods in the protocol ''protocol'' and in the protocol ''protocol-events'' are listed.
 
-The class has now three instance variables: ==models== to store the ""WidgetClassList"", ==protocols== to store the ""ProtocolList"" for the protocol ''protocol'', and ==events== to store the ""ProtocolList"" for protocol ''protocol-events''.
+The class has now three instance variables: ==models== to store the ""ModelList"", ==protocols== to store the ""ProtocolList"" for the protocol ''protocol'', and ==events== to store the ""ProtocolList"" for protocol ''protocol-events''.
 The code in *@ex_viewer_definition* shows the definition of the class ""ProtocolViewer"".
 
 [[[label=ex_viewer_definition|caption=ProtocolViewer definition|language=Smalltalk 
 ComposableModel subclass: #ProtocolViewer
 	instanceVariableNames: 'models protocols events'
 	classVariableNames: ''
-	category: 'Spec-Examples'
+	package: 'Spec-Examples'
 ]]]
 
 The ==initializeWidgets== method now uses a different way to initialize the sub-widgets of the UI. 
 This is because it does not use basic widgets but instead reuses the user interfaces we defined previously.
 The remainder of the method is quite similar to the previous implementation, as shown in the code in *@ex_viewer_initializeWidgets*.
 
-[[[label=ex_viewer_initializeWidgets|caption=Implementation of ProtocolViewer>>#initializeWidgets|language=Smalltalk 
+[[[label=ex_viewer_initializeWidgets|caption=Implementation of ProtocolViewer>>initializeWidgets|language=Smalltalk 
 ProtocolViewer>>initializeWidgets
 
-	models := self instantiate: WidgetClassList.
+	models := self instantiate: ModelList.
 	protocols := self instantiate: ProtocolList.
 	events := self instantiate: ProtocolList.
 	
-	protocols label: 'api'.
-	events label: 'api-events'.
+	protocols
+		label: 'api';
+		displayBlock: [ :m | m selector ].
+	events
+		label: 'api-events';
+		displayBlock: [ :m | m selector ].
 		
 	self focusOrder 
 		add: models;
@@ -299,15 +309,15 @@ More details on the ==initializePresenter== method are given in *@subsec_initial
 ProtocolViewer>>initializePresenter
 
 	models whenSelectedItemChanged: [ :class |
-		self resetProtocolSelection.
-		self resetEventSelection.
+		protocols resetSelection.
+		events resetSelection.
 		class
 			ifNil: [ 
 				protocols items: #().
 				events items: #() ]
 			ifNotNil: [ 
-				protocols items: (self methodsIn: class for: 'protocol').
-				events items: (self methodsIn: class for: 'protocol-events') ] ].
+				protocols items: (self methodsIn: class for: 'api').
+				events items: (self methodsIn: class for: 'api-events') ] ].
 	
 	protocols whenSelectedItemChanged: [ :method | method ifNotNil: [ self resetEventSelection ] ].
 	events whenSelectedItemChanged: [ :method | method ifNotNil: [ self resetProtocolSelection ] ].
@@ -351,22 +361,24 @@ Those methods are given in the code in *@ex_viewer_others*.
 
 As previously, the result can be seen by executing the following snippet of code: ==ProtocolViewer new openWithSpec==.
 
-!!! Protocol Editor
-@subsec_protocol_editor
++The ProtocolViewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
+
+!!! Protocol Browser
+@subsec_protocol_browser
 
 The last user interface reuses a ""ProtocolViewer"" with a different layout and adds a text zone to edit the source code of the selected method.
 The class definition can be seen in code in *@ex_browser_definition*.
 
 [[[label=ex_browser_definition|caption=ProtocolBrowser definition|language=Smalltalk 
-ComposableModel subclass: #ProtocolEditor
+ComposableModel subclass: #ProtocolBrowser
 	instanceVariableNames: 'viewer text'
 	classVariableNames: ''
-	category: 'Spec-Examples'
+	package: 'Spec-Examples'
 ]]]
 
 The ==initializeWidgets== implementation is shown in the code in *@ex_browser_initializeWidgets*.
 
-[[[label=ex_browser_initializeWidgets|caption=ProtocolEditor>>#initializeWidgets|language=Smalltalk 
+[[[label=ex_browser_initializeWidgets|caption=ProtocolBrowser>>initializeWidgets|language=Smalltalk 
 initializeWidgets
 
 	text := self newText.
@@ -406,7 +418,7 @@ When a method is seleted, the text zone updates its contents to show the source 
 The implementation of this method is detailled in the code in *@ex_browser_presenter*.
 
 [[[label=ex_browser_presenter|caption=ProtocolBrowser interactions|language=Smalltalk 
-ProtocolEditor>>initializePresenter
+ProtocolBrowser>>initializePresenter
 
 	viewer whenClassChanged: [ :class | text behavior: class ].
 	viewer whenProtocolChangedDo: [ :item | 
@@ -423,24 +435,25 @@ The other methods are two getters, a method to set the default size, and a metho
 Their implemenations are detailled in code *@ex_browser_others*.
 
 [[[label=ex_browser_others|caption=ProtocolBrowser remaining methods|language=Smalltalk
-	ProtocolEditor>>text
+	ProtocolBrowser>>text
 		^ text
 
-	ProtocolEditor>>viewer
+	ProtocolBrowser>>viewer
 		^ viewer
 
-	ProtocolEditor>>initialExtent
+	ProtocolBrowser>>initialExtent
 		^ 750@600
 	
-	ProtocolEditor>>title
+	ProtocolBrowser>>title
 		^ 'Protocols browser'
 ]]]
 
 This finishes the protocol browser.
 The final user interface can be opened with the following snippet: ==ProtocolBrowser new openWithSpec==.
-The result can be seen in figure *@fig_protocol_browser*.
+The result can be seen in figure *@fig_second_protocol_browser*.
+%spirita: an ancor named fig_protocol_browser already exists (its the same figure, give the same name create problems in reference).
 
-+Protocol Browser>file://figures/Protocol_Browser.png|width=50|label=fig_protocol_browser+
++The ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_second_protocol_browser+
 
 
 !!! Adding Menu and KeyBinding
@@ -588,7 +601,7 @@ To do this, instead of giving a symbol, an array with 2 symbols must
 be given.
 The first symbol identifies the UI being reused and the second the sub
 widget within this UI whose new layout position is being specified.
-We have seen an example of this reuse in *@subsec_protocol_editor*.
+We have seen an example of this reuse in *@subsec_protocol_browser*.
 
 As said above, multiple layouts can be described for the same user interface.
 In order to retrieve the correct method to apply, these methods need to be flagged with a pragma.
@@ -666,8 +679,7 @@ This example also shows the ==addSplitter== message, which adds a splitter betwe
 				 	add: #button7;
 					add: #button8;
 					add: #button9 
-			];
-	];
+			] ];
 	yourself
 ]]]
 
@@ -774,6 +786,8 @@ The example *@ex_specify_layout* shows how to add an instance of ""MyWidget"" us
 !! Where to find what I want
 @sec_where_to_find_what_I_want
 
+%Spirita: The name of that section have confusing me when i have see it in the table of contents.
+
 All the ''Spec'' models for basic widgets have an API that is explicitly documented through the use of pragmas.
 This section explains where to find the API of a model and meaning of the meta information that is attached to the API methods.
 
@@ -791,7 +805,7 @@ There are three types of public API methods: getters, setters and registration m
 The pragma for getters is always ==<api: #inspect>==.
 For example, the code in *@ex_api_getter* shows how the ''action''  method in ""ButtonModel"" is implemented.
 
-[[[label=ex_api_getter|caption=Implementation of ButtonModel>>#action|language=Smalltalk 
+[[[label=ex_api_getter|caption=Implementation of ButtonModel>>action|language=Smalltalk 
 action
 	<api: #inspect>
 	"get the block performed when the button is clicked"
@@ -821,7 +835,7 @@ The possible types are as follows:
 
 For example, the code in *@ex_api_setter* shows how ''actions:'' is implemented in ""ButtonModel"".
 
-[[[label=ex_api_setter|caption=Implementation of ButtonModel>>#action:|language=Smalltalk 
+[[[label=ex_api_setter|caption=Implementation of ButtonModel>>action:|language=Smalltalk 
 action: aBlock
 	<api: #block getter: #getAction registration: #whenActionChangedDo:>
 	"set the block performed when the button is clicked"
@@ -834,7 +848,7 @@ action: aBlock
 The pragma for registration methods information is always ''<api: #event>''.
 For example, the code in *@ex_api_registration* shows how the method ''whenActionChangedDo:'' is implemented in ""ButtonModel"".
 
-[[[label=ex_api_registration|caption=Implementation of ButtonModel>>#whenActionChangedDo|language=Smalltalk 
+[[[label=ex_api_registration|caption=Implementation of ButtonModel>>whenActionChangedDo|language=Smalltalk 
 whenActionChangedDo: aBlock 
 	<api: #event>
 	"Set the block performed when the action to perform is changed"
@@ -849,7 +863,7 @@ behavior of the widget.
 The pragma for these methods is ''<api: #do>''.
 For example,  *@ex_resetSelection* shows how ''resetSelection'' is implemented in ""ListModel"".
 
-[[[label=ex_resetSelection|caption=Implementation of ListModel>>#resetSelection|language=Smalltalk
+[[[label=ex_resetSelection|caption=Implementation of ListModel>>resetSelection|language=Smalltalk
 resetSelection
 	<api: #do>
 	"Unselect every items"
@@ -1097,6 +1111,7 @@ The final result looks like the Figure *@ex_browser*.
 
 +Prototype of Protocol Browser>file://figures/Dyn_Protocol_Browser.png|width=50|label=ex_browser+
 !! Creating new basic widgets
+@sec_basic_widget
 
 ''Spec'' provides for a large amount and wide variety of basic widgets. 
 In the rare case that a basic widget is missing, the ''Spec'' framework will need to be extended to add this new widget.
@@ -1167,7 +1182,7 @@ The message ==changed: with: == is used to send the message ''selector'' with th
 Each adapter can then convert this ''Spec'' message into a framework specific message. 
 For example, the method ==#filterWith:== sent by ""TreeModel"" via ==changed: with:== is implemented as shown in *@ex_filter_with* in MorphicTreeAdapter
 
-[[[label=ex_filter_with|caption=Implementation of MorphicTreeAdapter>>#filterWith:|language=Smalltalk 
+[[[label=ex_filter_with|caption=Implementation of MorphicTreeAdapter>>filterWith:|language=Smalltalk 
 filterWith: aFilter
 	
 	self widgetDo: [ :w || nodes |
@@ -1235,10 +1250,10 @@ This allows for the same model to be used with several UI frameworks.
 Adding the new adapter to the default binding is quite simple.
 It requires to update two methods: ==initializeBindings== in ""SpecAdapterBindings"" and ==initializeBindings== in the framework specific adapter class, e.g. ""MorphicAdapterBindings"" for Morphic.
 
-The method ==SpecAdapterBindings>>#initializeBindings== is present only to expose the whole set of adapters required.
+The method ==SpecAdapterBindings>>initializeBindings== is present only to expose the whole set of adapters required.
 It fills a dictionary, as shown in the code *@ex_adapter_init*.
 
-[[[label=ex_adapter_init|caption=Implementation of SpecAdapterBindings>>#initializeBindings|language=Smalltalk 
+[[[label=ex_adapter_init|caption=Implementation of SpecAdapterBindings>>initializeBindings|language=Smalltalk 
 initializeBindings
 	"This implementation is stupid, but it exposes all the containers which need to be bound"
 	
@@ -1327,7 +1342,7 @@ In order to create a framework specific UI element a ''Spec'' model is interpret
 The interpreter is in charge of recursively interpreting all the sub widgets of a model.
 It then combines them, according to the given layout and the given binding.
 
-The interpreter entry point is the method ==SpecInterpreter>>#interpretASpec:selector:==.
+The interpreter entry point is the method ==SpecInterpreter>>interpretASpec:selector:==.
 
 This section will explain the two main parts of the interpretation of a model: data collection and the interpretation loop.
 In addition, the flow diagram *@fig_flow_diagram* outlines the different steps of the process and their relationships.
