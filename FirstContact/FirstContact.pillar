@@ -1,4 +1,5 @@
 ! First Contact by examples
+@chap_first_contact
 
 !! ListModel
 
@@ -61,7 +62,7 @@ Summarizing:
 - instance side: widget instantiation along with actions performed by these and application logic.
 - class side: widget layout i.e., how all our widgets will be laid out in a window.
 
-A subclass of ==ComposableModel== have responsibility to define the ==initializeWidgets== method and defaultSpec class method. In which we will instanciate buttons and the screen wiith methods provided by the superclass.
+A subclass of ==ComposableModel== have responsibility to define the ==initializeWidgets== method and defaultSpec class method. In which we will instanciate buttons and the screen with methods provided by the superclass.
 Then, we define buttons with the label which will be display on them and the block to perform when they are acliked.
 Finally, its a good practice to define the focus order, it use for keyboard navigation.
 
@@ -94,7 +95,7 @@ Specalc>>addAtScreen: aLabel
 	calcScreen label: (calcScreen label , aLabel) asNumber asString
 ]]]
 
-In the following class side method ==defaultSpec==, the ==height:== is important to let enought place at the screen, note that accessor are used by their symbols.
+In the following class side method ==defaultSpec==, the ==height:== is important to let enought place at the screen. Pay attention the argument of the ==add:== message are accessors refered by their symbols.
 
 [[[label=ex_speccalc_defaultSpec|caption=code of Specalc class>>defaultSpec|language=Smalltalk|
 Specalc>>defaultSpec
@@ -128,49 +129,39 @@ and click the buttons : 0, 0, 1, 0, 2 should give the figure *fig_SpecCalc_First
 +First SpecCalc widget.>file://figures/SpecCalc_FirstWidget.png|width=50|label=fig_SpecCalc_FirstWidget+
 
 
+!!! Shortcut Instanciation
+
+The superclass ==ComposableModel== provides shorcut methods for the most used basics widget.
+ Its definition for ==newList== is the following one :
+
+[[[caption=Implementation of ComposableModel>>newList|language=Smalltalk
+ComposableModel>>newList
+	^ self instantiate: ListModel
+]]]
 
 
 
+% ******************************************************************
 
-!! Reusing UI Element
+
+!! Reusing Elements
 @sec_reuse_spec
 
-% Spirita : ModelList is confusing with ListModel, may it should be renamed WidgetList (SD's suggestion)
-
-
-This section introduces an example of how to define and reuse ''Spec'' user interfaces. The example UI that is built will serve to browse the public API of all the basic widgets offered by ''Spec''. This API is further documented in Section *@sec_Meta_Informations*. In this section we do not detail the different parts of ''Spec'' yet,  for a more in-depth discussion on the heart of ''Spec''  we refer to Section *@sec_heart_of_spec*.
-
-The example is structured in four parts that will result in the browser shown in figure *@fig_protocol_browser*.
-
-- First, a ""WidgetList"" : a list UI dedicated to render the subclasses of the ''AbstractWidgetModel'' class.
-- Second, a ""ProtocolList"" : an UI composed of a list and a label.
-- Third, a ""ProtocolViewer"" : defined by combining a ""WidgetList"" with two ""ProtocolList"" to browse the ''api'' and ''api-events'' methods.
-- Finally, a ""ProtocolBrowser"" is made by reusing a ""ProtocolViewer"" and adding a text zone. 
+The following example show how build complex applications by reusing existing widget and managed their interactions. It's structured in four parts that will result in the browser shown in figure *@fig_protocol_browser*.
 
 +A simple class browser composed of reusable elements.>file://figures/Protocol_Browser.png|width=80|label=fig_protocol_browser+
 
+- First, the ""WidgetList"" : a widget dedicated to render ==ListModel==.
+- Second, the ""ProtocolList"" : a widget composed of a ==ListModel== and a ==LabelModel==.
+- Third, the ""ProtocolViewer"" : defined by combining a ==WidgetList== with two ==ProtocolList==, it will browse the methods in protocols named ''api'' and ''api-events''.
+- Finally, the ""ProtocolBrowser"" : reuse a ==ProtocolViewer== and adding a ==TextModel==. 
 
-
-
-
-
-
-
-
-First we define the elements that compose the resulting browser. In the subsequent section we will add interaction between them. For example, what is happening when we select an element in the list.
-
-SD: we should show the intermediate results we will get.
 
 !!! The WidgetList
 
-Creating a specific UI always starts with the subclassing of ""ComposableModel"".
-Each sub widget is stored into an instance variable of the newly created class.
-The snippet *@ex_widget_list* shows the definition of this for the ==WidgetList== class.
+The snippet *@ex_widgetlist_classcreation* shows the definition of this for the ==WidgetList== class.
 
-
-
-
-[[[label=ex_widget_list|caption=WidgetList definition|language=Smalltalk 
+[[[label=ex_widgetlist_classcreation|caption=WidgetList definition|language=Smalltalk 
 ComposableModel subclass: #WidgetList
 	instanceVariableNames: 'list'
 	classVariableNames: ''
@@ -190,11 +181,7 @@ WidgetList>>initializeWidgets
 	self focusOrder add: list
 ]]]
 
-Note that ==newList== is a shortcut because lists are really used often. Its definition is the following one
-[[[caption=Implementation of newList>>initializeWidgets|language=Smalltalk
-ComposableModel>>newList
-	^ self instantiate: ListModel
-]]]
+
 
 
 

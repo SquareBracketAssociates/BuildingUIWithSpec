@@ -19,7 +19,6 @@ The structure of this document is as follows:
 - In section *@sec_Meta_Informations*, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
 - The section *@sec_spec_the_dynamic* presents the support for dynamic UIs in ''Spec''. 
 - The section *@sec_basic_widget* is dedicated to the creation of new ''Spec'' basic widgets.
-- In section *@sec_spec_interpreter* the core interpreter loop of ''Spec'' is outlined.
 
 
 !! Motivation 
@@ -39,7 +38,7 @@ To avoid possible misunderstandings due to confusion in terminology, we first de
 ;UI Model
 :an object that contains the state and behavior of one or several UI elements.
 ;Widget
-:the union of a UI Element and its UI model.
+:the union of a UI Element and its UI model. They are subclass of ==ComposableModel==.
 ;Basic widgets
-:low-level widgets like a list, a button, etc. They are not composed of other Spec widgets.
+:low-level widgets like a list, a button, etc. They are subclass of ==AbstractWidgetModel== and not composed of other Spec widgets.
 
