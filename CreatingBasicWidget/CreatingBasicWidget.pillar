@@ -1,0 +1,129 @@
+! Creating new basic widgets
+@sec_basic_widget
+
+''Spec'' provides for a large amount and wide variety of basic widgets. 
+In the rare case that a basic widget is missing, the ''Spec'' framework will need to be extended to add this new widget.
+In this section we will explain how to create such a new basic widget.
+
+We will first explain the applicable part of how the widget build process is performed.
+This will reveal the different actors in the process and provide a clearer understanding of their responsibilities.
+We then present the three steps of widget creation: writing a new model, writing an adapter, and updating or creating an individual UI framework binding.
+
+!! One step in the building process of a widget
+
+The UI building process does not make a distinction between basic and composed widgets.
+At a specific point in the building process of a basic widget the default spec method of the widget is called, just as if it would be a composed widget.
+However in this case, instead of providing a layout for multiple widgets that comprise the UI, this method builds an adapter to the underlying UI framework.
+Depending of the underlying UI framework that is currently used, this method can provide different kind of adapters, for example an adapter for Morphic, or an adapter for Seaside, etc.
+
+The adapter, when instantiated by the UI model, will in turn instantiate a widget that is specific to the UI framework being used.
+
+For example, when using a List in the Morphic UI, the adaptor will be a MorphicListAdapter and it will contain a PluggableListMorph.
+This is this framework-specific widget that will be added to the widget container.
+
+Figure *@model_adapter_uielement* shows the relationship between those objects.
+
++Relationship between the model, the adapter, and the UI element>file://figures/Model-Adapter-UIElement.png|width=50|label=model_adapter_uielement+
+
+!! The Model
+
+The new model needs to be a subclass of ""AbstractWidgetModel"" and its name should be composed of the new basic widget concept, e.g. list or button, and of the word ''Model''.
+The responsibility of the model is to store all the state of the widget.
+Examples of widget-specific state are:
+- the index of a list
+- the label of a button
+- the action block for when a text is validated in a text field
+
+The state is wrapped in value holders and kept in instance variables.
+For example, the code in *@ex_value_holder* shows how to wrap the state ==0== in a value holder and keep it as an instance variable.
+Value holders are needed because they are later used to propagate state changes and thus create the interaction flow of the user interface, as discussed in Section *@sec_heart_of_spec*.
+
+[[[label=ex_value_holder|caption=Storing state wrapped in a Value Holder in an instance variable|language=Smalltalk 
+index := 0 asValueHolder.
+]]]
+
+For each instance variable that holds state three methods should be defined: the getter, the setter, and the registration method.
+The first two should be classified in the protocol named ''protocol'' while the registration method should be in ''protocol-events''.
+For example, the code in *@ex_mutators* shows the methods for the example code in *@ex_value_holder*. 
+
+[[[label=ex_mutators|caption=Example of mutators for index|language=Smalltalk 
+"in protocol: protocol"
+index
+	^index value
+
+index: anInteger
+	index value: anInteger
+
+"in protocol: protocol-events"
+whenIndexChanged: aBlock
+	index whenChangedDo: aBlock
+]]]
+
+The last step to define a new model is to implement a method ==adapterName== on the class side.
+The method should be in the protocol named ''spec'' and should return a symbol.
+The symbol should be composed of the basic concept of the widget, e.g. list or button, and the word ''Adapter'', like ""ListAdapter"".
+
+The communication from the UI model to the adapter is performed using the dependents mechanism.
+This mechanism is used to to handle the fact that a same model can have multiple UI elements concurrently displayed.
+The message ==changed: with: == is used to send the message ''selector'' with the arguments ''aCollection'' to the adapters.
+Each adapter can then convert this ''Spec'' message into a framework specific message. 
+For example, the method ==#filterWith:== sent by ""TreeModel"" via ==changed: with:== is implemented as shown in *@ex_filter_with* in MorphicTreeAdapter
+
+[[[label=ex_filter_with|caption=Implementation of MorphicTreeAdapter>>filterWith:|language=Smalltalk 
+MorphicTreeAdapter>>filterWith: aFilter
+	self
+		widgetDo: [ :w | 
+			| nodes |
+			nodes := w model rootNodes.
+			nodes do: [ :r | r nodeModel updateAccordingTo: aFilter ].
+			self removeRootsSuchAs: [ :n | (aFilter keepTreeNode: n) not and: [ n isEmpty ] ].
+			self changed: #rootNodes ].
+]]]
+
+!! The Adapter
+
+An adapter must be a subclass of ""AbstractAdapter"".
+The adapter name should be composed of the UI framework name, e.g. Morphic, and the name of the adapter it is implementing, e.g. ListAdapter.
+The adapter is an object used to connect a UI framework specific element to the framework independent model.
+
+The only mandatory method for an adapter is ==defaultSpec== on the class side.
+This method has the responsibility to instantiate the corresponding UI element.
+
+The example *@ex_adapter_instanciation* shows how ""MorphicButtonAdapter"" instantiates its UI element.
+
+[[[label=ex_adapter_instanciation|caption=How ""MorphicButtonAdapter"" instantiates its UI element|language=Smalltalk 
+defaultSpec
+	<spec>
+	
+	^ #(PluggableButtonMorph
+			#color:								#(model color)
+	    	#on:getState:action:label:menu: 	#model #state #action #label nil
+			#getEnabledSelector: 				#enabled
+			#getMenuSelector:					#menu:
+			#hResizing: 						#spaceFill
+			#vResizing: 						#spaceFill
+			#borderWidth:						#(model borderWidth)
+			#borderColor:						#(model borderColor)
+			#askBeforeChanging:					#(model askBeforeChanging)
+			#setBalloonText:					#(model help)
+			#dragEnabled:						#(model dragEnabled)
+			#dropEnabled:						#(model dropEnabled)	
+			#eventHandler:						#(EventHandler on:send:to: keyStroke keyStroke:fromMorph: model))
+]]]
+
+Since the adapter is bridging the gap between the element of the UI framework and the model, the adapter also needs to forward the queries from the UI element to the model.
+Seen from the other way around: since the model is holding the state, the adapter is used to update the UI element state of the model.
+
+The methods involved in the communication from the model to the adapter as well as the methods involved in the communication from the adapter to the UI model should be in the protocol ''spec protocol''.
+On the other hand the methods involved in the communication from the adapter to the UI element and vice versa should be categorized in the protocol ''widget API''.
+
+To communicate with the UI element, the adapter methods use the method ==widgetDo:==.
+This method executes the block provided as argument, which will only happen after the UI element has already been created.
+
+The example *@ex_emphasis* shows how ""MorphicLabelAdapter"" propagates the modification of the emphasis from the adapter to the UI element.
+
+[[[label=ex_emphasis|caption=How MorphicLabelAdapter propagates the emphasis changes|language=Smalltalk 
+emphasis: aTextEmphasis
+
+	self widgetDo: [ :w | w emphasis: aTextEmphasis ]
+]]]

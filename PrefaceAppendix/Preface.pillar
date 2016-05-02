@@ -1,0 +1,44 @@
+! Spec: a framework for describing user interfaces
+
+!! Introduction
+
+This document presents the Spec UI builder framework. ''Spec'' has been originally developed by B. Van Ryseghem based on an idea of S. Ducasse. It is now maintained by the community and the Pharo core team.
+Spec is based on the idea that UI building should support UI logic reuse. Spec is influenced by VisualWorks and Dolphin MVP in the sense that it recognizes the need for a Presenter or ApplicationModel class, in Spec called ComposableModel that manages the logic and the link between widgets and domain objects. Spec, following the tradition, uses ''value holders'', simple objects raising announcements when their values, often domain objects, change. 
+
+In this documentation, originally written by B. Van Ryseghem and J. Fabry and now maintained and massively updated by S. Ducasse and J. Fabry we will teach you how to use Spec through several examples.  We will show how to reuse a UI logic and its elements.  
+We will also provide an overview of the functionalities of ''Spec''.
+
+We thank Sean De Nigris for his editing support. The documentation is actively maintained. Suggestions for improvements are welcome via the Pharo mailing-list. We thank Peter Uhnak for the discussions and the code exploration that led to cleaning some aspects of Spec.
+
+
+!! Structure
+
+The structure of this document is as follows:
+- First, in section *@sec_reuse_spec*, we give a short tutorial on how to define and reuse UIs with ''Spec''.
+- Then, in section *@sec_heart_of_spec*, the three axes that form the heart of ''Spec'' are explained. 
+- In section *@sec_Meta_Informations*, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
+- The section *@sec_spec_the_dynamic* presents the support for dynamic UIs in ''Spec''. 
+- The section *@sec_basic_widget* is dedicated to the creation of new ''Spec'' basic widgets.
+
+
+!! Motivation 
+
+Writing user interfaces is notoriously a tedious task. It often requires time and a clear understanding of the separation of concerns between the logic of the model and the logic of the user interface. Indeed, many frameworks mix domain models with widget models.
+
+''Spec'' is a framework for describing user interfaces.  It allows for the separation of concerns between the different parts of the user interface as expressed in the MVP pattern, on which it is inspired.
+''Spec'' emphasizes the reuse of widgets as well as their customization.
+ 
+
+!! Terminology
+
+To avoid possible misunderstandings due to confusion in terminology, we first define the following four terms, which will be used frequently:
+
+;UI Element
+:an interactive graphical element displayed as part of the graphical user interface.
+;UI Model
+:an object that contains the state and behavior of one or several UI elements.
+;Widget
+:the union of a UI Element and its UI model. They are subclass of ==ComposableModel==.
+;Basic widgets
+:low-level widgets like a list, a button, etc. They are subclass of ==AbstractWidgetModel== and not composed of other Spec widgets.
+
