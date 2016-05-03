@@ -1,5 +1,5 @@
-!! The heart of Spec
-@sec_heart_of_spec
+!Deeper into Spec
+@cha_heart_of_spec
 
 All user interfaces in ''Spec'' are constructed through the composition of existing user interfaces.
 To define a user interface, it is sufficient to define the model of the user interface.
@@ -13,7 +13,7 @@ It is built around three axes that materialize themselves as the following three
 These methods are hence typically found in the model for each user interface.
 In this section we describe the responsibility for each method, i.e. how these three work together to build the overall UI.
 
-!!! the ''initializeWidgets'' method 
+!! the ''initializeWidgets'' method 
 @subsec_initializeWidgets
 
 This method is used to instantiate the models for the different widgets that will be part of the UI and store them in their respective instance variables.
@@ -54,7 +54,7 @@ initializeWidgets
 Specifying this method is mandatory, as without it the UI would have no widgets.
 ]]]
 
-!!!! Widget instantiation
+!!! Widget instantiation
 
 The instantiation of the model for a widget (and hence the widget) can be done in two ways: through the use of an creation method or through the use of the ==instantiate:== method.
 Considering the first option, the framework provides unary messages for the creation of all basic widgets.
@@ -63,7 +63,7 @@ The complete list of available widget creation methods can be found in the class
 Considering the second option, to reuse any composite widgets, i.e. a subclass of ''ComposableModel'', the widget needs to be initialized using the ==instantiate:== method.
 For example, to reuse a ''MessageBrowser''  widget, the code is == self instantiate: MessageBrowser.==
 
-!!! The ''initializePresenter'' method
+!! The ''initializePresenter'' method
 @subsec_initializePresenter
 
 This method takes care of the interactions between the different widgets.
@@ -316,7 +316,26 @@ The example *@ex_specify_layout* shows how to add an instance of ""MyWidget"" us
 !! Menus
 
 
-!! Meta Informations
+
+
+
+@todo check with peter
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+!! Meta Informations (to be probably removed)
 @sec_Meta_Informations
 
 %Spirita: The name of that section have confusing me when i have see it in the table of contents.

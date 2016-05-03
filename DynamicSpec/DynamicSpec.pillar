@@ -1,4 +1,4 @@
-!! Dynamic Spec
+! Dynamic Spec (to be redesigned in presence of the next chapter)
 @sec_spec_the_dynamic
 
 Having an user interface with a well known number of sub widgets and a static layout is not always sufficient. 
@@ -79,6 +79,8 @@ The first example explains how to design by prototyping a user interface.
 The second example introduces the composition of dynamic models.
 
 !!!! Designing a pop up
+
+@@todo is it here for real? may be should be move to basic examples and here we keep the explanation for the dynamic part. 
 
 This example shows how to easily and quickly design a popup window asking for an input.
 

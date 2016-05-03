@@ -2,6 +2,18 @@
 - rename preface into intro/motivation
 - update structure
 - Motivation is a bit short and not really a nice section. 
+- ModelList  should be renamed in Pharo WidgetClassList
+
+- We should add a section on how to find example in the image: in Chapter two. 
+-- ComposableModel subclasses
+
+
+- add DialogModel
+-- open any spec model in modal : openWithDialogSpec: 
+
+--initialExtent should be put into (do not forget to say that this is only for window)
+
+- revisit the examples
 
 
 ! Spec: a framework for describing user interfaces
@@ -23,24 +35,6 @@ We will also provide an overview of the functionalities of ''Spec''.
 We thank Sean De Nigris for his editing support. The documentation is actively maintained. Suggestions for improvements are welcome via the Pharo mailing-list. We thank Peter Uhnak for the discussions and the code exploration that led to cleaning some aspects of Spec.
 
 
-!! Structure
-
-The structure of this document is as follows:
-- First, in section *@sec_reuse_spec*, we give a short tutorial on how to define and reuse UIs with ''Spec''.
-- Then, in section *@sec_heart_of_spec*, the three axes that form the heart of ''Spec'' are explained. 
-- In section *@sec_Meta_Informations*, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
-- The section *@sec_spec_the_dynamic* presents the support for dynamic UIs in ''Spec''. 
-- The section *@sec_basic_widget* is dedicated to the creation of new ''Spec'' basic widgets.
-
-
-!! Motivation 
-
-Writing user interfaces is notoriously a tedious task. It often requires time and a clear understanding of the separation of concerns between the logic of the model and the logic of the user interface. Indeed, many frameworks mix domain models with widget models.
-
-''Spec'' is a framework for describing user interfaces.  It allows for the separation of concerns between the different parts of the user interface as expressed in the MVP pattern, on which it is inspired.
-''Spec'' emphasizes the reuse of widgets as well as their customization.
- 
-
 !! Terminology
 
 To avoid possible misunderstandings due to confusion in terminology, we first define the following four terms, which will be used frequently:
@@ -54,3 +48,30 @@ To avoid possible misunderstandings due to confusion in terminology, we first de
 ;Basic widgets
 :low-level widgets like a list, a button, etc. They are subclass of ==AbstractWidgetModel== and not composed of other Spec widgets.
 
+
+!! Motivation: Supporting Interaction Reuse
+
+Writing user interfaces is notoriously a tedious task. It often requires time and a clear understanding of the separation of concerns between the logic of the model and the logic of the user interface. Indeed, many frameworks mix domain models with widget models.
+
+''Spec'' is a framework for describing user interfaces.  It allows for the separation of concerns between the different parts of the user interface as expressed in the MVP pattern, on which it is inspired.
+''Spec'' emphasizes the reuse of widgets as well as their customization.
+ 
+
+
+@@todo show that the logic can be reused in two different UI elements
+
+@@todo show that a UI can be shaped differently
+
+
+
+
+
+
+!! Structure of the document
+
+The structure of this document is as follows:
+- First, in section *@sec_reuse_spec*, we give a short tutorial on how to define and reuse UIs with ''Spec''.
+- Then, in section *@sec_heart_of_spec*, the three axes that form the heart of ''Spec'' are explained. 
+- In section *@sec_Meta_Informations*, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
+- The section *@sec_spec_the_dynamic* presents the support for dynamic UIs in ''Spec''. 
+- The section *@sec_basic_widget* is dedicated to the creation of new ''Spec'' basic widgets.
