@@ -1,5 +1,5 @@
 ! Spec Internals
-@cha_basic_widget
+@cha_spec_internals
 
 Normal user should not have to read this chapter. ''Spec'' provides for a large amount and wide variety of basic widgets. 
 In the rare case that a basic widget is missing, the ''Spec'' framework will need to be extended to add this new widget.
