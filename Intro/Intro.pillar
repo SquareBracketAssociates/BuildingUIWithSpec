@@ -1,10 +1,10 @@
 ! Todo
-- rename preface into intro/motivation
+- (done) rename preface into intro/motivation
 - update structure
 - Motivation is a bit short and not really a nice section. 
-- ModelList  should be renamed in Pharo WidgetClassList
+- ModelList should be renamed in Pharo WidgetClassList
 
-- We should add a section on how to find example in the image: in Chapter two. 
+- (in progress) We should add a section on how to find example in the image: in Chapter two. 
 -- ComposableModel subclasses
 
 

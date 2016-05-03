@@ -1,6 +1,7 @@
 ! First Contact With Examples
 @cha_first_contact
 
+
 This chapter presents Spec over a list of examples that highlight some characteristics of Spec. 
 It will guide you through examples of increasing complexity. 
 
@@ -73,7 +74,7 @@ Note that the interest of having such methods is unclear and can be revisited in
 
 !! ButtonModel and LabelModel
 
-This example show a create a widget and how to control basically the window and the layout used for the render.
+This example show a create a widget and how to basically control the window and the layout used for the render.
 
 !!! Create the widget
 
@@ -151,6 +152,10 @@ SpecHappy >> defaultSpec
 		yourself
 ]]]
 
+!!! The methods to control the window
+
+!!!! The ==title== method
+
 Overide the ==title== method in the subclass change the title of the window, like the call at the ==title:== method.
 
 [[[caption=code of SpecHappy class >> title|language=Smalltalk|
@@ -158,7 +163,9 @@ SpecHappy>>title
 	^ 'Customers satisfaction'
 ]]]
 
-!!! The methods to open the window
+!!!! The methods to open the Window
+
+@@todo may give more informations about modal
 
 ==ComposableModel== provides methods to open a window containing a widget.
 ==openWithSpec== is the most basic.
@@ -178,6 +185,11 @@ SpecHappy new openDialogWithSpec
 ]]]
 
 +SpecHappy widget in a Dialog.>file://figures/Customers_Dialog.png|width=50|label=fig_Customers_Dialog+
+
+
+!!!! The ==initialExtent== method
+
+@@todo explain the use of initialExtent
 
 !!! Declaring a Different Layout
 
@@ -205,6 +217,23 @@ SpecHappy new openWithSpec: #layout
 
 +New Layout for SpecHappy widget.>file://figures/Customers_NewLayout.png|width=50|label=fig_Customers_NewLayout+
 
+
+!! Found more Examples
+
+@@todo fill it (eventually revisit it)
+
+For the moment (and the writting) there are example in :
+- Package Spec-Examples
+- Help -> Spec -> Examples -> More Examples (link at the package)
+- BuildingUIWithSpec/material/nameOfExample (extract from a previous version to be revisited)
+- In BuildingUIWithSpec/material/Spec/SpecMaterial/ (M. Mrs)
+- on StephanEggermont's repot (Ancestry and SpecGenerator)
+- on the website http://spec.st/docs/home/ (drag 'n drop)
+- on Spirita's sandbox
+- AbstractWidgetModel subclasses (most part are in Spec-core widget) provide sometimes examples in their class side
+- idem with ComposableModel subclasses in Spec-PolyWidgets
+
 @@todo add textfield and may be some other widgets
 
 @@todo little example with radio button M. Mrs .. and inputfield
+
