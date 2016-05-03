@@ -1,5 +1,5 @@
 ! Reusing Elements
-@cha_reuse_spec
+@cha_reuse
 
 
 In this chapter we will show the power of Spec at work. We will reuse Spec elements in different little applications.
@@ -16,6 +16,7 @@ The following example shows how build complex applications by reusing existing w
 
 
 !! The WidgetList
+@sec_widgetlist
 
 The snippet *@ex_widgetlist_classcreation* shows the definition of this for the ==WidgetList== class.
 
@@ -28,7 +29,7 @@ ComposableModel subclass: #WidgetList
 
 The first required step then is to instantiate and define the sub widgets.
 This step is done in the method ==initializeWidgets== as shown in the code *@ex_WidgetList_initializeWidgets*. It creates the list and populates it with the required classes, in alphabetical order.
-More details on the use of the ==initializeWidgets== method are given in Subsection *@subsec_initializeWidgets*.
+More details on the use of the ==initializeWidgets== method are given in Section *@sec_initializeWidgets*.
 
 [[[label=ex_WidgetList_initializeWidgets|caption=Implementation of WidgetList>>initializeWidgets|language=Smalltalk 
 WidgetList>>initializeWidgets
@@ -40,15 +41,10 @@ WidgetList>>initializeWidgets
 ]]]
 
 
-
-
-
-
-
 The second required step is to define a layout, which is done on the class side.
 Since there is here only one sub widget, the layout is quite simple, as shown in the code *@ex_WidgetList_layout*.
 It simply returns a layout that contains only the list.
-More details on the use of this method are given in Subsection *@subsec_layout*.
+More details on the use of this method are given in Section *@sec_layout*.
 
 [[[label=ex_WidgetList_layout|caption=WidgetList layout|language=Smalltalk 
 WidgetList class>>defaultSpec
@@ -80,14 +76,15 @@ Note that this ==whenSelectedItemChanged: aBlock== will probably be deprecated i
 can simply send the message to the list directly.
 
 The first UI is now done.
-The result can be seen by executing the following snippet of code: ==WidgetList new openWithSpec== as shown in figure *@fig_widget_list*
+The result can be seen by executing the following snippet of code: ==WidgetList new openWithSpec== as shown in figure *@fig_WidgetList*
 
-+The WidgetList Element.>file://figures/List.png|width=50|label=fig_widget_list+
-
-
++The WidgetList Element.>file://figures/WidgetList.png|width=50|label=fig_WidgetList+
 
 
-!!! The ProtocolList
+
+
+!! The ProtocolList
+@sec_protocollist
 
 The next user interface that we will build is the protocol list.
 This UI combines two widgets: a list and a label.
@@ -161,10 +158,11 @@ We will see that the users may direcly register block using the accessors.
 The ""ProtocolList"" UI can be seen by evaluating ==ProtocolList new openWithSpec==. As shown in Figure *@fig_protocollist*
 the widgets is empty. This is normal since we did not initialize it. 
 
-+The ProtocolList Element.>file://figures/EmptyProtocolList.png|width=50|label=fig_protocollist+
++The ProtocolList Element.>file://figures/ProtocolList.png|width=50|label=fig_protocollist+
 
 
-!!! The ProtocolViewer
+!! The ProtocolViewer
+@sec_protocolviewer
 
 The third user interface is a composition of the two previous user interfaces.
 It is composed of a ""WidgetList"" and two ""ProtocolList"".
@@ -224,7 +222,7 @@ To describe the interactions between the sub widgets, the method ==initializePre
 Here, it specifies that when a class is selected, the selections in the protocol list are reset and both protocol lists are populated.
 Additionally, when a method is selected in one protocol list, the selection in the other list is reset.
 The implementation of this method is exposed in code *@ex_viewer_presenter*.
-More details on the ==initializePresenter== method are given in *@subsec_initializePresenter*.
+More details on the ==initializePresenter== method are given in the Section *@sec_initializePresenter*.
 
 [[[label=ex_viewer_presenter|caption=ProtocolViewer sub widget interactions|language=Smalltalk
 ProtocolViewer>>initializePresenter
@@ -284,8 +282,8 @@ As previously, the result can be seen by executing the following snippet of code
 
 +The ProtocolViewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
 
-!!! Protocol Browser
-@subsec_protocol_browser
+!! Protocol Browser
+@sec_protocolbrowser
 
 The last user interface reuses a ""ProtocolViewer"" with a different layout and adds a text zone to edit the source code of the selected method.
 The class definition can be seen in code in *@ex_browser_definition*.
@@ -372,12 +370,11 @@ Their implemenations are detailled in code *@ex_browser_others*.
 This finishes the protocol browser.
 The final user interface can be opened with the following snippet: ==ProtocolBrowser new openWithSpec==.
 The result can be seen in figure *@fig_second_protocol_browser*.
-%spirita: an ancor named fig_protocol_browser already exists (its the same figure, give the same name create problems in reference).
 
 +The ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_second_protocol_browser+
 
 
-!!! Adding Menu and KeyBinding
+!! Adding Menu and KeyBinding
 
 may be this should be adding in the flow.
 

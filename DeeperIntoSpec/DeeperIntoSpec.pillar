@@ -14,7 +14,7 @@ These methods are hence typically found in the model for each user interface.
 In this section we describe the responsibility for each method, i.e. how these three work together to build the overall UI.
 
 !! the ''initializeWidgets'' method 
-@subsec_initializeWidgets
+@sec_initializeWidgets
 
 This method is used to instantiate the models for the different widgets that will be part of the UI and store them in their respective instance variables.
 Instantiation of the models will in turn result in the instantiation and initialization of the different widgets that make up the UI.
@@ -55,6 +55,7 @@ Specifying this method is mandatory, as without it the UI would have no widgets.
 ]]]
 
 !!! Widget instantiation
+@sec_widgetinstanciation
 
 The instantiation of the model for a widget (and hence the widget) can be done in two ways: through the use of an creation method or through the use of the ==instantiate:== method.
 Considering the first option, the framework provides unary messages for the creation of all basic widgets.
@@ -64,7 +65,7 @@ Considering the second option, to reuse any composite widgets, i.e. a subclass o
 For example, to reuse a ''MessageBrowser''  widget, the code is == self instantiate: MessageBrowser.==
 
 !! The ''initializePresenter'' method
-@subsec_initializePresenter
+@sec_initializePresenter
 
 This method takes care of the interactions between the different widgets.
 By linking the behavior of the different widgets it specifies the overall presentation, i.e. how the overall UI responds to interactions by the user.
@@ -96,7 +97,7 @@ This method is optional. Without it, the different widgets in the UI will simply
 ]]]
 
 !!! The ''layout'' method
-@subsec_layout
+@sec_layoutmethod
 
 This method specifies the layout of the different widgets in the UI.
 It also specifies how a widget reacts when the window is resized.
@@ -134,7 +135,7 @@ To do this, instead of giving a symbol, an array with 2 symbols must
 be given.
 The first symbol identifies the UI being reused and the second the sub
 widget within this UI whose new layout position is being specified.
-We have seen an example of this reuse in *@subsec_protocol_browser*.
+We have seen an example of this reuse in *@sec_protocolbrowser*.
 
 As said above, multiple layouts can be described for the same user interface.
 In order to retrieve the correct method to apply, these methods need to be flagged with a pragma.
@@ -146,19 +147,21 @@ Specifying this method is mandatory, as without it the UI would show no widgets 
 
 
 !! Layouts
+@sec_layout
 
 As layouts can become quite complex, this section provides a list of examples of the construction of layouts.
-First two examples are given of the use of *@rows and columns>layout_rows_and_column_layout*.
-This is followed by two examples that explain how to set a *@fixed size>layout_set_size_pixels* for rows and columns.
-Next is an example that explains how to specify a widget *@proportionally>layout_percentage*.
-The last example presents the *@expert>layout_expert* mode in case everything else fails.
-To conclude, this section ends with a little *@explanation>layout_specify_layout* of how to specify which layout to use when a model defines multiple layouts.
+- First two examples are given of the use of rows and columns *@subsec_layout_rows_and_column*.
+- This is followed by two examples that explain how to set a fixed size *@subsec_layout_set_size_pixels* for rows and columns.
+- Next is an example that explains how to specify a widget proportionally *@subsec_layout_percentage*.
+- The last example presents the expert *@subsec_layout_expert* mode in case everything else fails.
+- To conclude, this section ends with a little explanation *@subsec_layout_specify* of how to specify which layout to use when a model defines multiple layouts.
 
 [[[caption:Hint|
 All the methods for adding sub widgets can be found in the ''commands'' and ''commands-advanced'' protocols of ""SpecLayout"".
 ]]]
 
-@layout_rows_and_column_layout
+!!! Rows and Column
+@subsec_layout_rows_and_column
 Often the layout of user interfaces can be described in rows and columns, and ""Spec"" provides for an easy way to specify such layouts.
 The example *@ex_layout_row* shows how to build a row of widgets.
 
@@ -216,9 +219,9 @@ This example also shows the ==addSplitter== message, which adds a splitter betwe
 	yourself
 ]]]
 
-_
 
-@layout_set_size_pixels
+!!! Set Size in pixels
+@subsec_layout_set_size_pixels
 The height of rows as well as the width of columns can be specified, to prevent them to take all the available space.
 The example *@ex_row_height* shows how to specify the height of a row in pixels while the example *@ex_column_width* shows how to specify the column width.
 
@@ -246,9 +249,9 @@ Note that it is generally considered a bad habit to hardcode the size of the wid
 Methods are available on ''ComposableModel'' providing sensible default sizes, like the width of a button.
 When specifying custom widget sizes, care should be taken to take in account the current font size.
 
-_
 
-@layout_percentage
+!!! Percentage
+@subsec_layout_percentage
 It is also possible to specify the percentage of the container, e.g. the window, that a widget should occupy.
 As a result of this, the widget size will change accordingly when the container is resized.
 To do so, the proportional position of the four sides of a widget can be specified, as shown in the example *@ex_layout_proportional*.
@@ -265,9 +268,10 @@ For example, for the top edge, the percentage is counted from the top down: 0 is
 
 Also, the argument can be an integer if the offset has to be a fixed number of pixels.
 The number of pixels should be positive, as it indicates a distance from the corresponding edge, going to the opposite edge.
-_
 
-@layout_expert
+
+!!! Expert Mode
+@subsec_layout_expert
 The previous examples should cover most of the cases of layout of widgets.
 For the remaining cases there is a last way to specify a widget by specifying its position.
 
@@ -292,11 +296,12 @@ It specifies that the widget in the ==toolbar== instance variable should take al
 	yourself
 ]]]
 
-_
 
-@layout_specify_layout
 
-As explained in the section *@subsec_layout*, a UI can have multiple layouts.
+!!! Specify Layout
+@subsec_layout_specify
+
+As explained in the section *@sec_layout*, a UI can have multiple layouts.
 So when the layout of a widget that is composed of multiple sub-widgets is defined, and this widget contains multiple layout methods that determine the layout of its sub-widgets, the layout method to use can be specified.
 
 All the methods seen in the previous examples come with a variant used to specify which selector to use for the layout method.
@@ -314,6 +319,7 @@ The example *@ex_specify_layout* shows how to add an instance of ""MyWidget"" us
 
 
 !! Menus
+@sec_menus
 
 
 
