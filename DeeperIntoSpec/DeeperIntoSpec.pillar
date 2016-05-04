@@ -85,8 +85,6 @@ theList whenSelectedItemChanged: [ :item |
 		ifNotNil: [ theButton text: 'An item is selected'] ]
 ]]]
 
-The whole event API of the basic widgets is described in the section *@sec_Meta_Informations*.
-
 [[[caption:Hint|
 If a programmer wants his or her widgets to be reused,
 they should provide a comprehensive API.

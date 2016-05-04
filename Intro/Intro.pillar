@@ -70,13 +70,7 @@ Writing user interfaces is notoriously a tedious task. It often requires time an
 !! Structure of the document
 
 The structure of this document is as follows:
-% First, in section *@sec_reuse_spec*, we give a short tutorial on how to define and reuse UIs with ''Spec''.
-% Then, in section *@sec_heart_of_spec*, the three axes that form the heart of ''Spec'' are explained. 
-% In section *@sec_Meta_Informations*, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
-% The section *@sec_spec_the_dynamic* presents the support for dynamic UIs in ''Spec''. 
-% The section *@sec_basic_widget* is dedicated to the creation of new ''Spec'' basic widgets.
 
-%Spirita : Commented to avoid warning while compilation
 
 @@todo should be update after the work on the book
 
