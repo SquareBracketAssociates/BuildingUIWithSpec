@@ -226,7 +226,13 @@ SpecHappy new openWithSpec: #layout
 
 This example shows how to design a popup window asking for an input, created dynamically.
 
-[[[label=ex_dynamic_popup|caption=A pop up created dynamically |language=Smalltalk|
+!!!! The code
+
+The widget is an instance of a subclass of ==ComposableModel== named ==DynamicComposableModel== which specialize ==doesNotUnderstand:== so that we can use accessors to access dynamic elements.
+
+@@todo must be checked but it seems impossible to define directly in a class (must use a static declaration).
+
+[[[label=ex_popup|caption=A pop up created dynamically |language=Smalltalk|
 	| popup |
 	"Widgets instanciation"
 	popup := DynamicComposableModel new
@@ -258,11 +264,12 @@ This example shows how to design a popup window asking for an input, created dyn
 	"DialogWindowModel instanciation"
 	popup openDialogWithSpec.
 
-	"Specification of action when Ok is aclicked."
+	"Specification of action when Ok is clicked."
 	popup window okAction: [ Transcript show: popup inputText text ]
 ]]]
 
-The widget is an instance of a subclass of ==ComposableModel== named ==DynamicComposableModel== which specialize ==doesNotUnderstand:== so that we can use accessors to access dynamic elements.
+
+!!!! The Messages
 
 In Widgets instanciation (provide by ==ComposableModel==) :
 - Message ==extent:==
@@ -272,11 +279,37 @@ In Widgets configuration specification, the following messages are provide by th
 - Message ==autoAccept:==specify that the text field should automatically accept the text on each keystroke, such that it does not show the yellow 'edited' triangle on the top right.
 - Message ==entryCompletion:==
 - Message ==ghostText:== set simply the text of the ghost text
-- Message ==bindKeyCombination:==
+- Message ==bindKeyCombination:== set the  action for when ''Ok'' is clicked
 
 Here, we must use the message ==layout:== to set the layout to use.
 
-+Prototype of a popup>file://figures/Popup.png|width=50|label=fig_popup+
++Prototype of a Popup>file://figures/Popup.png|width=50|label=fig_popup+
+
+
+!!!! Change the Toolbar
+
+The default toolbar of the ==DialogWindowModel== has an ''Ok'' button and a ''Cancel'' button.
+To get a widget with a single button ''Ok'', the toolbar to use should be defined explicitly using the accessor ==toolbar:==.
+
+[[[label=ex_popup_newtoolbar|caption=A New Toolbar for te popup|language=Smalltalk|
+	| popup toolbar |
+	
+	...
+	
+	"Specification of action when Ok is clicked."
+"comment that line -> popup window okAction: [ Transcript show: popup inputText text ]"
+	
+	"Define the new Toolbar"
+	newToolbar := OkToolbar new
+		okAction: [ Transcript show: popup inputText text ];
+		yourself.
+
+	"Set the new Toolbar"
+	popup window toolbar: newToolbar
+]]]
+
+
++The Popup with a New Toolbar>file://figures/Popup_NewToolbar.png|width=50|label=fig_popup+
 
 
 !! Found more Examples

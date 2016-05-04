@@ -2,8 +2,6 @@
 
 @@todo is it here for real? may be should be move to basic examples and here we keep the explanation for the dynamic part.
 
-@@todo spirita : must be revisited.
-
 This example shows how to easily and quickly design a popup window asking for an input.
 
 First we create a simple model with two sub widgets, a label and a text field, as shown by the snippet *@ex_widget_creation*.
@@ -50,9 +48,11 @@ view text
 
 Opening the UI again (==view openWithSpecLayout: layout==) now shows the text of the label and the ghost text of the text field.
 
+
 As we want the widget to be a popup with a single button ''Ok'', the toolbar to use should be defined explicitly (the default toolbar has an ''Ok'' button and a ''Cancel'' button).
 We also set the toolbar action for when ''Ok'' is clicked: the current text of the text field will be saved in the instance variable ''regex''.
 The code in *@ex_toolbar* shows how to do it.
+
 
 [[[label=ex_toolbar|caption=Instantiating the toolbar|language=Smalltalk 
 toolbar := OkToolbar new
