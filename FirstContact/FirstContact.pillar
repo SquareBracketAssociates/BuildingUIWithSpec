@@ -96,10 +96,10 @@ Summarizing:
 A subclass of ==ComposableModel== have responsibility to define the ==initializeWidgets== method and defaultSpec class method. In which we will instanciate buttons and the screen with methods provided by the superclass.
 
 Then, we define buttons :
-- ==label:== to define the label which will be display on them
-- ==action:== to define the block to perform when they are acliked
-- ==icon:== to define an icon which will be display near the label
-Note that ==label:== is used to define the default text on the screen. Then, it used by buttons to change the text on the screen.
+- Message ==label:== define the label which will be display on them
+- Message ==action:== define the block to perform when they are acliked
+- Message ==icon:== define an icon which will be display near the label
+Note that ==label:== is used to define the default text on the screen. Then, it used by buttons to change this text.
 
 Finally, its a good practice to define the focus order, it use for keyboard navigation.
 
@@ -163,7 +163,7 @@ SpecHappy>>title
 	^ 'Customers satisfaction'
 ]]]
 
-!!!! The methods to open the Window
+!!!! The methods to instanciate the Window
 
 @@todo may give more informations about modal
 
@@ -183,6 +183,8 @@ Another method of ==ComposableModel==, ==openDialogWithSpec==, open the model in
 [[[language=Smalltalk
 SpecHappy new openDialogWithSpec
 ]]]
+
+==ComposableModel== provide the accessor ==window== to access at the instance of the created window.
 
 +SpecHappy widget in a Dialog.>file://figures/Customers_Dialog.png|width=50|label=fig_Customers_Dialog+
 
@@ -216,6 +218,65 @@ SpecHappy new openWithSpec: #layout
 ]]]
 
 +New Layout for SpecHappy widget.>file://figures/Customers_NewLayout.png|width=50|label=fig_Customers_NewLayout+
+
+
+!! TextInputFieldModel and Dynamic Widget : The Pop up
+
+% spirita : fixed example, temporary variables was renamed to prevent being confusing whith methods
+
+This example shows how to design a popup window asking for an input, created dynamically.
+
+[[[label=ex_dynamic_popup|caption=A pop up created dynamically |language=Smalltalk|
+	| popup |
+	"Widgets instanciation"
+	popup := DynamicComposableModel new
+		instantiateModels: #(#inputLabel #LabelModel #inputText #TextInputFieldModel);
+		extent: 300 @ 90;
+		title: 'Choose your project';
+		yourself.
+
+	"Widgets configuration specification"
+	popup inputLabel label: 'Packages :'.
+	popup inputText
+		autoAccept: true;
+		entryCompletion: nil;
+		ghostText: 'I am a ghostText';
+		bindKeyCombination: Character cr toAction: [ popup window triggerOkAction ].
+
+	"Specification of order of focus"
+	popup focusOrder add: popup inputText.
+
+	"Layout specifiation"
+	popup layout:
+		(SpecLayout composed
+			newRow: [ :row | 
+				row
+					add: #inputLabel width: 75;
+					add: #inputText ];
+			yourself).
+
+	"DialogWindowModel instanciation"
+	popup openDialogWithSpec.
+
+	"Specification of action when Ok is aclicked."
+	popup window okAction: [ Transcript show: popup inputText text ]
+]]]
+
+The widget is an instance of a subclass of ==ComposableModel== named ==DynamicComposableModel== which specialize ==doesNotUnderstand:== so that we can use accessors to access dynamic elements.
+
+In Widgets instanciation (provide by ==ComposableModel==) :
+- Message ==extent:==
+- Message ==instantiateModels:==
+
+In Widgets configuration specification, the following messages are provide by the API of ==TextInputFieldModel== :
+- Message ==autoAccept:==specify that the text field should automatically accept the text on each keystroke, such that it does not show the yellow 'edited' triangle on the top right.
+- Message ==entryCompletion:==
+- Message ==ghostText:== set simply the text of the ghost text
+- Message ==bindKeyCombination:==
+
+Here, we must use the message ==layout:== to set the layout to use.
+
++Prototype of a popup>file://figures/Popup.png|width=50|label=fig_popup+
 
 
 !! Found more Examples
