@@ -226,7 +226,7 @@ SpecHappy new openWithSpec: #layout
 
 This example shows how to design a popup window asking for an input, created dynamically.
 
-!!!! The code
+!!! The code
 
 The widget is an instance of a subclass of ==ComposableModel== named ==DynamicComposableModel== which specialize ==doesNotUnderstand:== so that we can use accessors to access dynamic elements.
 
@@ -269,24 +269,27 @@ The widget is an instance of a subclass of ==ComposableModel== named ==DynamicCo
 ]]]
 
 
-!!!! The Messages
+!!! The Messages
 
-In Widgets instanciation (provide by ==ComposableModel==) :
-- Message ==extent:==
-- Message ==instantiateModels:==
+In Widgets instanciation :
+- Message ==extent:== (provide by ==ComposableModel==) set the initial size of the widget.
+- Message ==instantiateModels:== instanciates several models at once. It takes as argument an array of pairs, where each pair is composed of the unique name of the widget as key (here #inputLabel #inputText), and the name of the widget class to instanciate as value (here #LabelModel #TextInputFieldModel).
 
 In Widgets configuration specification, the following messages are provide by the API of ==TextInputFieldModel== :
 - Message ==autoAccept:==specify that the text field should automatically accept the text on each keystroke, such that it does not show the yellow 'edited' triangle on the top right.
-- Message ==entryCompletion:==
+- Message ==entryCompletion:== set an instance ==EntryCompletion== to treat the input.
 - Message ==ghostText:== set simply the text of the ghost text
 - Message ==bindKeyCombination:== set the  action for when ''Ok'' is clicked
 
 Here, we must use the message ==layout:== to set the layout to use.
 
+In Specification of action :
+- Message ==okAction:== set a block to perform when the ''Ok'' button is clicked, here we simply print the content of the field in the Transcript.
+
 +Prototype of a Popup>file://figures/Popup.png|width=50|label=fig_popup+
 
 
-!!!! Change the Toolbar
+!!! Change the Toolbar
 
 The default toolbar of the ==DialogWindowModel== has an ''Ok'' button and a ''Cancel'' button.
 To get a widget with a single button ''Ok'', the toolbar to use should be defined explicitly using the accessor ==toolbar:==.
