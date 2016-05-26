@@ -1,5 +1,5 @@
 ! Spec Internals
-@cha_basic_widget
+@cha_spec_internals
 
 Normal user should not have to read this chapter. ''Spec'' provides for a large amount and wide variety of basic widgets. 
 In the rare case that a basic widget is missing, the ''Spec'' framework will need to be extended to add this new widget.
@@ -36,7 +36,7 @@ Examples of widget-specific state are:
 
 The state is wrapped in value holders and kept in instance variables.
 For example, the code in *@ex_value_holder* shows how to wrap the state ==0== in a value holder and keep it as an instance variable.
-Value holders are needed because they are later used to propagate state changes and thus create the interaction flow of the user interface, as discussed in Section *@sec_heart_of_spec*.
+Value holders are needed because they are later used to propagate state changes and thus create the interaction flow of the user interface, as discussed in Section *@cha_deeper_into_spec*.
 
 [[[label=ex_value_holder|caption=Storing state wrapped in a Value Holder in an instance variable|language=Smalltalk 
 index := 0 asValueHolder.

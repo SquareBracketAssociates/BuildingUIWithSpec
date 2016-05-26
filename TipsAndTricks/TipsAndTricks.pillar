@@ -3,10 +3,11 @@
 This chapter will present some little examples that may help you for building interfaces with Spec. 
 
 !! Non-editable text field
+@sec_noneditable_textfield
 
-To create a non-editable text field you need to use ==TextInputFieldModel== and use ==#enabled:== as in the following code snippet *ex_noneditable_textfield* :
+To create a non-editable text field you need to use ==TextInputFieldModel== and use ==#enabled:== as in the following code snippet *@ex_noneditable_textfield* :
 
-[[[label=ex_non_editable_textfield|caption=Non-Editable Textfield|language=Smalltalk|
+[[[label=ex_noneditable_textfield|caption=Non-Editable Textfield|language=Smalltalk|
 	| inputField |
 	inputField := TextInputFieldModel new.
 	inputField

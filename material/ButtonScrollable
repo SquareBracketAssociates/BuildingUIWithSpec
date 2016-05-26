@@ -1,0 +1,9 @@
+You can use a ListModel and put your Buttons in it.
+
+ListModel new
+     items: ( 'Files' asPackage classes collect:[:c | ButtonModel new icon: c 
+systemIcon; label: c name; action:[ UIManager default alert: c comment title: c 
+name]]);
+     displayBlock: [ :x | x buildWithSpec ];
+     openWithSpec
+

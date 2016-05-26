@@ -1,10 +1,10 @@
 ! Todo
-- rename preface into intro/motivation
+- (done) rename preface into intro/motivation
 - update structure
 - Motivation is a bit short and not really a nice section. 
-- ModelList  should be renamed in Pharo WidgetClassList
+- ModelList should be renamed in Pharo WidgetClassList
 
-- We should add a section on how to find example in the image: in Chapter two. 
+- (in progress) We should add a section on how to find example in the image: in Chapter two. 
 -- ComposableModel subclasses
 
 
@@ -13,7 +13,7 @@
 
 --initialExtent should be put into (do not forget to say that this is only for window)
 
-- revisit the examples
+- revisit the examples  (and : rename it, place it in better package, revisit the help of pharo about Spec)
 
 
 ! Spec: a framework for describing user interfaces
@@ -70,8 +70,7 @@ Writing user interfaces is notoriously a tedious task. It often requires time an
 !! Structure of the document
 
 The structure of this document is as follows:
-- First, in section *@sec_reuse_spec*, we give a short tutorial on how to define and reuse UIs with ''Spec''.
-- Then, in section *@sec_heart_of_spec*, the three axes that form the heart of ''Spec'' are explained. 
-- In section *@sec_Meta_Informations*, the API of the ''Spec'' basic models is detailled as well as how to understand the meta information attached to this API. 
-- The section *@sec_spec_the_dynamic* presents the support for dynamic UIs in ''Spec''. 
-- The section *@sec_basic_widget* is dedicated to the creation of new ''Spec'' basic widgets.
+
+
+@@todo should be update after the work on the book
+
