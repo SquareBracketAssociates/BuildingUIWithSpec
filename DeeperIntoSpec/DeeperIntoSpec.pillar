@@ -105,14 +105,10 @@ If no such specific layout is given, the following lookup mechanism will be used
 # Search on class side, throughout the whole class hierarchy, for a method with the pragma ==<spec: #default>==.
 # If multiple such methods exist, the first one found is used.
 # If none such methods exist and if there is exactly one method with the pragma ==<spec>==, this method is used.
-# No layout method is found, an error is raised.
+# Otherwise the class-side ==defaultSpec== method will be called, which will raise ==subclassResponsibility== if it is not overriden.
 
 This method is on class side because it returns a value that usually is the same for all the instances.
 Put differently, usually all the instances of the same user interface have the same layout and hence this can be considered as being a class-side accessor for a class variable.
-
-@@todo Chekc the following sentence, it seems to be false.
-
-Note that the lookup for the spec method to use starts on instance side, which allows a UI to have a more specific layout depending on the state of the instance.
 
 The simpliest example of such a method is laying out just one widget.
 Example *@ex_layout1* presents such a layout.
