@@ -6,6 +6,7 @@ This chapter presents Spec over a list of examples that highlight some character
 It will guide you through examples of increasing complexity. 
 
 !! ListModel
+@sec_listModel
 
 We start with some example of lists: list with background colored item and icons. 
 
@@ -73,6 +74,7 @@ Note that the interest of having such methods is unclear and can be revisited in
 
 
 !! ButtonModel and LabelModel
+@sec_buttonModel
 
 This example show a create a widget and how to basically control the window and the layout used for the render.
 
@@ -80,11 +82,11 @@ This example show a create a widget and how to basically control the window and 
 
 That example is a bit more complex and we have to create a class from which it will be instantiated. That class must be a subclass of ==ComposableModel==.
 
-[[[label=ex_SpecHappy_classcreation|caption=Creation of the class|language=Smalltalk
-ComposableModel subclass: #SpecHappy
+[[[label=ex_CustomerStatisfaction_classcreation|caption=Creation of the class|language=Smalltalk
+ComposableModel subclass: #CustomerStatisfaction
 	instanceVariableNames: 'calcScreen button0 button1 button2'
 	classVariableNames: ''
-	package: 'SpecHappy'
+	package: 'Spec-BuildUIWithSpec-FirstContact'
 ]]]
 
 Basically, at the instance side of the class we will declare the widgets that we will be using, some aspects of these widgets like labels, actions, states, and the logic of the application and the glue between these widgets. On the other hand, at class side, we will set up the basic design of our GUI -how the widgets are laid out- and its title.
@@ -104,14 +106,14 @@ Note that ==label:== is used to define the default text on the screen. Then, it 
 Finally, its a good practice to define the focus order, it use for keyboard navigation.
 
 
-[[[label=ex_SpecHappy_initializewidgets|caption=code of SpecHappy>>initializeWidgets|language=Smalltalk|
-SpecHappy >> initializeWidgets
+[[[label=ex_CustomerStatisfaction_initializewidgets|caption=Code of CustomerStatisfaction>>initializeWidgets|language=Smalltalk|
+CustomerStatisfaction >> initializeWidgets
 
 	"widgets instanciation"
-	screen := self newLabel.
-	buttonHappy := self newButton.
-	buttonNeutral := self newButton.
-	buttonBad := self newButton.
+	screen := LabelModel new.
+	buttonHappy := ButtonModel new.
+	buttonNeutral := ButtonModel new.
+	buttonBad := ButtonModel new.
 
 	"widgets configuration specification"
 	screen label: 'Tell us ?'.
@@ -136,21 +138,23 @@ SpecHappy >> initializeWidgets
 ]]]
 
 
-In the following class side method ==defaultSpec==, the ==height:== is important to let enought place at the screen. Pay attention the argument of the ==add:== message are accessors refered by their symbols.
+In the following class side method ==defaultSpec==, the ==newRow:origin:corner:== is important to let enought place at the screen. Further informations about methods to define the layout are given in section *@sec_layout*. Pay attention the argument of the ==add:== messages are accessors refered by their symbols.
 
-[[[label=ex_spechappy_defaultspec|caption=Code of SpecHappy class >> defaultSpec|language=Smalltalk|
-SpecHappy >> defaultSpec
+[[[label=ex_CustomerStatisfaction_defaultspec|caption=Code of CustomerStatisfaction class >> defaultSpec|language=Smalltalk|
+CustomerStatisfaction >> defaultSpec
 	<spec: #default>
 	^ SpecLayout composed
-		newRow: [ :row | row add: #screen ];
+		newRow: [ :row | row add: #screen ] origin: 0 @ 0 corner: 1 @ 0.2;
 		newRow: [ :row | 
 			row
 				add: #buttonHappy;
 				add: #buttonNeutral;
 				add: #buttonBad ]
-			height: 50;
+			origin: 0 @ 0.2
+			corner: 1 @ 1;
 		yourself
 ]]]
+
 
 !!! The methods to control the window
 
@@ -158,10 +162,15 @@ SpecHappy >> defaultSpec
 
 Overide the ==title== method in the subclass change the title of the window, like the call at the ==title:== method.
 
-[[[caption=code of SpecHappy class >> title|language=Smalltalk|
-SpecHappy>>title
+[[[caption=code of CustomerStatisfaction class >> title|language=Smalltalk|
+CustomerStatisfaction>>title
 	^ 'Customers satisfaction'
 ]]]
+
+!!!! The ==initialExtent== and ==extent:== methods
+
+Similarly, overide the ==initialExtent== method set the initial size of the window. ==ComposableModel== provide the message ==extent:== to do that, but it must be called before the method to instanciate the window.
+
 
 !!!! The methods to instanciate the Window
 
@@ -173,164 +182,261 @@ Here, it will use the layout provide by the method containing the pragma "<spec:
 Further information about the layout lookup are given in the Chapter *@cha_deeper_into_spec*
 
 [[[language=Smalltalk
-SpecHappy new openWithSpec
+CustomerStatisfaction new openWithSpec
 ]]]
 
-+Basic SpecHappy widget.>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
++Basic CustomerStatisfaction widget.>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
 
 Another method of ==ComposableModel==, ==openDialogWithSpec==, open the model in a dialog window, the following code should give the figure *@fig_Customers_Dialog*.
 
 [[[language=Smalltalk
-SpecHappy new openDialogWithSpec
+CustomerStatisfaction new openDialogWithSpec
 ]]]
 
 ==ComposableModel== provide the accessor ==window== to access at the instance of the created window.
 
-+SpecHappy widget in a Dialog.>file://figures/Customers_Dialog.png|width=50|label=fig_Customers_Dialog+
++CustomerStatisfaction widget in a Dialog.>file://figures/Customers_Dialog.png|width=50|label=fig_Customers_Dialog+
 
-
-!!!! The ==initialExtent== method
-
-@@todo explain the use of initialExtent
 
 !!! Declaring a Different Layout
 
 Others methods of ==ComposableModel== let specify the layout to use, like ==openWithSpec:==.
 So we can declare a different layout for the same model. 
 
-[[[label=ex_spechappy_layout|caption=New Layout for SpecHappy |language=Smalltalk|
-SpecHappy class >> layout
+[[[label=ex_CustomerStatisfaction_layout|caption=New Layout for CustomerStatisfaction |language=Smalltalk|
+CustomerStatisfaction class >> layout
 	<spec>
 	^ SpecLayout composed
+		newColumn: [ :column | column add: #screen ] origin: 0 @ 0 corner: 0.2 @ 1;
 		newColumn: [ :column | 
 			column
 				add: #buttonHappy;
 				add: #buttonNeutral;
-				add: #buttonBad ];
-		newColumn: [ :column | column add: #screen ] width: 100;
+				add: #buttonBad ]
+			origin: 0.2 @ 0
+			corner: 1 @ 1;
 		yourself
 ]]]
 
-@@todo expliquer <spec>
+@@todo expliquer <spec> (briefly, more explaination are given in the chapter "Deeper into Spec")
 
 [[[language=Smalltalk
-SpecHappy new openWithSpec: #layout
+CustomerStatisfaction new openWithSpec: #layout
 ]]]
 
-+New Layout for SpecHappy widget.>file://figures/Customers_NewLayout.png|width=50|label=fig_Customers_NewLayout+
++New Layout for CustomerStatisfaction widget.>file://figures/Customers_NewLayout.png|width=50|label=fig_Customers_NewLayout+
 
 
 !! TextInputFieldModel and Dynamic Widget : The Pop up
-
-% spirita : fixed example, temporary variables was renamed to prevent being confusing whith methods
+@sec_textInputFieldModel
 
 This example shows how to design a popup window asking for an input, created dynamically.
 
-!!! The code
+The widget is an instance of a subclass of ==ComposableModel== named ==DynamicComposableModel==.
 
-The widget is an instance of a subclass of ==ComposableModel== named ==DynamicComposableModel== which specialize ==doesNotUnderstand:== so that we can use accessors to access dynamic elements.
-
-@@todo must be checked but it seems impossible to define directly in a class (must use a static declaration).
-
-[[[label=ex_popup|caption=A pop up created dynamically |language=Smalltalk|
-	| popup |
-	"Widgets instanciation"
-	popup := DynamicComposableModel new
-		instantiateModels: #(#inputLabel #LabelModel #inputText #TextInputFieldModel);
-		extent: 300 @ 90;
-		title: 'Choose your project';
-		yourself.
-
-	"Widgets configuration specification"
-	popup inputLabel label: 'Packages :'.
-	popup inputText
-		autoAccept: true;
-		entryCompletion: nil;
-		ghostText: 'I am a ghostText';
-		bindKeyCombination: Character cr toAction: [ popup window triggerOkAction ].
-
-	"Specification of order of focus"
-	popup focusOrder add: popup inputText.
-
-	"Layout specifiation"
-	popup layout:
-		(SpecLayout composed
-			newRow: [ :row | 
-				row
-					add: #inputLabel width: 75;
-					add: #inputText ];
-			yourself).
-
-	"DialogWindowModel instanciation"
-	popup openDialogWithSpec.
-
-	"Specification of action when Ok is clicked."
-	popup window okAction: [ Transcript show: popup inputText text ]
+[[[label=ex_popup_classcreation|caption=Creation of the class|language=Smalltalk|
+DynamicComposableModel subclass: #DynamicalPopup
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec-FirstContact'
 ]]]
 
+!!! Widget instanciation
 
-!!! The Messages
+The message ==instantiateModels:== provide by ==ComposableModel== instanciates several models at once. It takes as argument an array of pairs, where each pair is composed of the unique name of the widget as key (here #inputLabel #inputText), and the name of the widget class to instanciate as value (here #LabelModel #TextInputFieldModel).
 
-In Widgets instanciation :
-- Message ==extent:== (provide by ==ComposableModel==) set the initial size of the widget.
-- Message ==instantiateModels:== instanciates several models at once. It takes as argument an array of pairs, where each pair is composed of the unique name of the widget as key (here #inputLabel #inputText), and the name of the widget class to instanciate as value (here #LabelModel #TextInputFieldModel).
+But note that ==DynamicComposableModel== :
+- provide a Dictionnary ''widget'' and its getter ==widget==.
+- specialize ==instantiateModels:== to put widgets instanciated in the Dictionary using their names as keys.
+- specialize ==doesNotUnderstand:== to access these widgets by a search on the Dictionary before rise an exception, so creating acessors is not required (and could break the widget).
+
+[[[label=ex_popup_initializewidget|caption=The Popup initialization|language=Smalltalk|
+DynamicalPopup>>initializeWidgets
+	"Widgets instanciation"
+	self instantiateModels: #(#label #LabelModel #textInput #TextInputFieldModel).
+
+	"Widgets configuration specification"
+	self title: 'Choose your project'.
+	self label label: 'Packages :'.
+	self textInput
+		autoAccept: true;
+		entryCompletion: nil;
+		ghostText: '.*';
+		bindKeyCombination: Character cr toAction: [ self toolbar triggerOkAction ].
+
+	"Defining dynamically the layout"
+	self
+		layout:
+			(SpecLayout composed
+				newRow: [ :row | 
+					row
+						add: #label origin: 0 @ 0 corner: 0.3 @ 1;
+						add: #textInput origin: 0.3 @ 0 corner: 1 @ 1 ];
+				yourself)
+]]]
+
+!!! API of ==TextInputFieldModel==
 
 In Widgets configuration specification, the following messages are provide by the API of ==TextInputFieldModel== :
-- Message ==autoAccept:==specify that the text field should automatically accept the text on each keystroke, such that it does not show the yellow 'edited' triangle on the top right.
+- Message ==autoAccept:== specify that the text field should automatically accept the text on each keystroke, such that it does not show the yellow 'edited' triangle on the top right and content don't need to be saved.
 - Message ==entryCompletion:== set an instance ==EntryCompletion== to treat the input.
-- Message ==ghostText:== set simply the text of the ghost text
-- Message ==bindKeyCombination:== set the  action for when ''Ok'' is clicked
+- Message ==ghostText:== set the text of the ghost text.
+- Message ==bindKeyCombination:== set a shortcut associate at a block to perfom, here it make the entry key the same effect than a click on the ''Ok'' button.
 
-Here, we must use the message ==layout:== to set the layout to use.
+!!! Set the layout dynamically
 
-In Specification of action :
-- Message ==okAction:== set a block to perform when the ''Ok'' button is clicked, here we simply print the content of the field in the Transcript.
+==DynamicComposableModel== provide a variable ''layout'' and its setter ==layout:==, and it specialize ==openWithSpec== to try to use this layout if it has been specified before use the search of ==ComposableModel==.
+
+!!! Set an Action at ''Ok''
+
+[[[label=ex_popup_defaulttoolbar|caption=The Popup initialization|language=Smalltalk|
+DynamicalPopup>>defaultToolbarConfiguration
+	self window okAction: [ Transcript show: self inputText text ]
+]]]
+
+Here, ''self window'' is the default toolbar created by ==openDialogWithSpec==. The message ==okAction:== set a block to perform when the ''Ok'' button is clicked, here we simply print the content of the field in the Transcript.
+
+That method must be called after the instanciation of the window.
+
+[[[label=ex_popup_exampledefaulttoolbar|caption=Launch the Example with the Default Toolbar|language=Smalltalk|
+DynamicalPopup>>exampleDefaultToolbar
+	| example |
+	example := self new.
+	example openDialogWithSpec.
+	example defaultToolbarConfiguration
+]]]
 
 +Prototype of a Popup>file://figures/Popup.png|width=50|label=fig_popup+
-
 
 !!! Change the Toolbar
 
 The default toolbar of the ==DialogWindowModel== has an ''Ok'' button and a ''Cancel'' button.
-To get a widget with a single button ''Ok'', the toolbar to use should be defined explicitly using the accessor ==toolbar:==.
+To get a widget with a single button ''Ok'', the toolbar to use should be defined explicitly using the window's accessor ==toolbar:==.
 
-[[[label=ex_popup_newtoolbar|caption=A New Toolbar for te popup|language=Smalltalk|
-	| popup toolbar |
-	
-	...
-	
-	"Specification of action when Ok is clicked."
-"comment that line -> popup window okAction: [ Transcript show: popup inputText text ]"
-	
-	"Define the new Toolbar"
-	newToolbar := OkToolbar new
-		okAction: [ Transcript show: popup inputText text ];
-		yourself.
+[[[label=ex_popup_newtoolbar|caption=A New Toolbar for the popup|language=Smalltalk|
+DynamicalPopup>>alternativeToolbar
+	"Instanciate the alternative toolbar"
+	self instantiateModels: #(#toolbar #OkToolbar).
 
-	"Set the new Toolbar"
-	popup window toolbar: newToolbar
+	"Configuring the alternative toolbar"
+	self toolbar okAction: [ Transcript show: self textInput text ].
+
+	"Set the alternative toolbar in the window"
+	self window toolbar: self toolbar
+]]]
+
+That method must be called after the instanciation of the window.
+
+[[[label=ex_popup_examplenewtoolbar|caption=Launch the Example with the Alternative Toolbar|language=Smalltalk|
+DynamicalPopup>>exampleAlternativeToolbar
+	| example |
+	example := self new.
+	example openDialogWithSpec.
+	example alternativeToolbar
 ]]]
 
 
-+The Popup with a New Toolbar>file://figures/Popup_NewToolbar.png|width=50|label=fig_popup+
++The Popup with a New Toolbar>file://figures/Popup_NewToolbar.png|width=50|label=fig_popup_newtoolbar+
+
+
+
+!! RadioButtonModel and ==initializePresenter==
+
+[[[label=ex_radio_classcreation|caption=Class Creation|language=Smalltalk|
+ComposableModel subclass: #MrAndMrsRadioButton
+instanceVariableNames: 'labelGreeting textName buttonGreet groupRadio'
+classVariableNames: ''
+package: 'Spec-BuildUIWithSpec-FirstContact'
+]]]
+
+[[[label=ex_radio_initializewidget|caption=InitializeWidget|language=Smalltalk|
+MrAndMrsRadioButton>>initializeWidgets
+	| radioMr radioMs radioMrs |
+	
+	"Widgets instanciation"
+	self instantiateModels: #(#labelGreeting #LabelModel #textName #TextInputFieldModel #buttonGreet #ButtonModel).
+
+	"Widgets configuration specification"
+	labelGreeting label: 'Enter your name.'.
+	textName autoAccept: true.
+	buttonGreet
+		label: 'Greet Me!';
+		disable.
+
+	"RadioButtons' creation"
+	radioMr := RadioButtonModel new.
+	radioMs := RadioButtonModel new.
+	radioMrs := RadioButtonModel new.
+	radioMr label: 'Mr.'.
+	radioMs label: 'Ms.'.
+	radioMrs label: 'Mrs.'.
+
+	"Adding the group for RadioButton"
+	groupRadio := RadioButtonGroup new
+		addRadioButton: radioMr;
+		addRadioButton: radioMs;
+		addRadioButton: radioMrs.
+	groupRadio default: radioMr
+]]]
+
+==AbstractWidgetModel==, whom subclasses are basics widgets, provide the accessors ==enabled== and ==enabled:==, and the shortcuts ==enable== and ==disable==. It can be used to create tricks like in the section @sec_noneditable_textfield.
+
+@@todo explain RadioButtonGroup
+- add
+- default
+
+
+!!! A first ==initializePresenter==
+
+The method ==initializePresenter== is used to define relations between elements of the widget.
+
+[[[label=ex_radio_initializepresenter|caption=InitializePresenter|language=Smalltalk|
+MrAndMrsRadioButton>>initializePresenter
+	"Hook for events"
+	textName whenTextChanged: [ buttonGreet enable ].
+
+	"Specification of the Button's Action"
+	buttonGreet action: [ labelGreeting label: 'Hello, ' , groupRadio currentActivated label , ' ' , textName text.
+	buttonGreet disable ]
+]]]
+
+- Message named like ==when...== are hook provided by basic widgets.
+- Message ==action:== set a block to perform when the button is clicked.
+- ==currentActivated== and its acessors are provided by ==RadioButtonGroup==, it contains the button activated.
+
+!!! Another way to make a simple layout
+
+==SpecColumnLayout== is the object created by ==newColumn:==.
+
+[[[label=ex_radio_layout|caption=Another way to define the Layout|language=Smalltalk|
+MrAndMrsRadioButton>>defaultSpec
+	<spec: #default>
+	^ SpecColumnLayout new
+		add: #labelGreeting;
+		add: #textName;
+		add: #buttonGreet;
+		add: #groupRadio;
+		yourself
+]]]
+
+
++MrAndMrsRadioButton>file://figures/MrAndMrsRadioButton.png|width=50|label=fig_MrAndMrsRadioButton+
 
 
 !! Found more Examples
 
-@@todo fill it (eventually revisit it)
-
 For the moment (and the writting) there are example in :
+- Package Spec-BuildUIWithSpec
 - Package Spec-Examples
-- Help -> Spec -> Examples -> More Examples (link at the package)
-- BuildingUIWithSpec/material/nameOfExample (extract from a previous version to be revisited)
-- In BuildingUIWithSpec/material/Spec/SpecMaterial/ (M. Mrs)
+- Help -> Spec -> Examples -> More Examples (example from Spec-Examples)
+- BuildingUIWithSpec/material/... (extract from a previous version to be revisited)
 - on StephanEggermont's repot (Ancestry and SpecGenerator)
 - on the website http://spec.st/docs/home/ (drag 'n drop)
-- on Spirita's sandbox
-- AbstractWidgetModel subclasses (most part are in Spec-core widget) provide sometimes examples in their class side
-- idem with ComposableModel subclasses in Spec-PolyWidgets
+%- on Spirita's sandbox
+- AbstractWidgetModel subclasses (most part are in Spec-core widget) sometimes provide examples in their class side
+- Same with ComposableModel subclasses in Spec-PolyWidgets
 
-@@todo add textfield and may be some other widgets
+@@todo fill locations of others examples / revisit it
 
-@@todo little example with radio button M. Mrs .. and inputfield
+@@todo add some other widgets, little example with radio button M. Mrs .. and inputfield
 

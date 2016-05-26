@@ -109,6 +109,9 @@ If no such specific layout is given, the following lookup mechanism will be used
 
 This method is on class side because it returns a value that usually is the same for all the instances.
 Put differently, usually all the instances of the same user interface have the same layout and hence this can be considered as being a class-side accessor for a class variable.
+
+@@todo Chekc the following sentence, it seems to be false.
+
 Note that the lookup for the spec method to use starts on instance side, which allows a UI to have a more specific layout depending on the state of the instance.
 
 The simpliest example of such a method is laying out just one widget.
