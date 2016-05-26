@@ -40,7 +40,7 @@ Finally this example shows that the message ==openWithSpec== open and place the 
 
 In this example, we are going to build a list containing icons of the current theme and their respective selector using a subclass of ListModel : IconListModel.
 
-==#displayBlock:== wrap your domain specific items and should return something that can be displayed in a list, like a String or a Text.
+- Message ==displayBlock:== wrap your domain specific items and should return something that can be displayed in a list, like a String. See the tips section *@sec_scrollable_buttons* for an example of displaying widgets.
 
 [[[label=ex_icon_list|caption=Icons List|language=Smalltalk
 	| iconList |
@@ -432,7 +432,6 @@ For the moment (and the writting) there are example in :
 - BuildingUIWithSpec/material/... (extract from a previous version to be revisited)
 - on StephanEggermont's repot (Ancestry and SpecGenerator)
 - on the website http://spec.st/docs/home/ (drag 'n drop)
-%- on Spirita's sandbox
 - AbstractWidgetModel subclasses (most part are in Spec-core widget) sometimes provide examples in their class side
 - Same with ComposableModel subclasses in Spec-PolyWidgets
 

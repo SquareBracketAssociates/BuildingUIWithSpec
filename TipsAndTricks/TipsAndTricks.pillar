@@ -5,9 +5,10 @@ This chapter will present some little examples that may help you for building in
 !! Non-editable text field
 @sec_noneditable_textfield
 
-To create a non-editable text field you need to use ==TextInputFieldModel== and use ==#enabled:== as in the following code snippet *@ex_noneditable_textfield* :
+In That tip we create a non-editable text field using ==TextInputFieldModel== and disable it to don't let the possibility of editing it.
 
 [[[label=ex_noneditable_textfield|caption=Non-Editable Textfield|language=Smalltalk|
+SmallTips>>exampleNonEditableTextField
 	| inputField |
 	inputField := TextInputFieldModel new.
 	inputField
@@ -19,29 +20,56 @@ To create a non-editable text field you need to use ==TextInputFieldModel== and 
 +The non-editable text field>file://figures/noneditable_textfield.png|width=30|label=fig_noneditable_textfield+
 
 
-!! Nested focus order
+!! Scrollable List of Buttons
+@sec_scrollable_buttons
 
-Spec is made for composing and reusing widgets. When it is needed to create a new widget with two subwidget that are also composed of subwidgets there is a little trick to set up the focus correctly.
+In That example we create a scrollable list of buttons using ==ListModel== which is already able to manage scrollbar, and use the ==displayBlock:== to display widgets correctly, whatever their complexity.
 
-For this tip, we are going to implement three widgets : two simple subwidgets and the composed widget which must manage correctly the focus order.
+Here, it's a simple collection of Button created with classes' informations of the package ''Files''.
 
-First, create a widget ==TwoButtons== to hold two ==ButtonModel== and add the buttons to the focus order in ==#initializeWidgets== message.
-
-Then, create the second widget ==AList== to hold a ==ListModel==, add the list to the focus order in ==#initializeWidgets==.
-
-Finally, create the widget ==SuperWidget== to hold the two precedent widgets.
-
-Here is where the trick is made. To compose the focus correctly, you must add ==AList== to the focus order of ==TwoButtons== and add ==TwoButtons== to the focus order of ==AList== to ensure that the focus is managed correctly in ==SuperWidget==.
-
-[[[label=ex_composed_focus_order|caption=initializeWidgets to manage the focus order|language=Smalltalk|
-SuperWidget>>initializeWidgets
-
-    twoButtons := TwoButtons new.
-    aList := AList new.
-        
-    twoButtons focusOrder add: aList.
-    aList focusOrder add: twoButtons
+[[[label=ex_scrollable_buttons|caption=A Scrollable List of Widgets|language=Smalltalk|
+SmallTips>>exampleButtonScrollable
+	ListModel new
+		items:
+			('Files' asPackage classes
+				collect: [ :class | 
+					ButtonModel new
+						icon: class systemIcon;
+						label: class name;
+						action: [ UIManager default alert: class comment title: class name ] ]);
+		displayBlock: [ :x | x buildWithSpec ];
+		openWithSpec
 ]]]
 
-+The SuperWidget>file://figures/SuperWidget_focusorder.png|width=50|label=fig_superwidget_focusorder+
++The Scrollable List of Widgets>file://figures/scrollable_buttons.png|width=30|label=fig_scrollable_buttons+
+
++The Result of a Click on a Button>file://figures/scrollable_result.png|width=30|label=fig_scrollable_result+
+
+
+!! Nested focus order
+
+Spec is made for composing and reusing widgets. When it is needed to create a new widget with two subwidgets that are also composed of subwidgets there is a little trick to set up the focus correctly.
+
+For this tip, we use three widgets : two simple subwidgets and the composed widget which must manage correctly the focus order.
+
+First, we create a widget ==SubWidgetButtons== to hold two ==ButtonModel== and add the buttons to the focus order in ==initializeWidgets== message.
+
+Then, we create the second widget ==SubWidgetList== to hold a ==ListModel==, add the list to the focus order in ==#initializeWidgets==.
+
+Finally, we create the widget ==NestedFocusOrder== to hold the two precedent widgets.
+
+To compose the focus correctly, you must add ==SubWidgetList== to the focus order of ==SubWidgetButtons== and add ==SubWidgetButtons== to the focus order of ==SubWidgetList== to ensure that the focus is managed correctly in ==NestedFocusOrder==.
+
+[[[label=ex_composed_focus_order|caption=initializeWidgets to manage the focus order|language=Smalltalk|
+NestedFocusOrder>>initializeWidgets
+	"Widget instanciation"
+	twoButtons := SubWidgetButtons new.
+	aList := SubWidgetList new.
+
+	"focusOrder trick"
+	twoButtons focusOrder add: aList.
+	aList focusOrder add: twoButtons
+]]]
+
++The NestedFocusOrder>file://figures/nestedfocusorrder.png|width=50|label=fig_nestedfocusorrder+
 
