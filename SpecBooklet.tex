@@ -1,60 +1,57 @@
-% PAY ATTENTION
-% I will be copied to the book result folder before being compiled
+%!TEX TS-program = lualatex
+% -*- mode: LaTeX; -*-
+\documentclass[10pt,twoside,english,showtrims]{support/latex/sbabook/sbabook}
+\let\wholebook=\relax
 
-\documentclass[a4paper,10pt,twoside]{book}
-\usepackage[
-	papersize={6.13in,9.21in},
-	hmargin={.75in,.75in},
-	vmargin={.75in,1in},
-	ignoreheadfoot
-]{geometry}
+\usepackage{import}
+\subimport{support/latex/}{common.tex}
 
-\input{support/latex/common.tex}
-% It is found here because the folder is copied there by pillar
+%=================================================================
+% Debug packages for page layout and overfull lines
+% Remove the showtrims document option before printing
+\ifshowtrims
+  \usepackage{showframe}
+  \usepackage[color=magenta,width=5mm]{support/latex/overcolored}
+\fi
 
-\setboolean{lulu}{true}
 %=================================================================
 % Add the path for the figures of each chapter here:
 \graphicspath{
-  {figures/}
-  {Intro/}
-  {FirstContact/}
-  {Reuse/}
-  {DeeperIntoSpec/}
-  {SpecInternals/}
-  {LogginDiaog/}
-  {CalculatorTutorial/}
-  {DynamicSpec/}
-  {TipsAndTricks/}
+  {../figures/}
+  {../Intro/}
+  {../FirstContact/}
+  {../Reuse/}
+  {../DeeperIntoSpec/}
+  {../SpecInternals/}
+  {../LogginDiaog/}
+  {../CalculatorTutorial/}
+  {../DynamicSpec/}
+  {../TipsAndTricks/}
 }
 
 %=================================================================
-\let\wholebook=\relax
-\makeindex
-\makeglossary
-%=================================================================
-\renewcommand{\nnbb}[2]{} % Disable editorial comments
-%=================================================================
+\title{Building UI With Spec}
+\author{people}
+\date{plop}
+%\date{\gitdate\titlebreak[\smallskip]{ -- }\protect\gitCommitInfo}
+
+\hypersetup{pdfinfo = {
+    Title = {plop},
+    Author = {coin},
+    Keywords = {pharo, smalltalk, user interface}}}
+% =================================================================
 \begin{document}
-\frontmatter
-%=================================================================
-\setcounter{page}{1}
-\pagestyle{headings}
-%=================================================================
-\author{
-	St\'ephane Ducasse\quad Julien Delplanque\quad Stephan Eggermont \and Johan Fabry
-	}
-\title{\Huge\bf Building UI  \\ With Spec}
-\isodate
-\date{\emph{Version of \today}}
 
-\date{}
+% Title page and colophon on verso
 \maketitle
+\pagestyle{titlingpage}
+\thispagestyle{titlingpage} % \pagestyle does not work on the first oneâŠ
 
-
+\cleartoverso
 {\small
 
-  Copyright 2015 by St\'ephane Ducasse
+  Copyright 2015 by Damien Cassou, Stéphane Ducasse, Luc Fabresse, Johan Fabry,
+  and Sven Van Caekenberghe.
 
   The contents of this book are protected under the Creative Commons
   Attribution-ShareAlike 3.0 Unported license.
@@ -85,7 +82,7 @@
   author's moral rights.
 
   \begin{center}
-    \includegraphics[width=0.2\textwidth]{support/latex/CreativeCommons-BY-SA.pdf}
+    \includegraphics[width=0.2\textwidth]{CreativeCommons-BY-SA.pdf}
   \end{center}
 
   Your fair dealing and other rights are in no way affected by the
@@ -95,16 +92,30 @@
 
   \vfill
 
-}
+  \begin{tabular}{@{}c@{\quad}l}
+    \multirow{2}{*}{\includegraphics[width=2em]{support/latex/sbabook/sba-logo.pdf}}
+    & Published by Square Bracket Associates, Switzerland. \\
+    & \url{http://squarebracketassociates.org} \\[\smallskipamount]
+    & ISBN 978-1-326-65097-1 \\
+    & First Edition, April 2016. \\
+  \end{tabular}
+  \medskip
+
+  This book has been sponsored by ESUG. \includegraphics[width=2cm]{figures/esug-logo}
+
+  Cover design by Liudmyla Dolia. Layout and typography based on the
+  \textcode{sbabook} \LaTeX{} class by Damien Pollet. The source code
+  of the book itself lives at
+  \url{https://github.com/SquareBracketAssociates/EnterprisePharo} }
 
 
 \frontmatter
 \pagestyle{plain}
 
+\tableofcontents*
+\clearpage\listoffigures
 
-%=================================================================
-\tableofcontents
-\sloppy % To avoid LaTeX's annoying habit of letting lines stick over the margins!
+
 \mainmatter
 
 \input{Intro/Intro}
@@ -114,5 +125,9 @@
 \input{SpecInternals/SpecInternals}
 \input{DynamicSpec/DynamicSpec}
 \input{TipsAndTricks/TipsAndTricks}
-\end{document}
 
+% lulu requires an empty page at the end. That's why I'm using
+% \backmatter here.
+\backmatter
+
+\end{document}
