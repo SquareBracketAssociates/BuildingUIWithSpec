@@ -1,5 +1,8 @@
-! Dynamic Spec (to be redesigned in presence of the next chapter)
+! Dynamic Spec
 @sec_spec_the_dynamic
+
+
+!! ProtocolBrowser dynamic Version
 
 Having an user interface with a well known number of sub widgets and a static layout is not always sufficient. 
 A user interface is often more than just that, for example here are two situations where more is needed: 
@@ -131,19 +134,12 @@ m3 openWithSpec.
 m3 title: 'Protocol browser'
 ]]]
 
-The final result looks like the Figure *@ex_browser*.
+The final result looks like the Figure *@fig_browser*.
 
-+Prototype of Protocol Browser>file://figures/Dyn_Protocol_Browser.png|width=50|label=ex_browser+
-
-
++Prototype of Protocol Browser>file://figures/Dyn_Protocol_Browser.png|width=50|label=fig_browser+
 
 
-
-
-
-
-
-! Dynamic Spec: Parties, a dynamic example
+!! The Adresse Book
 
 In an address book we find addresses of both people and organizations. 
 The generalization of both is called a ''party'' ('Analysis Patterns', Martin Fowler). 
@@ -155,14 +151,14 @@ We show how to do add them with a dynamic user interface, and minimize duplicati
 !! The party model
 In the party model, party is a superclass of person and company. 
 
-@@todo Put an UML class diagram 
++UML Diagram of the Adress Book>file://figures/do.png|label=fig_do_diagram+
 
 Create the abstract superclass ==Party==
 [[[label=createParty|caption=Create the party class|language=Smalltalk 
 Object subclass: #DOParty
 	instanceVariableNames: ''
 	classVariableNames: ''
-	category: 'Domain-Parties'
+	package: 'Domain-Parties'
 ]]]
 
 We should be able to select parties from a list. 
@@ -180,7 +176,7 @@ Create a subclass for persons:
 DOParty subclass: #DOPerson
 	instanceVariableNames: 'firstName lastName'
 	classVariableNames: ''
-	category: 'Domain-Parties'
+	package: 'Domain-Parties'
 ]]]
 
 Create accessors for ==firstName== and ==lastName==. We don't want to need to handle ==nil==
@@ -213,7 +209,7 @@ Create a subclass for companies
 DOParty subclass: #DOCompany
 	instanceVariableNames: 'companyName'
 	classVariableNames: ''
-	category: 'Domain-Parties'
+	package: 'Domain-Parties'
 ]]]
 
 And its accessors and the overridden method
@@ -236,7 +232,7 @@ We create a class to hold parties
 Object subclass: #DOPartiesModel
 	instanceVariableNames: 'parties'
 	classVariableNames: ''
-	category: 'Domain-Parties'
+	package: 'Domain-Parties'
 ]]]
 
 And lazily initialize  with a collection
@@ -270,7 +266,7 @@ To edit a single party, we create a subclass of ==DynamicComposableModel==
 DynamicComposableModel subclass: #DOPartyEditor
 	instanceVariableNames: 'partyClass'
 	classVariableNames: ''
-	category: 'Domain-Parties'
+	package: 'Domain-Parties'
 ]]]
 When we instantiate this editor, we'll tell it on what kind of party it operates and store that in the
  ==partyClass==. On the instance side we add accessors and on the class side we use that in a constructor.
@@ -366,7 +362,7 @@ Add a class ==DOPartiesList==
 ComposableModel subclass: #DOPartiesList
 	instanceVariableNames: 'search addPerson addCompany list'
 	classVariableNames: ''
-	category: 'Domain-Parties'
+	package: 'Domain-Parties'
 ]]]
 
 As soon as something is typed in the search field, the list should show the list of parties 
@@ -524,5 +520,3 @@ DOPartiesList>>initializePresenter
 +		self editParty: party in: edit] 
 ]]]
 
-!! Conclusion
-We show you how to build dynamic widgets with Spec.

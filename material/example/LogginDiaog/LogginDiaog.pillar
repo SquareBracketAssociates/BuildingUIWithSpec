@@ -20,7 +20,7 @@ ComposableModel subclass: #LoginModel
 Specify the layout of the UI
 
 [[[
-LoginModel class>>#defaultSpec
+LoginModel class>>defaultSpec
   <spec: #default>
 
 	^ SpecLayout composed
@@ -42,7 +42,7 @@ LoginModel class>>#defaultSpec
 !! Build the UI elements
 
 [[[
-LoginModel>>#initializeWidgets
+LoginModel>>initializeWidgets
   usernameLabel := self newLabel.
   usernameLabel text: 'Username'.
   usernameField := self newTextInput.
@@ -58,7 +58,7 @@ LoginModel>>#initializeWidgets
 !! Open the UI as modal dialog
 
 [[[
-LoginModel class>>#getCredentials
+LoginModel class>>getCredentials
   "self getCredentials"
 	
   | login dialog |
@@ -74,13 +74,13 @@ LoginModel class>>#getCredentials
 Auto-generate read accessors for the 4 instance variables.
 
 [[[
-LoginModel>>#title
+LoginModel>>title
   ^ 'Login'
 
-LoginModel>>#initialExtent
+LoginModel>>initialExtent
   ^ 350 @ 150
 
-LoginModel>>#credentials
+LoginModel>>credentials
   ^ usernameField text -> passwordField text
 ]]]
 
