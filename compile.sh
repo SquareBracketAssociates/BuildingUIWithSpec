@@ -2,6 +2,8 @@
 
 set -e
 
+git submodule update --init
+
 PILLAR_COMMAND="pillar"
 
 if [ -x pillar ]; then
