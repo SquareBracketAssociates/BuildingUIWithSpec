@@ -60,9 +60,9 @@ In this example, we are going to build a list containing icons of the current th
 
 In the previous example, we explicitly referred to the class ==ListModel==. Note that the 
 superclass ==ComposableModel== provides shorcut methods for the most used basics widget.
-Its definition for ==newList== is the following one :
+Its definition for ==newList== in the code *@ex_newlist*.
 
-[[[caption=Implementation of ComposableModel>>newList|language=Smalltalk
+[[[label=ex_newlist|caption=Implementation of ComposableModel>>newList|language=Smalltalk
 ComposableModel >> newList
 	^ self instantiate: ListModel
 ]]]
@@ -81,7 +81,7 @@ This example show a create a widget and how to basically control the window and 
 
 That example is a bit more complex and we have to create a class from which it will be instantiated. That class must be a subclass of ==ComposableModel==.
 
-[[[label=ex_CustomerStatisfaction_classcreation|caption=Creation of the class|language=Smalltalk
+[[[label=ex_CustomerStatisfaction_classcreation|caption=Creation of the class to manage subwidgets|language=Smalltalk
 ComposableModel subclass: #CustomerStatisfaction
 	instanceVariableNames: 'calcScreen button0 button1 button2'
 	classVariableNames: ''
@@ -94,7 +94,11 @@ Summarizing:
 - instance side: widget instantiation along with actions performed by these and application logic.
 - class side: widget layout i.e., how all our widgets will be laid out in a window.
 
+!!! Instanciate Subwidgets
+
 A subclass of ==ComposableModel== have responsibility to define the ==initializeWidgets== method and defaultSpec class method. In which we will instanciate buttons and the screen with methods provided by the superclass.
+
+First, the message ==instantiate:== can be used to instanciate basics widgets or widgets, it will configure some variable like ==owner== which is use to keep the hierachy of widgets.
 
 Then, we define buttons :
 - Message ==label:== define the label which will be display on them
@@ -104,15 +108,14 @@ Note that ==label:== is used to define the default text on the screen. Then, it 
 
 Finally, its a good practice to define the focus order, it use for keyboard navigation.
 
-
 [[[label=ex_CustomerStatisfaction_initializewidgets|caption=Code of CustomerStatisfaction>>initializeWidgets|language=Smalltalk|
 CustomerStatisfaction >> initializeWidgets
 
 	"widgets instanciation"
-	screen := LabelModel new.
-	buttonHappy := ButtonModel new.
-	buttonNeutral := ButtonModel new.
-	buttonBad := ButtonModel new.
+	screen := self instantiate: LabelModel.
+	buttonHappy := self instantiate: ButtonModel.
+	buttonNeutral := self instantiate: ButtonModel.
+	buttonBad := self instantiate: ButtonModel.
 
 	"widgets configuration specification"
 	screen label: 'Tell us ?'.
@@ -247,7 +250,7 @@ The message ==instantiateModels:== provide by ==ComposableModel== instanciates s
 But note that ==DynamicComposableModel== :
 - provide a Dictionnary ''widget'' and its getter ==widget==.
 - specialize ==instantiateModels:== to put widgets instanciated in the Dictionary using their names as keys.
-- specialize ==doesNotUnderstand:== to access these widgets by a search on the Dictionary before rise an exception, so creating acessors is not required (and could break the widget).
+- specialize ==doesNotUnderstand:== to access these widgets by a search on the Dictionary before rise an exception, so creating acessors is not required (and could break the widget). Notice that this mechanism is used to specified the focusOrder.
 
 [[[label=ex_popup_initializewidget|caption=The Popup initialization|language=Smalltalk|
 DynamicalPopup>>initializeWidgets
@@ -271,7 +274,10 @@ DynamicalPopup>>initializeWidgets
 					row
 						add: #label origin: 0 @ 0 corner: 0.3 @ 1;
 						add: #textInput origin: 0.3 @ 0 corner: 1 @ 1 ];
-				yourself)
+				yourself).
+	
+	"specification of order of focus"
+	self focusOrder add: self textInput
 ]]]
 
 !!! API of TextInputFieldModel
@@ -341,6 +347,10 @@ DynamicalPopup >> exampleAlternativeToolbar
 
 !! RadioButtonModel and initializePresenter
 
+That example show the use of ==RadioButtonGroupModel== to managed radiobuttons. And the method ==initializePresenter== that manage interaction between subwidgets.
+
+Notice that ==MrAndMrsRadioButton== is a subclass of ==ComposableModel== have a subwidget ==RadioButtonGroupModel== which is a subclass of ==DynamicComposableModel==, they are compatible.
+
 [[[label=ex_radio_classcreation|caption=Class Creation|language=Smalltalk|
 ComposableModel subclass: #MrAndMrsRadioButton
 instanceVariableNames: 'labelGreeting textName buttonGreet groupRadio'
@@ -348,12 +358,22 @@ classVariableNames: ''
 package: 'Spec-BuildUIWithSpec-FirstContact'
 ]]]
 
+Here, the buttons created are not subwidgets of ==MrAndMrsRadioButton== but of the ''groupRadio''.
+
+==RadioButtonGroupModel== provide :
+- Message ==addRadioButton:== add a RadioButton at the group and do all necessary things to manage it properly :
+-- it configures the variables of the button to keep the hierarchy coherent
+-- it manages the deselection of other button when one is activated
+-- it creates an accessor ==radioX== where X is a number depending of the place of the button (first button added will be radio1, second button will be radio2, ...)
+- Message ==default:== activates the specified button. Here, we use the accessor created by ==addRadioButton:==, it's equivalent at ''default: radioMr''.
+- ValueHolder ==currentActevated== and its accessors, what contains the last activated button, and provide an hook ==whenCurrentActivatedChanged:== which propagate an event when a change happend
+
 [[[label=ex_radio_initializewidget|caption=InitializeWidget|language=Smalltalk|
 MrAndMrsRadioButton >> initializeWidgets
 	| radioMr radioMs radioMrs |
-	
 	"Widgets instanciation"
-	self instantiateModels: #(#labelGreeting #LabelModel #textName #TextInputFieldModel #buttonGreet #ButtonModel).
+	self
+		instantiateModels: #(#labelGreeting #LabelModel #textName #TextInputFieldModel #buttonGreet #ButtonModel).
 
 	"Widgets configuration specification"
 	labelGreeting label: 'Enter your name.'.
@@ -362,7 +382,7 @@ MrAndMrsRadioButton >> initializeWidgets
 		label: 'Greet Me!';
 		disable.
 
-	"RadioButtons' creation"
+	"RadioButton creation"
 	radioMr := RadioButtonModel new.
 	radioMs := RadioButtonModel new.
 	radioMrs := RadioButtonModel new.
@@ -371,25 +391,28 @@ MrAndMrsRadioButton >> initializeWidgets
 	radioMrs label: 'Mrs.'.
 
 	"Adding the group for RadioButton"
-	groupRadio := RadioButtonGroup new
+	groupRadio := self instantiate: RadioButtonGroupModel.
+	groupRadio
 		addRadioButton: radioMr;
 		addRadioButton: radioMs;
-		addRadioButton: radioMrs.
-	groupRadio default: radioMr
+		addRadioButton: radioMrs;
+		default: groupRadio radio1.
+
+	"specification of order of focus"
+	self focusOrder
+		add: textName;
+		add: buttonGreet;
+		add: groupRadio
 ]]]
 
 ==AbstractWidgetModel==, whom subclasses are basics widgets, provide the accessors ==enabled== and ==enabled:==, and the shortcuts ==enable== and ==disable==. It can be used to create tricks like in the section @sec_noneditable_textfield.
 
-@@todo explain RadioButtonGroup
-- add
-- default
 
-
-!!! A first  initializePresenter
+!!! A first initializePresenter
 
 The method ==initializePresenter== is used to define relations between elements of the widget.
 
-[[[label=ex_radio_initializepresenter|caption=InitializePresenter|language=Smalltalk|
+[[[label=ex_radio_initializepresenter|caption=MrAndMrsRadioButton >> initializePresenter|language=Smalltalk|
 MrAndMrsRadioButton >> initializePresenter
 	"Hook for events"
 	textName whenTextChanged: [ buttonGreet enable ].
@@ -399,7 +422,7 @@ MrAndMrsRadioButton >> initializePresenter
 	buttonGreet disable ]
 ]]]
 
-- Message named like ==when...== are hook provided by basic widgets.
+- Messages named like ==when...== are hooks provided by widgets, they performed the specified block when their event happend. The most often they use directly the hook ==whenChangedDo:== provide by NewValueHolder.
 - Message ==action:== set a block to perform when the button is clicked.
 - ==currentActivated== and its acessors are provided by ==RadioButtonGroup==, it contains the button activated.
 
@@ -418,7 +441,6 @@ MrAndMrsRadioButton >> defaultSpec
 		yourself
 ]]]
 
-
 +MrAndMrsRadioButton>file://figures/MrAndMrsRadioButton.png|width=50|label=fig_MrAndMrsRadioButton+
 
 
@@ -436,5 +458,5 @@ For the moment (and the writting) there are example in :
 
 @@todo fill locations of others examples / revisit it
 
-@@todo add some other widgets, little example with radio button M. Mrs .. and inputfield
+@@todo may add Login Dialog Example
 
