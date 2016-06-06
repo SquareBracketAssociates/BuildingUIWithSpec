@@ -191,29 +191,26 @@ This example also shows the ==addSplitter== message, which adds a splitter betwe
 
 [[[label=ex_three_columns|caption=3-column layout|language=Smalltalk 
 ^ SpecLayout composed
-	newRow: [ :row |
-		row
-			newColumn: [ :column | 
-				 column
-				 	add: #button1;
-					add: #button2;
-					add: #button3 
-			];
-			addSplitter;
-			newColumn: [ :column | 
-				 column
-				 	add: #button4;
-					add: #button5;
-					add: #button6 
-			];
-			addSplitter;
-			newColumn: [ :column | 
-				 column
-				 	add: #button7;
-					add: #button8;
-					add: #button9 
-			] ];
-	yourself
+				newRow: [ :row | 
+					row
+						newColumn: [ :column | 
+							column
+								add: #button1;
+								add: #button4;
+								add: #button7 ];
+						addSplitter;
+						newColumn: [ :column | 
+							column
+								add: #button2;
+								add: #button5;
+								add: #button8 ];
+						addSplitter;
+						newColumn: [ :column | 
+							column
+								add: #button3;
+								add: #button6;
+								add: #button9 ] ];
+				yourself
 ]]]
 
 
@@ -232,14 +229,14 @@ The example *@ex_row_height* shows how to specify the height of a row in pixels 
 	yourself
 ]]]
 
-[[[label=ex_column_width|caption=Column of 30 pixels|language=Smalltalk 
+[[[label=ex_column_width|caption=Column of 50 pixels|language=Smalltalk 
 ^ SpecLayout composed
-	newColumn: [ :column |
-		column
-			add: #theList;
-			add: #theButton
-	] width: 30;
-	yourself
+				newColumn: [ :column | 
+					column
+						add: #theList;
+						add: #theButton ]
+					width: 50;
+				yourself
 ]]]
 
 Note that it is generally considered a bad habit to hardcode the size of the widgets.
@@ -284,13 +281,17 @@ The offset expresses the number of pixels from the corresponding corner, in the 
 Note that this approach is similar to the ProportionalLayout of ""Morphic"".
 
 
-The example *@ex_layout_expert* shows how to add a widget as a toolbar.
-It specifies that the widget in the ==toolbar== instance variable should take all the window width, but should be only 30 pixels in height.
+The example *@ex_layout_expert* shows how to add a widget looking like a toolbar.
+Here we reuse theButton for simplicity, we specifie that it take all the window width but only 30 pixels in height.
 
 [[[label=ex_layout_expert|caption=Using expert mode to specify a toolbar|language=Smalltalk 
 ^ SpecLayout composed
-	add: #toolbar origin: 0@0 corner: 1@0 offsetOrigin: 0@0 offsetCorner: 0@30;
-	yourself
+				add: #theButton
+					origin: 0 @ 0
+					corner: 1 @ 0
+					offsetOrigin: 0 @ 0
+					offsetCorner: 0 @ 30;
+				yourself
 ]]]
 
 
