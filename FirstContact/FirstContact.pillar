@@ -444,6 +444,22 @@ MrAndMrsRadioButton >> defaultSpec
 +MrAndMrsRadioButton>file://figures/MrAndMrsRadioButton.png|width=50|label=fig_MrAndMrsRadioButton+
 
 
+!! Menus
+@sec_littletoolbar
+
+@@todo integrate LittleToolbar
+
+- MenuModel
+- MenuGoupModel
+- MenuItemModel
+
+
+
+
+
+
+
+
 !! Found more Examples
 
 For the moment (and the writting) there are example in :
@@ -458,5 +474,4 @@ For the moment (and the writting) there are example in :
 
 @@todo fill locations of others examples / revisit it
 
-@@todo may add Login Dialog Example
 

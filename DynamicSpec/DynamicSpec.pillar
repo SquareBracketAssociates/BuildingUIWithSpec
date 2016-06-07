@@ -88,7 +88,9 @@ In addition, a text zone is added to show the selected methods source code.
 
 The final result looks like the Figure *@fig_browser*.
 
-[[[label=code_to_integrate|caption=Code to integrate|language=Smalltalk 
+[[[label=code_to_integrate|caption=Code to integrate|language=Smalltalk
+
+
 | dynamicWidgetClassList dynamicProtocolViewer dynamicProtoclBrowser |
 	dynamicWidgetClassList := DynamicComposableModel new.
 	dynamicWidgetClassList instantiateModels: #(#list #ListModel).

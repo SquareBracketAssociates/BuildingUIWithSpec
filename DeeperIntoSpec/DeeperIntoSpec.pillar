@@ -85,14 +85,12 @@ theList whenSelectedItemChanged: [ :item |
 		ifNotNil: [ theButton text: 'An item is selected'] ]
 ]]]
 
-[[[caption:Hint|
 If a programmer wants his or her widgets to be reused,
 they should provide a comprehensive API.
-]]]
 
-[[[caption:Hint|
+
 This method is optional. Without it, the different widgets in the UI will simply not respond to changes in each others' state.
-]]]
+
 
 !!! The ''layout'' method
 @sec_layoutmethod
@@ -120,6 +118,17 @@ It returns a layout in which just one widget is added: the widget contained in =
 	yourself
 ]]]
 
+
+
+
+
+
++Render of only one widget>file://figures/OnlyOneWidget.png|width=50|label=fig_OnlyOneWidget+
+
+
+
+
+
 The symbol ==theList== refers to an instance side method returning a widget.
 This is because instance variables are private, so the layout class needs to use an accessor to obtain it when building the UI.
 Note that by default, a widget will take all the space available in its container.
@@ -138,9 +147,7 @@ As said above, multiple layouts can be described for the same user interface.
 In order to retrieve the correct method to apply, these methods need to be flagged with a pragma.
 The pragma can be either ==<spec: default>== for the layout to use by default, or ==<spec>== for the other layouts.
 
-[[[caption:Hint|
 Specifying this method is mandatory, as without it the UI would show no widgets to the user.
-]]]
 
 
 !! Layouts
@@ -153,9 +160,7 @@ As layouts can become quite complex, this section provides a list of examples of
 - The last example presents the expert *@subsec_layout_expert* mode in case everything else fails.
 - To conclude, this section ends with a little explanation *@subsec_layout_specify* of how to specify which layout to use when a model defines multiple layouts.
 
-[[[caption:Hint|
 All the methods for adding sub widgets can be found in the ''commands'' and ''commands-advanced'' protocols of ""SpecLayout"".
-]]]
 
 !!! Rows and Column
 @subsec_layout_rows_and_column
@@ -172,6 +177,16 @@ The example *@ex_layout_row* shows how to build a row of widgets.
 	yourself
 ]]]
 
+
+
+
+
++Render of a Row of Widgets>file://figures/RowOfWidgets.png|width=50|label=fig_RowOfWidgets+
+
+
+
+
+
 Having the widgets rendered as a column is similar, as shown in the example *@ex_layout_column*
 
 [[[label=ex_layout_column|caption=Column of widgets|language=Smalltalk 
@@ -183,6 +198,16 @@ Having the widgets rendered as a column is similar, as shown in the example *@ex
 	];
 	yourself
 ]]]
+
+
+
+
+
+
++Render of a Column of Widgets>file://figures/ColumnOfWidgets.png|width=50|label=fig_ColumnOfWidgets+
+
+
+
 
 
 Rows and columns can be combined to build more complex layouts, and splitters between cells can be added.
@@ -214,6 +239,17 @@ This example also shows the ==addSplitter== message, which adds a splitter betwe
 ]]]
 
 
+
+
+
+
++Render of three Columns of Widgets>file://figures/ThreeColumns.png|width=50|label=fig_ThreeColumns+
+
+
+
+
+
+
 !!! Set Size in pixels
 @subsec_layout_set_size_pixels
 The height of rows as well as the width of columns can be specified, to prevent them to take all the available space.
@@ -229,6 +265,16 @@ The example *@ex_row_height* shows how to specify the height of a row in pixels 
 	yourself
 ]]]
 
+
+
+
+
++Render of a Row of 30 pixels>file://figures/Row30pixels.png|width=50|label=fig_Row30pixels+
+
+
+
+
+
 [[[label=ex_column_width|caption=Column of 50 pixels|language=Smalltalk 
 ^ SpecLayout composed
 				newColumn: [ :column | 
@@ -238,6 +284,16 @@ The example *@ex_row_height* shows how to specify the height of a row in pixels 
 					width: 50;
 				yourself
 ]]]
+
+
+
+
+
++Render of a Column of 50 pixels>file://figures/Column50pixels.png|width=50|label=fig_Column50pixels+
+
+
+
+
 
 Note that it is generally considered a bad habit to hardcode the size of the widgets.
 Methods are available on ''ComposableModel'' providing sensible default sizes, like the width of a button.
@@ -259,6 +315,17 @@ For example, for the top edge, the percentage is counted from the top down: 0 is
 	add: #theButton top: 0.25 bottom: 0.25 left: 0.25 right: 0.25;
 	yourself
 ]]]
+
+
+
+
+
+
++Render of a centrered Button>file://figures/CentreredButton.png|width=50|label=fig_CentreredButton+
+
+
+
+
 
 Also, the argument can be an integer if the offset has to be a fixed number of pixels.
 The number of pixels should be positive, as it indicates a distance from the corresponding edge, going to the opposite edge.
@@ -296,23 +363,68 @@ Here we reuse theButton for simplicity, we specifie that it take all the window 
 
 
 
+
+
+
++Render of a Toolbar made with the Expert Mode>file://figures/ExpertModeToolbar.png|width=50|label=fig_ExpertModeToolbar+
+
+
+
+
+
 !!! Specify Layout
 @subsec_layout_specify
 
-As explained in the section *@sec_layout*, a UI can have multiple layouts.
-So when the layout of a widget that is composed of multiple sub-widgets is defined, and this widget contains multiple layout methods that determine the layout of its sub-widgets, the layout method to use can be specified.
-
 All the methods seen in the previous examples come with a variant used to specify which selector to use for the layout method.
-By example, for the ==add:== method the variant is  ==add:withSpec:==.
+By example, for the ==add:== method the variant is  ==add:withSpec:== (by its symbol).
 
-For example, consider a widget ""MyWidget"" defining a first layout method ==firstLayout== as the default layout and another layout method called ==anotherLayout==.
-The example *@ex_specify_layout* shows how to add an instance of ""MyWidget"" using its ==anotherLayout== layout method.
 
-[[[label=ex_specify_layout|caption=How to specify an alternative layout|language=Smalltalk 
-^ SpecLayout composed
-	add: #myWidget withSpec: #anotherLayout;
-	yourself
+@@todo explain and create an example
+
+
+!! The Focusorder
+@sec_focusorder
+
+
+@@todo explain focusOrcer mechanism
+
+
+
+[[[label=ex_focusOrder_acessor|caption=The getter ComposableModel>>focusOrder|language=Smalltalk 
+ComposableModel>>focusOrder
+	^ focusOrder ifNil: [ focusOrder := SpecFocusOrder new ]
 ]]]
+
+SpecFocusOrder manages models in an OrderedCollection (presenters) and provides a getter for it and some methods like:
+- ==add:== to add a model in its collection
+- ==giveFocusToNextFrom:for:==
+
+@@todo check if for: aModel is mandatory
+
+[[[label=ex_focusOrder_giveFocusToNextFrom|caption=The method SpecFocusOrder>>giveFocusToNextFrom|language=Smalltalk 
+SpecFocusOrder>>giveFocusToNextFrom: aPresenter for: aModel
+	| focus |
+	focus := self presenters.
+	(focus includes: aPresenter)
+		ifTrue: [ | index next |
+			index := (focus indexOf: aPresenter) + 1.
+			index <= focus size
+				ifTrue: [ next := focus at: index.
+					next takeKeyboardFocus.
+					^ true ] ].
+	^ aModel owner
+		ifNil: [ | next |
+			next := focus at: 1 ifAbsent: [ ^ false ].
+			next takeKeyboardFocus.
+			true ]
+		ifNotNil: [ aModel owner giveFocusToNextFrom: aModel.
+			true ]	
+]]]
+
+That method looks for the next model to give the focus through these steps:
+- It looks in its collection for the index of the object (aPresenter) currently having the focus. If it finds it, it increments the index by one.
+- If it does not find it or if the new index is out of its collection bounds, it tries to give the focus to the next parent in the subwidgets' hierarchy (using aModel).
+- If there is no parent, it loops at the beginning of its collection to give the focus at its first model)
 
 
 
@@ -320,6 +432,6 @@ The example *@ex_specify_layout* shows how to add an instance of ""MyWidget"" us
 @sec_menus
 
 
-@todo check with peter
+@@todo check with peter, see First contact
 
 
