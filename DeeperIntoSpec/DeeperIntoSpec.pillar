@@ -1,5 +1,5 @@
-! Deeper into Spec
-@cha_deeper_into_spec
+{ "title" : "The three pillars of Spec"}
+@cha_pillars_of_spec
 
 All user interfaces in ''Spec'' are constructed through the composition of existing user interfaces.
 To define a user interface, it is sufficient to define the model of the user interface.
@@ -10,7 +10,7 @@ It is the composition of this model and these UI elements that makes up the resu
 Hence, since all UIs are constructed through ""composition"" of other UI's, and it is sufficient to define the ""model"" to define the UI, the root class of all UIs is named ==ComposableModel==.
 So, to define a new user interface, a subclass of ==ComposableModel== needs to be created.
 
-As said above, Spec is inspired by the MVP pattern.
+Spec is inspired by the MVP pattern.
 It is built around three axes that materialize themselves as the following three methods in ==ComposableModel==:
 - ==initializeWidgets==
 - ==initializePresenter==
@@ -19,7 +19,7 @@ It is built around three axes that materialize themselves as the following three
 These methods are hence typically found in the model for each user interface.
 In this section we describe the responsibility for each method, i.e. how these three work together to build the overall UI.
 
-!! the ''initializeWidgets'' method 
+!! the ''initializeWidgets'' method
 @sec_initializeWidgets
 
 This method is used to instantiate the models for the different widgets that will be part of the UI and store them in their respective instance variables.
@@ -61,7 +61,6 @@ Specifying this method is mandatory, as without it the UI would have no widgets.
 ]]]
 
 !!! Widget instantiation
-@sec_widgetinstanciation
 
 The instantiation of the model for a widget (and hence the widget) can be done in two ways: through the use of an creation method or through the use of the ==instantiate:== method.
 Considering the first option, the framework provides unary messages for the creation of all basic widgets.
@@ -70,36 +69,7 @@ The complete list of available widget creation methods can be found in the class
 Considering the second option, to reuse any composite widgets, i.e. a subclass of ''ComposableModel'', the widget needs to be initialized using the ==instantiate:== method.
 For example, to reuse a ''MessageBrowser''  widget, the code is == self instantiate: MessageBrowser.==
 
-!! The ''initializePresenter'' method
-@sec_initializePresenter
-
-This method takes care of the interactions between the different widgets.
-By linking the behavior of the different widgets it specifies the overall presentation, i.e. how the overall UI responds to interactions by the user.
-
-Usually this method consists of specifications of actions to perform when a certain event is received by a widget.
-From the propagation of those events the whole interaction flow of the UI emerges.
-
-In  ""Spec"", the different UI models are contained in value holders, and the event mechanism relies on the announcements of these value holders to manage the interactions between widgets.
-Value holders provide a single method ==whenChangedDo:== that is used to register a block to perform on change.
-
-In addition to this primitive  ==whenChangedDo:== method, the basic widgets provide more specific hooks, e.g. when an item in a list is selected or deselected.
-
-The example *@ex_button* shows how to use one of the registration methods of the list widget to change the label of the button according to the selection in the list.
-
-[[[label=ex_button|caption=How to change a button label according to a list selection|language=Smalltalk 
-theList whenSelectedItemChanged: [ :item | 
-	item 
-		ifNil: [ theButton text: 'No selected item' ]
-		ifNotNil: [ theButton text: 'An item is selected'] ]
-]]]
-
-If a programmer wants his or her widgets to be reused,
-they should provide a comprehensive API.
-
-This method is optional. Without it, the different widgets in the UI will simply not respond to changes in each others' state.
-
-
-!!! The ''layout'' method
+!! The ''layout'' method
 @sec_layoutmethod
 
 This method specifies the layout of the different widgets in the UI.
@@ -147,172 +117,10 @@ The pragma can be either ==<spec: default>== for the layout to use by default, o
 
 Specifying this method is mandatory, as without it the UI would show no widgets to the user.
 
-
-!! Layouts
-@sec_layout
-
-As layouts can become quite complex, this section provides a list of examples of the construction of layouts.
-- First two examples are given of the use of rows and columns *@subsec_layout_rows_and_column*.
-- This is followed by two examples that explain how to set a fixed size *@subsec_layout_set_size_pixels* for rows and columns.
-- Next is an example that explains how to specify a widget proportionally *@subsec_layout_percentage*.
-- The last example presents the expert *@subsec_layout_expert* mode in case everything else fails.
-- To conclude, this section ends with a little explanation *@subsec_layout_specify* of how to specify which layout to use when a model defines multiple layouts.
-
-All the methods for adding sub widgets can be found in the ''commands'' and ''commands-advanced'' protocols of ""SpecLayout"".
-
-
-!!! Rows and Column
-@subsec_layout_rows_and_column
-Often the layout of user interfaces can be described in rows and columns, and ""Spec"" provides for an easy way to specify such layouts.
-The example *@ex_layout_row* shows how to build a row of widgets.
-
-[[[label=ex_layout_row|caption=Row of widgets|language=Smalltalk 
-^ SpecLayout composed
-	newRow: [ :row |
-		row
-			add: #theList;
-			add: #theButton
-	];
-	yourself
-]]]
-
-+Render of a Row of Widgets>file://figures/RowOfWidgets.png|width=50|label=fig_RowOfWidgets+
-
-Having the widgets rendered as a column is similar, as shown in the example *@ex_layout_column*
-
-[[[label=ex_layout_column|caption=Column of widgets|language=Smalltalk 
-^ SpecLayout composed
-	newColumn: [ :column |
-		column
-			add: #theList;
-			add: #theButton
-	];
-	yourself
-]]]
-
-+Render of a Column of Widgets>file://figures/ColumnOfWidgets.png|width=50|label=fig_ColumnOfWidgets+
-
-Rows and columns can be combined to build more complex layouts, and splitters between cells can be added.
-The example *@ex_three_columns* shows how to create a 3 columns layout, containing three buttons in each column.
-This example also shows the ==addSplitter== message, which adds a splitter between the element added before it and the element added after.
-
-[[[label=ex_three_columns|caption=3-column layout|language=Smalltalk 
-^ SpecLayout composed
-				newRow: [ :row | 
-					row
-						newColumn: [ :column | 
-							column
-								add: #button1;
-								add: #button4;
-								add: #button7 ];
-						addSplitter;
-						newColumn: [ :column | 
-							column
-								add: #button2;
-								add: #button5;
-								add: #button8 ];
-						addSplitter;
-						newColumn: [ :column | 
-							column
-								add: #button3;
-								add: #button6;
-								add: #button9 ] ];
-				yourself
-]]]
-
-+Render of three Columns of Widgets>file://figures/ThreeColumns.png|width=50|label=fig_ThreeColumns+
-
-
-!!! Set Size in pixels
-@subsec_layout_set_size_pixels
-The height of rows as well as the width of columns can be specified, to prevent them to take all the available space.
-The example *@ex_row_height* shows how to specify the height of a row in pixels while the example *@ex_column_width* shows how to specify the column width.
-
-[[[label=ex_row_height|caption=Row of 30 pixels|language=Smalltalk 
-^ SpecLayout composed
-	newRow: [ :row |
-		row
-			add: #theList;
-			add: #theButton
-	] height: 30;
-	yourself
-]]]
-
-+Render of a Row of 30 pixels>file://figures/Row30pixels.png|width=50|label=fig_Row30pixels+
-
-[[[label=ex_column_width|caption=Column of 50 pixels|language=Smalltalk 
-^ SpecLayout composed
-				newColumn: [ :column | 
-					column
-						add: #theList;
-						add: #theButton ]
-					width: 50;
-				yourself
-]]]
-
-+Render of a Column of 50 pixels>file://figures/Column50pixels.png|width=50|label=fig_Column50pixels+
-
-Note that it is generally considered a bad habit to hardcode the size of the widgets.
-Methods are available on ''ComposableModel'' providing sensible default sizes, like the width of a button.
-When specifying custom widget sizes, care should be taken to take in account the current font size.
-
-
-!!! Percentage
-@subsec_layout_percentage
-It is also possible to specify the percentage of the container, e.g. the window, that a widget should occupy.
-As a result of this, the widget size will change accordingly when the container is resized.
-To do so, the proportional position of the four sides of a widget can be specified, as shown in the example *@ex_layout_proportional*.
-
-For each edge, the proportion indicates at what percentage of the overall container the edge should be placed.
-Zero percent is the container edge, 100 percent is the opposite container edge.
-For example, for the top edge, the percentage is counted from the top down: 0 is the top edge, and 1 is the bottom edge.
-
-[[[label=ex_layout_proportional|caption=A Button centered in, and half the size of its container|language=Smalltalk 
-^ SpecLayout composed
-	add: #theButton top: 0.25 bottom: 0.25 left: 0.25 right: 0.25;
-	yourself
-]]]
-
-+Render of a centrered Button>file://figures/CentreredButton.png|width=50|label=fig_CentreredButton+
-
-Also, the argument can be an integer if the offset has to be a fixed number of pixels.
-The number of pixels should be positive, as it indicates a distance from the corresponding edge, going to the opposite edge.
-
-
-!!! Expert Mode
-@subsec_layout_expert
-The previous examples should cover most of the cases of layout of widgets.
-For the remaining cases there is a last way to specify a widget by specifying its position.
-
-The method ==add: origin: corner: == of ==SpecLayout== specifies the layout of a widget, percentage-wise from the origin point to the corner point.
-These two points represent respectively the top left corner and the bottom right corner of the widget.
-The arguments express a percentage of the container, so these __must__ be between ''0@0'' and ''1@1'' .
-
-In addition to those points, two offsets can be also be specified, using the method ==add: origin: corner:  offsetOrigin: offsetCorner: ==.
-The offsets specify the number of pixels that the origin and the corner should be moved.
-
-Contrary to the previous way to define layouts, while using ==add: origin: corner:  offsetOrigin: offsetCorner: == the offset can be negative.
-The offset expresses the number of pixels from the corresponding corner, in the classical computer graphics coordinate system where the origin is in the top left corner.
-Note that this approach is similar to the ProportionalLayout of ""Morphic"".
-
-
-The example *@ex_layout_expert* shows how to add a widget looking like a toolbar.
-Here we reuse theButton for simplicity, we specifie that it take all the window width but only 30 pixels in height.
-
-[[[label=ex_layout_expert|caption=Using expert mode to specify a toolbar|language=Smalltalk 
-^ SpecLayout composed
-				add: #theButton
-					origin: 0 @ 0
-					corner: 1 @ 0
-					offsetOrigin: 0 @ 0
-					offsetCorner: 0 @ 30;
-				yourself
-]]]
-
-+Render of a Toolbar made with the Expert Mode>file://figures/ExpertModeToolbar.png|width=50|label=fig_ExpertModeToolbar+
-
 !!! Specify Layout
-@subsec_layout_specify
+
+@@todo may give more informations about modal
+
 
 As seen in section *@sec_buttonModel*, ==ComposableModel== provides methods to specify the layout to use at the openning, like ==openWithSpec:==. But notice it does not let the possibility to choose the layout of subwidgets.
 
@@ -395,55 +203,34 @@ The second using ==add:withSpec:== to use the other layout of ==SubWidgetButtons
 
 +Render of SuperWidget using alternativeButton>file://figures/alternativeButton.png|width=50|label=fig_alternativeButton+
 
++Diagram of hierarchy of parents of SuperWidget>file://figures/hierarchy.png|width=50|label=fig_superwidget_hierarchy+
 
-!! The Focusorder
-@sec_focusorder
 
-==ComposableModel== provides a variable '''focusOrder''' and its accessors to managed the path followed by the focus. If it lets nil the default Object is set.
+!! The ''initializePresenter'' method
+@sec_initializePresenter
 
-[[[label=ex_focusOrder_acessor|caption=The getter ComposableModel focusOrder|language=Smalltalk 
-ComposableModel>>focusOrder
-	^ focusOrder ifNil: [ focusOrder := SpecFocusOrder new ]
+This method takes care of the interactions between the different widgets.
+By linking the behavior of the different widgets it specifies the overall presentation, i.e. how the overall UI responds to interactions by the user.
+
+Usually this method consists of specifications of actions to perform when a certain event is received by a widget.
+From the propagation of those events the whole interaction flow of the UI emerges.
+
+In  ""Spec"", the different UI models are contained in value holders, and the event mechanism relies on the announcements of these value holders to manage the interactions between widgets.
+Value holders provide a single method ==whenChangedDo:== that is used to register a block to perform on change.
+
+In addition to this primitive  ==whenChangedDo:== method, the basic widgets provide more specific hooks, e.g. when an item in a list is selected or deselected.
+
+The example *@ex_button* shows how to use one of the registration methods of the list widget to change the label of the button according to the selection in the list.
+
+[[[label=ex_button|caption=How to change a button label according to a list selection|language=Smalltalk 
+theList whenSelectedItemChanged: [ :item | 
+	item 
+		ifNil: [ theButton text: 'No selected item' ]
+		ifNotNil: [ theButton text: 'An item is selected'] ]
 ]]]
 
-SpecFocusOrder manages models in an OrderedCollection (presenters) and provides a getter for it and some methods like:
-- ==add:== to add a model in its collection
-- ==giveFocusToNextFrom:for:== to transfert the focus at the next model
+If a programmer wants his or her widgets to be reused,
+they should provide a comprehensive API.
 
-
-
-@@todo check if for: aModel is mandatory
-
-[[[label=ex_focusOrder_giveFocusToNextFrom|caption=The method SpecFocusOrder giveFocusToNextFrom|language=Smalltalk 
-SpecFocusOrder>>giveFocusToNextFrom: aPresenter for: aModel
-	| focus |
-	focus := self presenters.
-	(focus includes: aPresenter)
-		ifTrue: [ | index next |
-			index := (focus indexOf: aPresenter) + 1.
-			index <= focus size
-				ifTrue: [ next := focus at: index.
-					next takeKeyboardFocus.
-					^ true ] ].
-	^ aModel owner
-		ifNil: [ | next |
-			next := focus at: 1 ifAbsent: [ ^ false ].
-			next takeKeyboardFocus.
-			true ]
-		ifNotNil: [ aModel owner giveFocusToNextFrom: aModel.
-			true ]	
-]]]
-
-That method looks for the next model to give the focus through these steps:
-- It looks in its collection for the index of the object (aPresenter) currently having the focus. If it finds it, it increments the index by one.
-- If it does not find it or if the new index is out of its collection bounds, it tries to give the focus to the next parent in the subwidgets' hierarchy (using aModel).
-- If there is no parent, it loops at the beginning of its collection to give the focus at its first model)
-
-
-
-!! Menus
-@sec_menus
-
-@@todo check with peter, see First contact
-
+This method is optional. Without it, the different widgets in the UI will simply not respond to changes in each others' state.
 
