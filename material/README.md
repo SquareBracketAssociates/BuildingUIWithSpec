@@ -10,8 +10,8 @@
 
 ## partRedacted
 - old
-- RemovedInterpreterAndBinding, '''extracted from the tuto'''
-- NestedFocusOrder, '''removed from the tuto''', bad habit and confusing example
+- RemovedInterpreterAndBinding, '''extracted from the tuto''' -> reintegrated
+- NestedFocusOrder, '''removed from the tuto''', bad habit and confusing example -> revisited and reintegrated
 
 
 ## pert
