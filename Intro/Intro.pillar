@@ -1,8 +1,9 @@
-! Todo
+{ "title" : "Todo"}
+
 - (done) rename preface into intro/motivation
 - update structure
 - Motivation is a bit short and not really a nice section. 
-- ModelList should be renamed in Pharo WidgetClassList
+- (in progress) ModelList should be renamed in Pharo WidgetClassList
 
 - (in progress) We should add a section on how to find example in the image: in Chapter two. 
 -- ComposableModel subclasses
@@ -13,7 +14,7 @@
 
 --initialExtent should be put into (do not forget to say that this is only for window)
 
-- revisit the examples  (and : rename it, place it in better package, revisit the help of pharo about Spec)
+- (in progress) revisit the examples  (and : rename it, place it in better package, revisit the help of pharo about Spec)
 
 
 ! Spec: a framework for describing user interfaces

@@ -1,4 +1,4 @@
-! Reusing Elements
+{ "title" : "Reusing Elements"}
 @cha_reuse
 
 
@@ -372,11 +372,4 @@ The final user interface can be opened with the following snippet: ==ProtocolBro
 The result can be seen in figure *@fig_second_protocol_browser*.
 
 +The ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_second_protocol_browser+
-
-
-!! Adding Menu and KeyBinding
-
-may be this should be adding in the flow.
-
-
 

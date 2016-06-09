@@ -1,4 +1,5 @@
-! Tips and Tricks
+{ "title" : "Tips and Tricks"}
+@cha_tips_and_tricks
 
 This chapter will present some little examples that may help you for building interfaces with Spec. 
 
@@ -44,4 +45,15 @@ SmallTips>>exampleButtonScrollable
 +The Scrollable List of Widgets>file://figures/scrollable_buttons.png|width=30|label=fig_scrollable_buttons+
 
 +The Result of a Click on a Button>file://figures/scrollable_result.png|width=30|label=fig_scrollable_result+
+
+
+!! Found more Examples
+
+- Package Spec-BuildUIWithSpec
+- Package Spec-Examples
+- Package Spec-PolyWidgets
+- StephanEggermont's repot (Ancestry and SpecGenerator)
+- ==AbstractWidgetModel== subclasses sometimes provide examples in their class side, the most part of them are in the package Spec-core in the protocol Widget
+
+@@todo fill locations of others examples / revisit it
 
