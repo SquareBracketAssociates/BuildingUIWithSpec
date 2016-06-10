@@ -1,0 +1,64 @@
+{ "title" : "The methods to control the window"}
+@cha_managing_window
+
+!! Instanciate the Window
+
+==ComposableModel== provides methods to open a window containing a widget.
+==openWithSpec== is the most basic.
+Here, it will use the layout provide by the method containing the pragma "<spec: #default>" and should give the figure *@fig_Customers_Basic*.
+Further information about the layout lookup are given in the Chapter *@cha_deeper_into_spec*
+
+[[[language=Smalltalk
+CustomerStatisfaction new openWithSpec
+]]]
+
++Render of CustomerStatisfaction>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
+
+Another method of ==ComposableModel==, ==openDialogWithSpec==, open the model in a dialog window, the following code should give the figure *@fig_Customers_Dialog*.
+
+[[[language=Smalltalk
+CustomerStatisfaction new openDialogWithSpec
+]]]
+
++Render of CustomerStatisfaction in a Dialog Window>file://figures/Customers_Dialog.png|width=50|label=fig_Customers_Dialog+
+
+
+!! Methods provided by ComposableModel
+
+!!! The Title
+
+By default, the title of a new window of a ==ComposableModel== is '''Untitled window'''.
+
+Overide the ==title== method in the subclass change the title of the window, like the call at the ==title:== method.
+
+[[[caption=Code of CustomerStatisfaction class >> title|language=Smalltalk|
+CustomerStatisfaction >> title
+	^ 'Customers satisfaction'
+]]]
+
+
+!!! The initail size
+
+Similarly at the setting of the title, overide the ==initialExtent== method set the initial size of the window. ==ComposableModel== provide the message ==extent:== to do that, but it must be called before the method to instanciate the window.
+
+
+!! The Window
+
+==ComposableModel== provide the accessor ==window== to access at the instance of the created window.
+- ==openWithSpec== create an instance of WindowModel
+- ==openDialogWithSpec== create an instance of DialogWindowModel (a subclass of WindowModel)
+
+
+@@todo may explain the following methods of ==ComposableModel==:
+- hasWindow
+- isDisplayed
+- windowIcon: (spirita: i have try it without see any change)
+- askOkToClose:
+
+
+@@todo may explain the API methods of windows
+- okAction:
+
+The default toolbar of the ==DialogWindowModel== has an ''Ok'' button and a ''Cancel'' button.
+In *@sec_textInputFieldModel*, acessor of the window is use.
+

@@ -68,12 +68,7 @@ ComposableModel >> newList
 ]]]
 
 Similarly ==ComposableModel== defines message for ==newButton==, ==newCheckBox==, ==newDropList==,...
-Note that the interest of having such methods is unclear and can be revisited in future versions of Spec. 
-
-
-
-@todo if possible, integrate Drag n Drop here
-
+Note that the interest of having such methods is unclear and can be revisited in future versions of Spec.
 
 
 !! ButtonModel and LabelModel
@@ -146,7 +141,7 @@ CustomerStatisfaction >> initializeWidgets
 ]]]
 
 
-In the following class side method ==defaultSpec==, the ==newRow:origin:corner:== is important to let enought place at the screen. Further informations about methods to define the layout are given in section *@sec_layout*. Pay attention the argument of the ==add:== messages are accessors refered by their symbols.
+In the following class side method ==defaultSpec==, the ==newRow:origin:corner:== is important to let enought place at the screen. Further informations about methods to define the layout are given in the chapter *@cha_layouts_construction*. Pay attention the argument of the ==add:== messages are accessors refered by their symbols.
 
 [[[label=ex_CustomerStatisfaction_defaultspec|caption=Code of CustomerStatisfaction class >> defaultSpec|language=Smalltalk|
 CustomerStatisfaction >> defaultSpec
@@ -162,45 +157,4 @@ CustomerStatisfaction >> defaultSpec
 			corner: 1 @ 1;
 		yourself
 ]]]
-
-
-!!! The methods to control the window
-
-!!!! The title method
-
-Overide the ==title== method in the subclass change the title of the window, like the call at the ==title:== method.
-
-[[[caption=code of CustomerStatisfaction class >> title|language=Smalltalk|
-CustomerStatisfaction >> title
-	^ 'Customers satisfaction'
-]]]
-
-
-!!!! The initialExtent and extent: methods
-
-Similarly, overide the ==initialExtent== method set the initial size of the window. ==ComposableModel== provide the message ==extent:== to do that, but it must be called before the method to instanciate the window.
-
-
-!!!! The methods to instanciate the Window
-
-==ComposableModel== provides methods to open a window containing a widget.
-==openWithSpec== is the most basic.
-Here, it will use the layout provide by the method containing the pragma "<spec: #default>" and should give the figure *@fig_Customers_Basic*.
-Further information about the layout lookup are given in the Chapter *@cha_deeper_into_spec*
-
-[[[language=Smalltalk
-CustomerStatisfaction new openWithSpec
-]]]
-
-+Render of CustomerStatisfaction>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
-
-Another method of ==ComposableModel==, ==openDialogWithSpec==, open the model in a dialog window, the following code should give the figure *@fig_Customers_Dialog*.
-
-[[[language=Smalltalk
-CustomerStatisfaction new openDialogWithSpec
-]]]
-
-==ComposableModel== provide the accessor ==window== to access at the instance of the created window.
-
-+CustomerStatisfaction in a Dialog Window>file://figures/Customers_Dialog.png|width=50|label=fig_Customers_Dialog+
 

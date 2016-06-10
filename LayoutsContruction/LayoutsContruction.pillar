@@ -16,7 +16,7 @@ All the methods for adding sub widgets can be found in the ''commands'' and ''co
 Often the layout of user interfaces can be described in rows and columns, and ""Spec"" provides for an easy way to specify such layouts.
 The example *@ex_layout_row* shows how to build a row of widgets.
 
-[[[label=ex_layout_row|caption=Row of widgets|language=Smalltalk 
+[[[label=ex_layout_row|caption=Code of a Row of widgets|language=Smalltalk 
 ^ SpecLayout composed
 	newRow: [ :row |
 		row
@@ -30,7 +30,7 @@ The example *@ex_layout_row* shows how to build a row of widgets.
 
 Having the widgets rendered as a column is similar, as shown in the example *@ex_layout_column*
 
-[[[label=ex_layout_column|caption=Column of widgets|language=Smalltalk 
+[[[label=ex_layout_column|caption=Code of a Column of widgets|language=Smalltalk 
 ^ SpecLayout composed
 	newColumn: [ :column |
 		column
@@ -46,7 +46,7 @@ Rows and columns can be combined to build more complex layouts, and splitters be
 The example *@ex_three_columns* shows how to create a 3 columns layout, containing three buttons in each column.
 This example also shows the ==addSplitter== message, which adds a splitter between the element added before it and the element added after.
 
-[[[label=ex_three_columns|caption=3-column layout|language=Smalltalk 
+[[[label=ex_three_columns|caption=Code of a 3-column layout|language=Smalltalk 
 ^ SpecLayout composed
 				newRow: [ :row | 
 					row
@@ -78,7 +78,7 @@ This example also shows the ==addSplitter== message, which adds a splitter betwe
 The height of rows as well as the width of columns can be specified, to prevent them to take all the available space.
 The example *@ex_row_height* shows how to specify the height of a row in pixels while the example *@ex_column_width* shows how to specify the column width.
 
-[[[label=ex_row_height|caption=Row of 30 pixels|language=Smalltalk 
+[[[label=ex_row_height|caption=Code of a Row of 30 pixels|language=Smalltalk 
 ^ SpecLayout composed
 	newRow: [ :row |
 		row
@@ -90,7 +90,7 @@ The example *@ex_row_height* shows how to specify the height of a row in pixels 
 
 +Render of a Row of 30 pixels>file://figures/Row30pixels.png|width=50|label=fig_Row30pixels+
 
-[[[label=ex_column_width|caption=Column of 50 pixels|language=Smalltalk 
+[[[label=ex_column_width|caption=Code of a Column of 50 pixels|language=Smalltalk 
 ^ SpecLayout composed
 				newColumn: [ :column | 
 					column
@@ -117,7 +117,7 @@ For each edge, the proportion indicates at what percentage of the overall contai
 Zero percent is the container edge, 100 percent is the opposite container edge.
 For example, for the top edge, the percentage is counted from the top down: 0 is the top edge, and 1 is the bottom edge.
 
-[[[label=ex_layout_proportional|caption=A Button centered in, and half the size of its container|language=Smalltalk 
+[[[label=ex_layout_proportional|caption=Code of a Button centered in, and half the size of its container|language=Smalltalk 
 ^ SpecLayout composed
 	add: #theButton top: 0.25 bottom: 0.25 left: 0.25 right: 0.25;
 	yourself
@@ -149,7 +149,7 @@ Note that this approach is similar to the ProportionalLayout of ""Morphic"".
 The example *@ex_layout_expert* shows how to add a widget looking like a toolbar.
 Here we reuse theButton for simplicity, we specifie that it take all the window width but only 30 pixels in height.
 
-[[[label=ex_layout_expert|caption=Using expert mode to specify a toolbar|language=Smalltalk 
+[[[label=ex_layout_expert|caption=Code using Expert Mode to specify a Toolbar|language=Smalltalk 
 ^ SpecLayout composed
 				add: #theButton
 					origin: 0 @ 0

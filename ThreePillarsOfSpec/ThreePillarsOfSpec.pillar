@@ -43,7 +43,7 @@ It first instantiates a button and a list widget, storing each in an instance va
 It second configures the button it by setting its label.
 Third it specifies the focus order of all the widgets: first the button and then the list.
 
-[[[label=pattern|caption=Example of initializeWidgets|
+[[[label=pattern|caption=Code of a simple initializeWidgets|
 initializeWidgets
 
 	theButton := self newButton.
@@ -89,7 +89,7 @@ The simpliest example of such a method is laying out just one widget.
 Example *@ex_layout1* presents such a layout.
 It returns a layout in which just one widget is added: the widget contained in ==theList== instance variable.
 
-[[[label=ex_layout1|caption=Layout with only one widget|language=Smalltalk 
+[[[label=ex_layout1|caption=Code of a Layout with only one widget|language=Smalltalk 
 ^ SpecLayout composed
 	add: #theList;
 	yourself
@@ -128,7 +128,7 @@ In that aim, all the methods seen in the previous examples come with a variant u
 
 In the following example, ==SubWidgetButtons== manages two ButtonModel and provides two layout to display them.
 
-[[[label=ex_SubWidgetButtons|caption=SubWidgetButtons|language=Smalltalk 
+[[[label=ex_SubWidgetButtons|caption=Code of SubWidgetButtons|language=Smalltalk 
 SubWidgetButtons>>initializeWidgets
 	button1 := self instantiate: ButtonModel.
 	button2 := self instantiate: ButtonModel.
@@ -159,7 +159,7 @@ SubWidgetButtons>>onALine
 
 ==SubWidgetList== is very simple, and manages a ListModel.
 
-[[[label=ex_SubWidgetList|caption=SubWidgetList|language=Smalltalk 
+[[[label=ex_SubWidgetList|caption=Code of SubWidgetList|language=Smalltalk 
 SubWidgetList>>initializeWidgets
 	list := self instantiate: ListModel.
 	list items: (1 to: 10).
@@ -170,7 +170,7 @@ SubWidgetList>>initializeWidgets
 ==SuperWidget== reuses them and provides two layout. One using the default layout of ==SubWidgetButtons== as result the figure *@fig_SuperWidget*.
 
  
-[[[label=ex_SuperWidget|caption=SuperWidget|language=Smalltalk 
+[[[label=ex_SuperWidget|caption=Code of SuperWidget|language=Smalltalk 
 SuperWidget>>initializeWidgets
 	subButtons := self instantiate: SubWidgetButtons.
 	subList := self instantiate: SubWidgetList.
@@ -203,7 +203,7 @@ The second using ==add:withSpec:== to use the other layout of ==SubWidgetButtons
 
 +Render of SuperWidget using alternativeButton>file://figures/alternativeButton.png|width=50|label=fig_alternativeButton+
 
-+Diagram of hierarchy of parents of SuperWidget>file://figures/hierarchy.png|width=50|label=fig_superwidget_hierarchy+
++Diagram of hierarchy of parents of SuperWidget>file://figures/SuperWidgetHierarchy.png|label=fig_superwidget_hierarchy+
 
 
 !! The ''initializePresenter'' method
@@ -222,7 +222,7 @@ In addition to this primitive  ==whenChangedDo:== method, the basic widgets prov
 
 The example *@ex_button* shows how to use one of the registration methods of the list widget to change the label of the button according to the selection in the list.
 
-[[[label=ex_button|caption=How to change a button label according to a list selection|language=Smalltalk 
+[[[label=ex_button|caption=Code of How to change a button label according to a list selection|language=Smalltalk 
 theList whenSelectedItemChanged: [ :item | 
 	item 
 		ifNil: [ theButton text: 'No selected item' ]

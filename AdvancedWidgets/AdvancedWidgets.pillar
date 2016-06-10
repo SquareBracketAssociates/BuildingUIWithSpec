@@ -1,7 +1,7 @@
 { "title" : "Advanced Widgets"}
 @cha_advanced_widgets
 
-!! TextInputFieldModel and Dynamic Widget : The Popup
+!! TextInputFieldModel and Dynamic Widget
 @sec_textInputFieldModel
 
 This example shows how to design a popup window asking for an input, created dynamically.
@@ -12,7 +12,7 @@ The widget is an instance of a subclass of ==ComposableModel== named ==DynamicCo
 DynamicComposableModel subclass: #DynamicalPopup
 	instanceVariableNames: ''
 	classVariableNames: ''
-	package: 'Spec-BuildUIWithSpec-FirstContact'
+	package: 'Spec-BuildUIWithSpec-AdvancedWidgets'
 ]]]
 
 
@@ -52,13 +52,19 @@ DynamicalPopup >> initializeWidgets
 ]]]
 
 
-!!! API of TextInputFieldModel
+!!! Messages of TextInputFieldModel
 
-In Widgets configuration specification, the following messages are provide by the API of ==TextInputFieldModel== :
+In Widgets configuration specification,
+
+==ComposableModel== provides:
+- Message ==bindKeyCombination:== set a shortcut associate at a block to perfom, here it make the entry key the same effect than a click on the ''Ok'' button.
+
+==TextModel== provides:
 - Message ==autoAccept:== specify that the text field should automatically accept the text on each keystroke, such that it does not show the yellow 'edited' triangle on the top right and content don't need to be saved.
+
+The API of ==TextInputFieldModel== provides:
 - Message ==entryCompletion:== set an instance ==EntryCompletion== to treat the input.
 - Message ==ghostText:== set the text of the ghost text.
-- Message ==bindKeyCombination:== set a shortcut associate at a block to perfom, here it make the entry key the same effect than a click on the ''Ok'' button.
 
 
 !!! Set the layout dynamically
@@ -72,7 +78,7 @@ DynamicalPopup >> defaultToolbarConfiguration
 	self window okAction: [ Transcript show: self inputText text ]
 ]]]
 
-Here, ''self window'' is the default toolbar created by ==openDialogWithSpec==. The message ==okAction:== set a block to perform when the ''Ok'' button is clicked, here we simply print the content of the field in the Transcript.
+The message ==okAction:== set a block to perform when the ''Ok'' button is clicked, here we simply print the content of the field in the Transcript.
 
 That method must be called after the instanciation of the window.
 
@@ -89,7 +95,6 @@ DynamicalPopup >> exampleDefaultToolbar
 
 !!! Change the Toolbar
 
-The default toolbar of the ==DialogWindowModel== has an ''Ok'' button and a ''Cancel'' button.
 To get a widget with a single button ''Ok'', the toolbar to use should be defined explicitly using the window's accessor ==toolbar:==.
 
 [[[label=ex_popup_newtoolbar|caption=Code of a New Toolbar for the popup|language=Smalltalk|
@@ -118,10 +123,9 @@ DynamicalPopup >> exampleAlternativeToolbar
 +Render of the Popup with a New Toolbar>file://figures/Popup_NewToolbar.png|width=50|label=fig_popup_newtoolbar+
 
 
+!! RadioButtonModel
 
-!! RadioButtonModel and initializePresenter
-
-That example show the use of ==RadioButtonGroupModel== to managed radiobuttons. And the method ==initializePresenter== that manage interaction between subwidgets.
+That example show the use of ==RadioButtonGroupModel== to managed radiobuttons.
 
 Notice that ==MrAndMrsRadioButton== is a subclass of ==ComposableModel== have a subwidget ==RadioButtonGroupModel== which is a subclass of ==DynamicComposableModel==, they are compatible.
 
@@ -129,7 +133,7 @@ Notice that ==MrAndMrsRadioButton== is a subclass of ==ComposableModel== have a 
 ComposableModel subclass: #MrAndMrsRadioButton
 instanceVariableNames: 'labelGreeting textName buttonGreet groupRadio'
 classVariableNames: ''
-package: 'Spec-BuildUIWithSpec-FirstContact'
+package: 'Spec-BuildUIWithSpec-AdvancedWidgets'
 ]]]
 
 Here, the buttons created are not subwidgets of ==MrAndMrsRadioButton== but of the ''groupRadio''.
@@ -181,11 +185,6 @@ MrAndMrsRadioButton >> initializeWidgets
 
 ==AbstractWidgetModel==, whom subclasses are basics widgets, provide the accessors ==enabled== and ==enabled:==, and the shortcuts ==enable== and ==disable==. It can be used to create tricks like in the section @sec_noneditable_textfield.
 
-
-!!! A first initializePresenter
-
-The method ==initializePresenter== is used to define relations between elements of the widget.
-
 [[[label=ex_radio_initializepresenter|caption=Code of MrAndMrsRadioButton >> initializePresenter|language=Smalltalk|
 MrAndMrsRadioButton >> initializePresenter
 	"Hook for events"
@@ -196,9 +195,9 @@ MrAndMrsRadioButton >> initializePresenter
 	buttonGreet disable ]
 ]]]
 
-- Messages named like ==when...== are hooks provided by widgets, they performed the specified block when their event happend. The most often they use directly the hook ==whenChangedDo:== provide by NewValueHolder.
+In the code of ==initializePresenter== *@ex_radio_initializepresenter*,
 - Message ==action:== set a block to perform when the button is clicked.
-- ==currentActivated== and its acessors are provided by ==RadioButtonGroup==, it contains the button activated.
+- ==currentActivated== and its acessors are provided by ==RadioButtonGroupModel==, it contains the button activated.
 
 !!! Another way to make a simple layout
 
@@ -226,7 +225,7 @@ That example expose the creation of menu, a menu is the collaboration between th
 - ==MenuGoupModel== containing ==MenuItemModel==.
 - ==MenuItemModel==, each of them will be a button in the menu, they wears their behaviour and their appearence.
 
-@@todo explain the message ==applyTo:==
+The message ==applyTo:== links the shorcuts of the menu at a model. Making them usable, even if the menu is not displayed.
 
 [[[label=ex_littletoolbar_initializeWidgets|caption=Code of LittleToolbar >> initializeWidgets|language=Smalltalk|
 LittleToolbar >> initializeWidgets
@@ -235,7 +234,7 @@ LittleToolbar >> initializeWidgets
 	menu applyTo: self
 ]]]
 
-The layout dislay simply the menu.
+Here, the layout dislay simply the menu.
 
 [[[label=ex_littletoolbar_defaultSpec|caption=Code of LittleToolbar >> defaultSpec|language=Smalltalk|
 LittleToolbar >> defaultSpec
