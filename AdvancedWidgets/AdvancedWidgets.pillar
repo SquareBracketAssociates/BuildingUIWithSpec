@@ -1,0 +1,325 @@
+{ "title" : "Advanced Widgets"}
+@cha_advanced_widgets
+
+!! TextInputFieldModel and Dynamic Widget
+@sec_textInputFieldModel
+
+This example shows how to design a popup window asking for an input, created dynamically.
+
+The widget is an instance of a subclass of ==ComposableModel== named ==DynamicComposableModel==.
+
+[[[label=ex_popup_classcreation|caption=Creation of the class DynamicalPopup|language=Smalltalk|
+DynamicComposableModel subclass: #DynamicalPopup
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec-AdvancedWidgets'
+]]]
+
+
+!!! Widget instanciation
+
+==DynamicComposableModel== :
+- provide a Dictionnary ''widget'' and its getter ==widget==.
+- specialize ==instantiateModels:== to put widgets instanciated in the Dictionary using their names as keys and created instance as values.
+- specialize ==doesNotUnderstand:== to access these widgets by a search on the Dictionary before rise an exception, so creating acessors is not required (and could break the widget). Notice that this mechanism is used in the code *@ex_popup_initializewidget* to specified the focusOrder.
+
+[[[label=ex_popup_initializewidget|caption=Code of DynamicalPopup >> initializeWidgets|language=Smalltalk|
+DynamicalPopup >> initializeWidgets
+	"Widgets instanciation"
+	self instantiateModels: #(#label #LabelModel #textInput #TextInputFieldModel).
+
+	"Widgets configuration specification"
+	self title: 'Choose your project'.
+	self label label: 'Packages :'.
+	self textInput
+		autoAccept: true;
+		entryCompletion: nil;
+		ghostText: '.*';
+		bindKeyCombination: Character cr toAction: [ self toolbar triggerOkAction ].
+
+	"Defining dynamically the layout"
+	self
+		layout:
+			(SpecLayout composed
+				newRow: [ :row | 
+					row
+						add: #label origin: 0 @ 0 corner: 0.3 @ 1;
+						add: #textInput origin: 0.3 @ 0 corner: 1 @ 1 ];
+				yourself).
+	
+	"specification of order of focus"
+	self focusOrder add: self textInput
+]]]
+
+
+!!! Messages of TextInputFieldModel
+
+In Widgets configuration specification,
+
+==ComposableModel== provides:
+- Message ==bindKeyCombination:== set a shortcut associate at a block to perfom, here it make the entry key the same effect than a click on the ''Ok'' button.
+
+==TextModel== provides:
+- Message ==autoAccept:== specify that the text field should automatically accept the text on each keystroke, such that it does not show the yellow 'edited' triangle on the top right and content don't need to be saved.
+
+The API of ==TextInputFieldModel== provides:
+- Message ==entryCompletion:== set an instance ==EntryCompletion== to treat the input.
+- Message ==ghostText:== set the text of the ghost text.
+
+
+!!! Set the layout dynamically
+
+==DynamicComposableModel== provide a variable ''layout'' and its setter ==layout:==, and it specialize ==openWithSpec== to try to use this layout if it has been specified before use the search of ==ComposableModel==.
+
+!!! Set an Action at ''Ok''
+
+[[[label=ex_popup_defaulttoolbar|caption=Code of DynamicalPopup >> defaultToolbarConfiguration|language=Smalltalk|
+DynamicalPopup >> defaultToolbarConfiguration
+	self window okAction: [ Transcript show: self inputText text ]
+]]]
+
+The message ==okAction:== set a block to perform when the ''Ok'' button is clicked, here we simply print the content of the field in the Transcript.
+
+That method must be called after the instanciation of the window.
+
+[[[label=ex_popup_exampledefaulttoolbar|caption=Code to launch the DynamicalPopup with the Default Toolbar|language=Smalltalk|
+DynamicalPopup >> exampleDefaultToolbar
+	| example |
+	example := self new.
+	example openDialogWithSpec.
+	example defaultToolbarConfiguration
+]]]
+
++Render of the Popup>file://figures/Popup.png|width=50|label=fig_popup+
+
+
+!!! Change the Toolbar
+
+To get a widget with a single button ''Ok'', the toolbar to use should be defined explicitly using the window's accessor ==toolbar:==.
+
+[[[label=ex_popup_newtoolbar|caption=Code of a New Toolbar for the popup|language=Smalltalk|
+DynamicalPopup >> alternativeToolbar
+	"Instanciate the alternative toolbar"
+	self instantiateModels: #(#toolbar #OkToolbar).
+
+	"Configuring the alternative toolbar"
+	self toolbar okAction: [ Transcript show: self textInput text ].
+
+	"Set the alternative toolbar in the window"
+	self window toolbar: self toolbar
+]]]
+
+That method must be called after the instanciation of the window.
+
+[[[label=ex_popup_examplenewtoolbar|caption=Code to launch the Example with the Alternative Toolbar|language=Smalltalk|
+DynamicalPopup >> exampleAlternativeToolbar
+	| example |
+	example := self new.
+	example openDialogWithSpec.
+	example alternativeToolbar
+]]]
+
+
++Render of the Popup with a New Toolbar>file://figures/Popup_NewToolbar.png|width=50|label=fig_popup_newtoolbar+
+
+
+!! RadioButtonModel
+
+That example show the use of ==RadioButtonGroupModel== to managed radiobuttons.
+
+Notice that ==MrAndMrsRadioButton== is a subclass of ==ComposableModel== have a subwidget ==RadioButtonGroupModel== which is a subclass of ==DynamicComposableModel==, they are compatible.
+
+[[[label=ex_radio_classcreation|caption=Creation of the class MrAndMrsRadioButton|language=Smalltalk|
+ComposableModel subclass: #MrAndMrsRadioButton
+instanceVariableNames: 'labelGreeting textName buttonGreet groupRadio'
+classVariableNames: ''
+package: 'Spec-BuildUIWithSpec-AdvancedWidgets'
+]]]
+
+Here, the buttons created are not subwidgets of ==MrAndMrsRadioButton== but of the ''groupRadio''.
+
+==RadioButtonGroupModel== provide :
+- Message ==addRadioButton:== add a RadioButton at the group and do all necessary things to manage it properly :
+-- it configures the variables of the button to keep the hierarchy coherent
+-- it manages the deselection of other button when one is activated
+-- it creates an accessor ==radioX== where X is a number depending of the place of the button (first button added will be radio1, second button will be radio2, ...)
+- Message ==default:== activates the specified button. Here, we use the accessor created by ==addRadioButton:==, it's equivalent at ''default: radioMr''.
+- ValueHolder ==currentActevated== and its accessors, what contains the last activated button, and provide an hook ==whenCurrentActivatedChanged:== which propagate an event when a change happend
+
+[[[label=ex_radio_initializewidget|caption=Code of MrAndMrsRadioButton >> InitializeWidget|language=Smalltalk|
+MrAndMrsRadioButton >> initializeWidgets
+	| radioMr radioMs radioMrs |
+	"Widgets instanciation"
+	self
+		instantiateModels: #(#labelGreeting #LabelModel #textName #TextInputFieldModel #buttonGreet #ButtonModel).
+
+	"Widgets configuration specification"
+	labelGreeting label: 'Enter your name.'.
+	textName autoAccept: true.
+	buttonGreet
+		label: 'Greet Me!';
+		disable.
+
+	"RadioButton creation"
+	radioMr := RadioButtonModel new.
+	radioMs := RadioButtonModel new.
+	radioMrs := RadioButtonModel new.
+	radioMr label: 'Mr.'.
+	radioMs label: 'Ms.'.
+	radioMrs label: 'Mrs.'.
+
+	"Adding the group for RadioButton"
+	groupRadio := self instantiate: RadioButtonGroupModel.
+	groupRadio
+		addRadioButton: radioMr;
+		addRadioButton: radioMs;
+		addRadioButton: radioMrs;
+		default: groupRadio radio1.
+
+	"specification of order of focus"
+	self focusOrder
+		add: textName;
+		add: buttonGreet;
+		add: groupRadio
+]]]
+
+==AbstractWidgetModel==, whom subclasses are basics widgets, provide the accessors ==enabled== and ==enabled:==, and the shortcuts ==enable== and ==disable==. It can be used to create tricks like in the section @sec_noneditable_textfield.
+
+[[[label=ex_radio_initializepresenter|caption=Code of MrAndMrsRadioButton >> initializePresenter|language=Smalltalk|
+MrAndMrsRadioButton >> initializePresenter
+	"Hook for events"
+	textName whenTextChanged: [ buttonGreet enable ].
+
+	"Specification of the Button's Action"
+	buttonGreet action: [ labelGreeting label: 'Hello, ' , groupRadio currentActivated label , ' ' , textName text.
+	buttonGreet disable ]
+]]]
+
+In the code of ==initializePresenter== *@ex_radio_initializepresenter*,
+- Message ==action:== set a block to perform when the button is clicked.
+- ==currentActivated== and its acessors are provided by ==RadioButtonGroupModel==, it contains the button activated.
+
+!!! Another way to make a simple layout
+
+==SpecColumnLayout== is the object created by ==newColumn:==.
+
+[[[label=ex_radio_layout|caption=Code of another way to define the Layout of MrAndMrsRadioButton|language=Smalltalk|
+MrAndMrsRadioButton >> defaultSpec
+	<spec: #default>
+	^ SpecColumnLayout new
+		add: #labelGreeting;
+		add: #textName;
+		add: #buttonGreet;
+		add: #groupRadio;
+		yourself
+]]]
+
++Render of MrAndMrsRadioButton>file://figures/MrAndMrsRadioButton.png|width=50|label=fig_MrAndMrsRadioButton+
+
+
+!! Menus
+@sec_littletoolbar
+
+That example expose the creation of menu, a menu is the collaboration between three classes:
+- ==MenuModel== containing ==MenuGoupModel== and displaying them spepareted by a splitter.
+- ==MenuGoupModel== containing ==MenuItemModel==.
+- ==MenuItemModel==, each of them will be a button in the menu, they wears their behaviour and their appearence.
+
+The message ==applyTo:== links the shorcuts of the menu at a model. Making them usable, even if the menu is not displayed.
+
+[[[label=ex_littletoolbar_initializeWidgets|caption=Code of LittleToolbar >> initializeWidgets|language=Smalltalk|
+LittleToolbar >> initializeWidgets
+	menu := self instantiate: MenuModel.
+	self configMainMenu.
+	menu applyTo: self
+]]]
+
+Here, the layout dislay simply the menu.
+
+[[[label=ex_littletoolbar_defaultSpec|caption=Code of LittleToolbar >> defaultSpec|language=Smalltalk|
+LittleToolbar >> defaultSpec
+	<spec: #default>
+	^ SpecLayout composed
+		newColumn: [ :column | column add: #menu ];
+		yourself
+]]]
+
+- The message ==addGroup:== is provided by ==MenuModel== to create a new ==MenuGoupModel==.
+- The message ==addItem:== is provided by ==MenuGoupModel== to create a new ==MenuItemModel==.
+
+==MenuItemModel== provides the following methods to control its apperence:
+- ==name:== is the text appearring at in the button.
+- ==icon:== is the icon appearring at in the button.
+- ==description:== is diplayed in a tooltips.
+- ==shortcut:== to add a shorcut to activate the item,the shortcut is diplayed near the name.
+
+And to control the following methods its behaviour, it should be defined only one in the same time:
+- ==subMenu:== to open the specified menu.
+- ==action:== to perform the specified block.
+
+[[[label=ex_littletoolbar_configMainMenu|caption=Code of LittleToolbar >> configMainMenu|language=Smalltalk|
+LittleToolbar >> configMainMenu
+	menu
+		addGroup: [ :group1 | 
+			group1
+				addItem: [ :item | 
+					item
+						name: 'File';
+						subMenu: self createSubMenu ].
+			group1
+				addItem: [ :item | 
+					item
+						description: 'Open file';
+						icon: (Smalltalk ui icons iconNamed: #openIcon);
+						action: [ self inform: 'Open File' ] ] ];
+		addGroup: [ :group2 | 
+			group2
+				addItem: [ :item | 
+					item
+						description: 'Add menu item';
+						icon: (Smalltalk ui icons iconNamed: #add);
+						action: [ self dynamicalAdding: group2 ] ] ]
+]]]
+
+==createSubMenu== return a new MenuModel with two items.
+
+[[[label=ex_littletoolbar_createSubMenu|caption=Code of LittleToolbar >> createSubMenu|language=Smalltalk|
+LittleToolbar >> createSubMenu
+	^ MenuModel new
+		addGroup: [ :group | 
+			group
+				addItem: [ :item | 
+					item
+						name: 'Save';
+						icon: (Smalltalk ui icons iconNamed: #smallSaveIcon);
+						shortcut: $s meta;
+						action: [ self inform: 'Save' ] ].
+			group
+				addItem: [ :item | 
+					item
+						name: 'Print';
+						shortcut: $p meta;
+						icon: (Smalltalk ui icons iconNamed: #smallPrintIcon);
+						action: [ self inform: 'Print' ] ] ]
+]]]
+
+==dynamicalAdding:== creates a new item, configures the item to remove itself when is clicked and adds the item to the specified group.
+
+[[[label=ex_littletoolbar_dynamicalAdding|caption=Code of LittleToolbar >> dynamicalAdding:|language=Smalltalk|
+LittleToolbar >> dynamicalAdding: aGroup
+	aGroup
+		addItem: [ :item | 
+			item
+				name: 'Dynamic';
+				icon: (Smalltalk ui icons iconNamed: #delete);
+				action: [ aGroup menuItems remove: item.
+					self needRebuild: false.
+					self buildWithSpec ] ].
+	self needRebuild: false.
+	self buildWithSpec
+]]]
+
+The figure *@fig_LittleToolbar* show the result after two clicks on the button to add an item and a click on the button displaying a submenu
+
++Render of LittleToolbar>file://figures/LittleToolbar.png|width=50|label=fig_LittleToolbar+
+

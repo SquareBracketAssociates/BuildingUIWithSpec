@@ -1,122 +1,92 @@
-! Reusing Elements
+{ "title" : "Reusing Elements"}
 @cha_reuse
 
+In this chapter we will show the power of Spec at work to build complex applications by reusing existing widgets and managed their interactions.
 
-In this chapter we will show the power of Spec at work. We will reuse Spec elements in different little applications.
-
-
-The following example shows how build complex applications by reusing existing widget and managed their interactions. It's structured in four parts that will result in the browser shown in figure *@fig_protocol_browser*.
-
-+A simple class browser composed of reusable elements.>file://figures/Protocol_Browser.png|width=80|label=fig_protocol_browser+
-
-- First, the ""WidgetList"" : a widget dedicated to render ==ListModel==.
+It's structured in four parts that will result in the browser shown in figure *@fig_protocol_browser*:
+- First, the ""WidgetClassList"" : a widget dedicated to render ==ListModel== displaying AbstractWidgetModel subclasses.
 - Second, the ""ProtocolList"" : a widget composed of a ==ListModel== and a ==LabelModel==.
-- Third, the ""ProtocolViewer"" : defined by combining a ==WidgetList== with two ==ProtocolList==, it will browse the methods in protocols named ''api'' and ''api-events''.
-- Finally, the ""ProtocolBrowser"" : reuse a ==ProtocolViewer== and adding a ==TextModel==. 
+- Third, the ""ProtocolViewer"" : defined by combining a ==WidgetClassList== with two ==ProtocolList==, it will browse the methods in protocols named ''api'' and ''api-events''.
+- Finally, the ""ProtocolBrowser"" : reuse a ==ProtocolViewer== and adding a ==TextModel==.
+
+This composition is shown by the diagram *@fig_protocolbrowser_hierarchy*.
+
++Diagram of hierarchy of parents of ProtocolBrowser>file://figures/ProtocolBrowserHierarchy.png|label=fig_protocolbrowser_hierarchy+
 
 
-!! The WidgetList
-@sec_widgetlist
 
-The snippet *@ex_widgetlist_classcreation* shows the definition of this for the ==WidgetList== class.
+!! Using a Basic Widget 
+@sec_WidgetClassList
 
-[[[label=ex_widgetlist_classcreation|caption=WidgetList definition|language=Smalltalk 
-ComposableModel subclass: #WidgetList
+[[[label=ex_WidgetClassList_classcreation|caption=Creation of the class WidgetClassList|language=Smalltalk 
+ComposableModel subclass: #WidgetClassList
 	instanceVariableNames: 'list'
 	classVariableNames: ''
-	package: 'Spec-Examples'
+	package: 'Spec-BuildUIWithSpec-Reuse'
 ]]]
 
-The first required step then is to instantiate and define the sub widgets.
-This step is done in the method ==initializeWidgets== as shown in the code *@ex_WidgetList_initializeWidgets*. It creates the list and populates it with the required classes, in alphabetical order.
-More details on the use of the ==initializeWidgets== method are given in Section *@sec_initializeWidgets*.
+In the method ==initializeWidgets==, we create the list and populates it with the required classes, in alphabetical order.
 
-[[[label=ex_WidgetList_initializeWidgets|caption=Implementation of WidgetList>>initializeWidgets|language=Smalltalk 
-WidgetList>>initializeWidgets
-
+[[[label=ex_WidgetClassList_initializeWidgets|caption=Code of WidgetClassList>>initializeWidgets|language=Smalltalk 
+WidgetClassList >> initializeWidgets
 	list := self newList.
 	list items: (AbstractWidgetModel allSubclasses 
 		sorted: [:a :b | a name < b name ]).
 	self focusOrder add: list
 ]]]
 
+The layout contains only the list.
 
-The second required step is to define a layout, which is done on the class side.
-Since there is here only one sub widget, the layout is quite simple, as shown in the code *@ex_WidgetList_layout*.
-It simply returns a layout that contains only the list.
-More details on the use of this method are given in Section *@sec_layout*.
-
-[[[label=ex_WidgetList_layout|caption=WidgetList layout|language=Smalltalk 
-WidgetList class>>defaultSpec
+[[[label=ex_WidgetClassList_layout|caption=Code of WidgetClassList class >> defaultSpec|language=Smalltalk 
+WidgetClassList class >> defaultSpec
 	<spec: #default>
-	
 	^ SpecLayout composed
 		add: #list;
 		yourself
 ]]]
 
-Pay attention the argument, ==#list==, of the ==add:== message, refers to a method that we did not define yet and that should return the associated UI element (here a list). 
+The three last methods to define on WidgetClassList are the getter of the list, a method to display the UI title and a method to register to list selection changes.
 
-
-The three last methods to define on WidgetList are a getter, a method to display the UI title and a method to register to list selection changes.
-The code *@ex_WidgetList_others* shows the implementation of these three methods and their protocols.
-
-[[[label=ex_WidgetList_others|caption=WidgetList other methods|language=Smalltalk 
-WidgetList>>list
-	^ list
-
-WidgetList>>title
-	^ 'Widgets'
-
-WidgetList>>whenSelectedItemChanged: aBlock
+[[[label=ex_WidgetClassList_register|caption=WidgetClassList other methods|language=Smalltalk 
+WidgetClassList>>whenSelectedItemChanged: aBlock
 	list whenSelectedItemChanged: aBlock
 ]]]
 
-Note that this ==whenSelectedItemChanged: aBlock== will probably be deprecated in the future, since clients
-can simply send the message to the list directly.
+Note that this ==whenSelectedItemChanged: aBlock== will probably be deprecated in the future, since clients can simply send the message to the list directly.
 
-The first UI is now done.
-The result can be seen by executing the following snippet of code: ==WidgetList new openWithSpec== as shown in figure *@fig_WidgetList*
+The result can be seen by executing the following snippet of code: ==WidgetClassList new openWithSpec== as shown in figure *@fig_WidgetClassList*
 
-+The WidgetList Element.>file://figures/WidgetList.png|width=50|label=fig_WidgetList+
++Render of the WidgetClassList>file://figures/WidgetClassList.png|width=50|label=fig_WidgetClassList+
 
 
 
-
-!! The ProtocolList
+!! Render of two Basic Widgets
 @sec_protocollist
 
-The next user interface that we will build is the protocol list.
 This UI combines two widgets: a list and a label.
-The class definition is similar to the code above, as can be seen in *@ex_protocolList_definition*.
 
-[[[label=ex_protocolList_definition|caption=ProtocolList definition|language=Smalltalk 
+[[[label=ex_protocolList_definition|caption=Creation of the class ProtocolList|language=Smalltalk 
 ComposableModel subclass: #ProtocolList
 	instanceVariableNames: 'label protocols'
 	classVariableNames: ''
-	package: 'Spec-Examples'
+	package: 'Spec-BuildUIWithSpec-Reuse'
 ]]]
 
-The ==initializeWidgets== method for this UI is quite similar to the method in WidgetList, as the code in *@ex_protocolList_init* shows.
+The ==initializeWidgets== method for this UI is quite similar to the method in WidgetClassList, as the code in *@ex_protocolList_init* shows.
 
-[[[label=ex_protocolList_init|caption=ProtocolList implementation of initializeWidgets|language=Smalltalk 
-ProtocolList>>initializeWidgets
-
-	protocols := self newList.
-	label := self newLabel.	
+[[[label=ex_protocolList_init|caption=Code of ProtocolList >> initializeWidgets|language=Smalltalk 
+ProtocolList >> initializeWidgets
+	protocols := self instantiate: ListModel.
+	label :=  self instantiate: LabelModel.
 	label label: 'Protocol'.
 	self focusOrder add: protocols
 ]]]
 
-
-The layout method is quite different though.
-Now the sub widgets need to be placed more specifically than in the previous example.
 The code *@ex_protocolList_layout* shows how to build a column with the label on top and the list taking all the space that is left.
 
-[[[label=ex_protocolList_layout|caption=ProtocolList layout|language=Smalltalk 
-ProtocolList class>>defaultSpec
+[[[label=ex_protocolList_layout|caption=Code of ProtocolList class >> defaultSpec|language=Smalltalk 
+ProtocolList class >> defaultSpec
 	<spec: #default>
-
 	^ SpecLayout composed
 		newColumn: [ :column |
 			column
@@ -126,66 +96,34 @@ ProtocolList class>>defaultSpec
 		yourself
 ]]]
 
-Note again that the arguments of the message ==add:== refer to methods that we will implement now. The remaining methods are getters, sub widget delegation methods, a method to display the title, and a method to register to list selection changes.
-The code *@ex_protocolList_others* shows the implementations of these methods.
+The remaining methods are getters, sub widget delegation methods, a method to display the title, and a method to register to list selection changes.
 
-[[[label=ex_protocolList_others|caption=ProtocolList other methods|language=Smalltalk 
-ProtocolList>>label
-	^ label
+The ""ProtocolList"" UI can be seen by evaluating ==ProtocolList new openWithSpec==. As shown in Figure *@fig_protocollist* the widgets is empty. This is normal since we did not initialize it. 
 
-ProtocolList>>protocols
-	^ protocols
-
-ProtocolList>>items: aCollection
-	protocols items: aCollection
-	
-ProtocolList>>label: aText
-	label text: aText
-	
-ProtocolList>>resetSelection
-	protocols resetSelection
-	
-ProtocolList>>title
-	^ 'Protocol widget'
-	
-ProtocolList>>whenSelectedItemChanged: aBlock
-	protocols whenSelectedItemChanged: aBlock
-]]]
-
-Note again that the message ==whenSelectedItemChanged:== may be deprecated in the future.
-We will see that the users may direcly register block using the accessors.
-
-The ""ProtocolList"" UI can be seen by evaluating ==ProtocolList new openWithSpec==. As shown in Figure *@fig_protocollist*
-the widgets is empty. This is normal since we did not initialize it. 
-
-+The ProtocolList Element.>file://figures/ProtocolList.png|width=50|label=fig_protocollist+
++Render of the ProtocolList>file://figures/ProtocolList.png|width=50|label=fig_protocollist+
 
 
-!! The ProtocolViewer
+!! Managing three Widgets and their interactions
 @sec_protocolviewer
 
 The third user interface is a composition of the two previous user interfaces.
-It is composed of a ""WidgetList"" and two ""ProtocolList"".
-When a model class is selected, the methods in the protocol ''protocol'' and in the protocol ''protocol-events'' are listed.
+It is composed of a ==WidgetClassList== and two ==ProtocolList==, and manage the reaction when a model class is selected in the ==WidgetClassList==, to make the methods in the protocol ''api'' and in the protocol ''api-events'' listed in the two ==ProtocolList==.
 
-The class has now three instance variables: ==models== to store the ""WidgetList"", ==protocols== to store the ""ProtocolList"" for the protocol ''protocol'', and ==events== to store the ""ProtocolList"" for protocol ''protocol-events''.
-The code in *@ex_viewer_definition* shows the definition of the class ""ProtocolViewer"".
+The code in *@ex_viewer_definition* shows the definition of the class ==ProtocolViewer==.
 
-[[[label=ex_viewer_definition|caption=ProtocolViewer definition|language=Smalltalk 
+[[[label=ex_viewer_definition|caption=Creation of the class ProtocolViewer|language=Smalltalk 
 ComposableModel subclass: #ProtocolViewer
 	instanceVariableNames: 'models protocols events'
 	classVariableNames: ''
-	package: 'Spec-Examples'
+	package: 'Spec-BuildUIWithSpec-Reuse'
 ]]]
 
-The ==initializeWidgets== method now uses a different way to initialize the sub-widgets of the UI. 
-This is because it does not use basic widgets but instead reuses the user interfaces we defined previously.
-The remainder of the method is quite similar to the previous implementation, as shown in the code in *@ex_viewer_initializeWidgets*.
+The ==initializeWidgets== method now initializes the ==ProtocolList==, but not the ==WidgetClassList== as it already intiialize itself.
 
-[[[label=ex_viewer_initializeWidgets|caption=Implementation of ProtocolViewer>>initializeWidgets|language=Smalltalk 
-ProtocolViewer>>initializeWidgets
+[[[label=ex_viewer_initializeWidgets|caption=Code of ProtocolViewer >> initializeWidgets|language=Smalltalk 
+ProtocolViewer >> initializeWidgets
 
-	models := self instantiate: WidgetList.
+	models := self instantiate: WidgetClassList.
 	protocols := self instantiate: ProtocolList.
 	events := self instantiate: ProtocolList.
 	
@@ -203,10 +141,9 @@ ProtocolViewer>>initializeWidgets
 ]]]
 
 The layout puts the sub widgets in one column, with all sub widgets taking the same amount of space.
-The code in *@ex_viewer_layout* shows the implementation of this layout.
 
-[[[label=ex_viewer_layout|caption=ProtocolViewer column layout|language=Smalltalk 
-ProtocolViewer class>>defaultSpec
+[[[label=ex_viewer_layout|caption=Code of ProtocolViewer class >> defaultSpe|language=Smalltalk 
+ProtocolViewer class >> defaultSpec
 	<spec: #default>
 	
 	^ SpecLayout composed
@@ -219,13 +156,11 @@ ProtocolViewer class>>defaultSpec
 ]]]
 
 To describe the interactions between the sub widgets, the method ==initializePresenter== needs to be defined.
-Here, it specifies that when a class is selected, the selections in the protocol list are reset and both protocol lists are populated.
-Additionally, when a method is selected in one protocol list, the selection in the other list is reset.
-The implementation of this method is exposed in code *@ex_viewer_presenter*.
-More details on the ==initializePresenter== method are given in the Section *@sec_initializePresenter*.
+- Here, it specifies that when a class is selected, the selections in the protocol list are reset and both protocol lists are populated.
+- Additionally, when a method is selected in one protocol list, the selection in the other list is reset.
 
-[[[label=ex_viewer_presenter|caption=ProtocolViewer sub widget interactions|language=Smalltalk
-ProtocolViewer>>initializePresenter
+[[[label=ex_viewer_presenter|caption=Code of ProtocolViewer >> initializePresenter|language=Smalltalk
+ProtocolViewer >> initializePresenter
 
 	models whenSelectedItemChanged: [ :class |
 		protocols resetSelection.
@@ -245,7 +180,7 @@ ProtocolViewer>>initializePresenter
 The remaining methods are getters, methods to delegate to sub widgets, one method to compute the methods in a specific class for a specific protocol, and methods to register to sub widget events.
 Those methods are given in the code in *@ex_viewer_others*.
 
-[[[label=ex_viewer_others|caption=ProtocolViewer other methods|language=Smalltalk 
+[[[label=ex_viewer_others|caption=Code of ProtocolViewer other methods|language=Smalltalk 
 	ProtocolViewer>>events
 		^ events
 
@@ -280,41 +215,35 @@ Those methods are given in the code in *@ex_viewer_others*.
 
 As previously, the result can be seen by executing the following snippet of code: ==ProtocolViewer new openWithSpec==.
 
-+The ProtocolViewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
++Render of the ProtocolViewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
 
-!! Protocol Browser
+
+
+!! TextModel and basic Change of the Layout
 @sec_protocolbrowser
 
-The last user interface reuses a ""ProtocolViewer"" with a different layout and adds a text zone to edit the source code of the selected method.
-The class definition can be seen in code in *@ex_browser_definition*.
+The last user interface reuses a ==ProtocolViewer== with a different layout and adds a text zone to edit the source code of the selected method.
 
-[[[label=ex_browser_definition|caption=ProtocolBrowser definition|language=Smalltalk 
-ComposableModel subclass: #ProtocolBrowser
-	instanceVariableNames: 'viewer text'
-	classVariableNames: ''
-	package: 'Spec-Examples'
-]]]
-
-The ==initializeWidgets== implementation is shown in the code in *@ex_browser_initializeWidgets*.
-
-[[[label=ex_browser_initializeWidgets|caption=ProtocolBrowser>>initializeWidgets|language=Smalltalk 
+[[[label=ex_browser_initializeWidgets|caption=Code of ProtocolBrowser >> initializeWidgets|language=Smalltalk 
 initializeWidgets
-
-	text := self newText.
+	text := self instantiate: TextModel.
 	viewer := self instantiate: ProtocolViewer.
-	text aboutToStyle: true.
+	text
+		aboutToStyle: true;
+		isCodeCompletionAllowed: true.
 	self focusOrder 
 		add: viewer;
 		add: text
 ]]]
 
-The layout is more complex than the previous layouts.
-Now the user interface mainly lays out widgets that are contained in its ==viewer== sub widget (the list of models and the two protocol browsers).
-The layout is based on a column whose first row is divided in columns.
-The implementation of this method is shown in code in *@ex_browser_layout*.
+The following messages are dedicated at code:
+- ==aboutToStyle:== stylised the text according to the syntaxe.
+- ==isCodeCompletionAllowed:==, argument '''true''' enables the completion of the tipping code.
 
-[[[label=ex_browser_layout|caption=ProtocolBrowser layout|language=Smalltalk 
-defaultSpec
+Now the user interface mainly lays out widgets that are contained in its ==viewer== sub widget (the list of models and the two protocol browsers).
+
+[[[label=ex_browser_layout|caption=Code of ProtocolBrowser class >> defaultSpec|language=Smalltalk 
+ProtocolBrowser class >> defaultSpec
 	<spec: #default>
 	
 	^ SpecLayout composed
@@ -334,11 +263,9 @@ defaultSpec
 
 The ==initalizePresenter== method is used to make the text zone react to a selection in the lists.
 When a method is seleted, the text zone updates its contents to show the source code  of the selected method.
-The implementation of this method is detailled in the code in *@ex_browser_presenter*.
 
-[[[label=ex_browser_presenter|caption=ProtocolBrowser interactions|language=Smalltalk 
-ProtocolBrowser>>initializePresenter
-
+[[[label=ex_browser_presenter|caption=Code of ProtocolBrowser >> initializePresenter|language=Smalltalk 
+ProtocolBrowser >> initializePresenter
 	viewer whenClassChanged: [ :class | text behavior: class ].
 	viewer whenProtocolChangedDo: [ :item | 
 		item 
@@ -350,33 +277,9 @@ ProtocolBrowser>>initializePresenter
 			ifNotNil: [ text text: item sourceCode ] ]
 ]]]
 
-The other methods are two getters, a method to set the default size, and a method to set the UI title.
-Their implemenations are detailled in code *@ex_browser_others*.
+The other methods are getters, a method to set the default size of the window, and a method to set the UI title.
 
-[[[label=ex_browser_others|caption=ProtocolBrowser remaining methods|language=Smalltalk
-	ProtocolBrowser>>text
-		^ text
+The final user interface can be opened with the following snippet: ==ProtocolBrowser new openWithSpec==. The result can be seen in figure *@fig_protocol_browser*.
 
-	ProtocolBrowser>>viewer
-		^ viewer
-
-	ProtocolBrowser>>initialExtent
-		^ 750@600
-	
-	ProtocolBrowser>>title
-		^ 'Protocols browser'
-]]]
-
-This finishes the protocol browser.
-The final user interface can be opened with the following snippet: ==ProtocolBrowser new openWithSpec==.
-The result can be seen in figure *@fig_second_protocol_browser*.
-
-+The ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_second_protocol_browser+
-
-
-!! Adding Menu and KeyBinding
-
-may be this should be adding in the flow.
-
-
++Render of the ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_protocol_browser+
 

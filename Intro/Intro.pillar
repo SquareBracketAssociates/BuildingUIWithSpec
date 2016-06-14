@@ -1,10 +1,11 @@
-! Todo
+{ "title" : "Todo"}
+
 - (done) rename preface into intro/motivation
 - update structure
 - Motivation is a bit short and not really a nice section. 
-- ModelList should be renamed in Pharo WidgetClassList
+- (done) ModelList should be renamed in Pharo WidgetClassList
 
-- (in progress) We should add a section on how to find example in the image: in Chapter two. 
+- (in Tips, temporarly) We should add a section on how to find example in the image: in Chapter two. 
 -- ComposableModel subclasses
 
 
@@ -13,25 +14,26 @@
 
 --initialExtent should be put into (do not forget to say that this is only for window)
 
-- revisit the examples  (and : rename it, place it in better package, revisit the help of pharo about Spec)
+- (in progress) revisit the examples  (and : rename it, place it in better package, revisit the help of pharo about Spec)
 
 
+%{ "title" : "Spec: a framework for describing user interfaces"}
 ! Spec: a framework for describing user interfaces
 
 !! Introduction
 
 This document presents the Spec UI builder framework. ''Spec'' has been originally developed by B. Van Ryseghem based on an idea of S. Ducasse. It is now maintained by the community and the Pharo core team.
 
-!!!!! In a nutshell
+!!! In a nutshell
 Spec is based on the idea that UI building should support UI logic reuse. Spec is influenced by VisualWorks and Dolphin Model View Presenter (MVP) in the sense that it recognizes the need for a Presenter or ApplicationModel class, in Spec called ComposableModel that manages the logic and the link between widgets and domain objects. Spec, following the tradition, uses ''value holders'', simple objects raising announcements when their values, often domain objects, change. Such value holders allows for the connection of domain objects that are totally unaware of UI elements. 
 
 
-!!!!! Goal
+!!! Goal
 In this documentation, originally written by B. Van Ryseghem and J. Fabry and now maintained and massively updated by S. Ducasse and J. Fabry, we will teach you how to use Spec through several examples.  We will show how to reuse a UI logic and its elements. 
 We will also provide an overview of the functionalities of ''Spec''.
 
 
-!!!!! Thanks
+!!! Thanks
 We thank Sean De Nigris for his editing support. The documentation is actively maintained. Suggestions for improvements are welcome via the Pharo mailing-list. We thank Peter Uhnak for the discussions and the code exploration that led to cleaning some aspects of Spec.
 
 
@@ -63,13 +65,13 @@ Writing user interfaces is notoriously a tedious task. It often requires time an
 @@todo show that a UI can be shaped differently
 
 
-
-
-
-
 !! Structure of the document
 
 The structure of this document is as follows:
+- 
+- 
+- 
+- 
 
 
 @@todo should be update after the work on the book

@@ -1,5 +1,56 @@
-! Spec Internals
+{ "title" : "Spec Internals"}
 @cha_spec_internals
+
+@@todo integrate explanation of focus order
+
+
+!! The Focusorder
+@sec_focusorder
+
+==ComposableModel== provides a variable '''focusOrder''' and its accessors to managed the path followed by the focus. If it lets nil the default Object is set.
+
+[[[label=ex_focusOrder_acessor|caption=The getter ComposableModel focusOrder|language=Smalltalk 
+ComposableModel>>focusOrder
+	^ focusOrder ifNil: [ focusOrder := SpecFocusOrder new ]
+]]]
+
+SpecFocusOrder manages models in an OrderedCollection (presenters) and provides a getter for it and some methods like:
+- ==add:== to add a model in its collection
+- ==giveFocusToNextFrom:for:== to transfert the focus at the next model
+
+
+
+@@todo check if for: aModel is mandatory
+
+[[[label=ex_focusOrder_giveFocusToNextFrom|caption=The method SpecFocusOrder giveFocusToNextFrom|language=Smalltalk 
+SpecFocusOrder>>giveFocusToNextFrom: aPresenter for: aModel
+	| focus |
+	focus := self presenters.
+	(focus includes: aPresenter)
+		ifTrue: [ | index next |
+			index := (focus indexOf: aPresenter) + 1.
+			index <= focus size
+				ifTrue: [ next := focus at: index.
+					next takeKeyboardFocus.
+					^ true ] ].
+	^ aModel owner
+		ifNil: [ | next |
+			next := focus at: 1 ifAbsent: [ ^ false ].
+			next takeKeyboardFocus.
+			true ]
+		ifNotNil: [ aModel owner giveFocusToNextFrom: aModel.
+			true ]	
+]]]
+
+That method looks for the next model to give the focus through these steps:
+- It looks in its collection for the index of the object (aPresenter) currently having the focus. If it finds it, it increments the index by one.
+- If it does not find it or if the new index is out of its collection bounds, it tries to give the focus to the next parent in the subwidgets' hierarchy (using aModel).
+- If there is no parent, it loops at the beginning of its collection to give the focus at its first model)
+
+
+
+
+!! title needed
 
 Normal user should not have to read this chapter. ''Spec'' provides for a large amount and wide variety of basic widgets. 
 In the rare case that a basic widget is missing, the ''Spec'' framework will need to be extended to add this new widget.
@@ -129,4 +180,186 @@ emphasis: aTextEmphasis
 ]]]
 
 
-@@todo can you put back The spec interpreter and the UI fraemwork binding from git hisotory
+
+!!! The UI Framework binding
+
+The binding is an object that is used to resolve the name of the adapter at run time.
+This allows for the same model to be used with several UI frameworks.
+
+Adding the new adapter to the default binding is quite simple.
+It requires to update two methods: ==initializeBindings== in ""SpecAdapterBindings"" and ==initializeBindings== in the framework specific adapter class, e.g. ""MorphicAdapterBindings"" for Morphic.
+
+The method ==SpecAdapterBindings>>initializeBindings== is present only to expose the whole set of adapters required.
+It fills a dictionary, as shown in the code *@ex_adapter_init*.
+
+[[[label=ex_adapter_init|caption=Implementation of SpecAdapterBindings>>initializeBindings|language=Smalltalk 
+initializeBindings
+	"This implementation is stupid, but it exposes all the containers which need to be bound"
+	
+	bindings
+		at: #ButtonAdapter				put: #ButtonAdapter;
+		at: #CheckBoxAdapter			put: #CheckBoxAdapter;
+		at: #ContainerAdapter			put: #ContainerAdapter;
+		at: #DiffAdapter				put: #MorphicDiffAdapter;
+		at: #ImageAdapter				put: #ImageAdapter;
+		at: #LabelAdapter				put: #LabelAdapter;
+		at: #ListAdapter				put: #ListAdapter;
+		at: #IconListAdapter			put: #IconListAdapter;
+		at: #DropListAdapter			put: #DropListAdapter;
+		at: #MultiColumnListAdapter		put: #MultiColumnListAdapter;
+		at: #MenuAdapter				put: #MenuAdapter;
+		at: #MenuGroupAdapter			put: #MenuGroupAdapter;
+		at: #MenuItemAdapter			put: #MenuItemAdapter;	
+		at: #NewListAdapter				put: #NewListAdapter;
+		at: #RadioButtonAdapter			put: #RadioButtonAdapter;
+		at: #SliderAdapter				put: #SliderAdapter;
+		at: #TabManagerAdapter			put: #TabManagerAdapter;
+		at: #TabAdapter					put: #TabAdapter;
+		at: #TextAdapter				put: #TextAdapter;
+		at: #TextInputFieldAdapter		put: #TextInputFieldAdapter;
+		at: #TreeAdapter				put: #TreeAdapter;
+		at: #TreeColumnAdapter			put: #TreeColumnAdapter;
+		at: #TreeNodeAdapter			put: #TreeNodeAdapter;		
+		at: #WindowAdapter				put: #WindowAdapter;
+		at: #DialogWindowAdapter		put: #DialogWindowAdapter;
+		yourself
+]]]
+
+Each UI framework-specific adapter set should define its own bindings.
+To implement a new binding, a subclass of ""SpecAdapterBindings"" must be defined that overrides the method ==initializeBindings==.
+This method must bind ''Spec'' adapter names with framework specific adapter class names.
+The example *@ex_morphic_bindings* shows how the morphic binding implements the method ==initializeBindings==.
+
+[[[label=ex_morphic_bindings|caption=Definition of Morphic specific bindings|language=Smalltalk 
+initializeBindings
+	
+	bindings
+		at: #ButtonAdapter				put: #MorphicButtonAdapter;
+		at: #CheckBoxAdapter			put: #MorphicCheckBoxAdapter;
+		at: #ContainerAdapter			put: #MorphicContainerAdapter;
+		at: #DiffAdapter				put: #MorphicDiffAdapter;
+		at: #DropListAdapter			put: #MorphicDropListAdapter;
+		at: #LabelAdapter				put: #MorphicLabelAdapter;
+		at: #ListAdapter				put: #MorphicListAdapter;
+		at: #IconListAdapter			put: #MorphicIconListAdapter;
+		at: #ImageAdapter				put: #MorphicImageAdapter;
+		at: #MultiColumnListAdapter		put: #MorphicMultiColumnListAdapter;
+		at: #MenuAdapter				put: #MorphicMenuAdapter;
+		at: #MenuGroupAdapter			put: #MorphicMenuGroupAdapter;
+		at: #MenuItemAdapter			put: #MorphicMenuItemAdapter;
+		at: #NewListAdapter				put: #MorphicNewListAdapter;
+		at: #RadioButtonAdapter			put: #MorphicRadioButtonAdapter;
+		at: #SliderAdapter				put: #MorphicSliderAdapter;
+		at: #TabManagerAdapter			put: #MorphicTabManagerAdapter;
+		at: #TabAdapter					put: #MorphicTabAdapter;
+		at: #TextAdapter				put: #MorphicTextAdapter;
+		at: #TextInputFieldAdapter		put: #MorphicTextInputFieldAdapter;
+		at: #TreeAdapter				put: #MorphicTreeAdapter;
+		at: #TreeColumnAdapter			put: #MorphicTreeColumnAdapter;
+		at: #TreeNodeAdapter			put: #MorphicTreeNodeAdapter;
+		at: #WindowAdapter				put: #MorphicWindowAdapter;
+		at: #DialogWindowAdapter		put: #MorphicDialogWindowAdapter;
+		yourself
+]]]
+
+Once this is done, the bindings should be re-initialized by running the following snippet of code: ==SpecInterpreter hardResetBindings==.
+
+Then during the process of computing a ''Spec'' model and its layout into a framework specific UI element, the binding can be changed to change the output framework.
+The binding is managed by the ""SpecInterpreter"".
+
+The example *@ex_setting_bindings* shows how to do change the binding to use the ""MyOwnBindingClass"" class.
+
+[[[label=ex_setting_bindings|caption=How to set custom bindings|language=Smalltalk 
+SpecInterpreter bindings: MyOwnBindingClass new.
+]]]
+
+Note that the ""SpecInterpreter"" bindings are reset after each execution.
+!! The Spec interpreter
+@sec_spec_interpreter
+
+In order to create a framework specific UI element a ''Spec'' model is interpreted via the ""SpecInterpreter"".
+The interpreter is in charge of recursively interpreting all the sub widgets of a model.
+It then combines them, according to the given layout and the given binding.
+
+The interpreter entry point is the method ==SpecInterpreter>>interpretASpec:selector:==.
+
+This section will explain the two main parts of the interpretation of a model: data collection and the interpretation loop.
+In addition, the flow diagram *@fig_flow_diagram* outlines the different steps of the process and their relationships.
+
++Spec interpretation flow chart>file://figures/Interpretation_Chart.png|width=50|label=fig_flow_diagram+
+
+!!! Collect the data
+
+Before the interpretation loop itself, the interpreter starts by collecting the required data from the model.
+The first element is the array to interpret.
+The second is the spec wrapper used to encapsulate data during the interpretation.
+
+The array to interpret is extracted from the layout provided by the model.
+The code *@ex_extract_array* shows the conversion of a SpecLayout into an array of literals that the interpreter can iterate over.
+
+[[[label=ex_extract_array|caption=Conversion of a SpecLayout into an Array of literals|language=Smalltalk 
+SpecLayout composed
+	newRow: [ :row | row add: #theList ];
+	asArray
+	 
+"returns"	 
+
+#(#ContainerModel 
+	#add: #(
+		#(#ContainerModel 
+			#add: #(
+				#(#model #theList) 
+					#layout: #(
+						#SpecLayoutFrame 
+							#leftFraction: 0 
+							#topFraction: 0 
+							#rightFraction: 1 
+							#bottomFraction: 1 
+							#leftOffset: 0 
+							#topOffset: 0 
+							#rightOffset: 0 
+							#bottomOffset: 0
+					)
+			)
+		) #layout: #(
+			#SpecLayoutFrame 
+				#leftFraction: 0 
+				#topFraction: 0 
+				#rightFraction: 1 
+				#bottomFraction: 1 
+				#leftOffset: 0 
+				#topOffset: 0 
+				#rightOffset: 0 
+				#bottomOffset: 0
+		)
+	)
+)
+]]]
+
+During the recursive calls of the interpretation loop, the interpreter can be called with any kind of object.
+So the first step is the extraction of the data to interpret, if any.
+If there is no data to interpret, it means that the recursive calls reached a ''primitive object'' (like the integer in the example *@ex_extract_array*), i.e. an object which can not be interpreted.
+In this case the primitive object is directly returned.
+
+The second item to collect, if the first step succeeded, is the spec wrapper that will be used throughout the interpretation.
+This step checks if the model provided as argument needs to be rebuild or not.
+If not, the currently existing UI element is directly returned.
+Otherwise this step results in the creation of a wrapper object that keeps the current model as well as the receiver of messages that will be performed in the interpretation loop.
+The result of the interpretation is this wrapper object, and the type of the wrapper is determined by the first element of the array.
+For example, the type of the wrapper that results from the interpretation of the example *@ex_extract_array* is determined by the very first ==#ContainerModel== element.
+
+!!! Interpretation loop
+
+Once all the required data is collected, the interpretation loop can begin.
+
+The loop is quite simple. The first element of the array is popped out of the array to interpret.
+This literal is the selector of the method that will be performed on the receiver that was previously stored inside the wrapper.
+According to the selector, an adequate number of arguments are popped from the array to interpret.
+
+Each argument is then interpreted using a new ""SpecInterpreter"" instance, following the exact same process.
+This step is the step leading to recursive calls.
+
+The selector is then performed on the current receiver and given as arguments the results of the argument interpretation.
+
+The loop ends when the array is empty.
+The resulting adapter is returned and linked to the model that was provided to the interpreter.

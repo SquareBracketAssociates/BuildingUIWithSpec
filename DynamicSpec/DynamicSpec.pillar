@@ -1,5 +1,5 @@
 { "title" : "Dynamic Spec"}
-
+@cha_dynamic_spec
 
 !! ProtocolBrowser dynamic Version
 
@@ -14,32 +14,21 @@ In this section we show how to use ''Spec'' in these situations.
 First, we talk about making dynamic modifications of the layout of widgets, and second we discuss the dynamic adding and removing of subwidgets.
 Third and last we show how the dynamic features can be used to quickly prototype a user interface.
 
+
+
 !!! Dynamic modification of the layout
 
 Changing the layout of widgets at runtime is straightforward, as we will see here.
+
 Such changes basically consist of three steps:
-# creating the new layout,
-# setting a flag to prohibit the creation of a new UI element (and instead reuse the existing one),
-# building the UI again with the newly created layout.
-
-The code in *@rebuildDynamically* is an example of rebuilding a widget with a new layout.
-First, a helper method is used to obtain a ==SpecLayout== object that determines the new layout.
-Second, the ==needRebuild== flag is set to ==false== such that the existing UI element is reused.
-Third, the rebuilding of the user interface is performed.
-
-[[[label=rebuildDynamically|caption=Rebuild a widget at run time|language=Smalltalk 
-rebuildWithNewLayout
-	| newLayout |
-
-	newLayout := self newLayoutCreatedDynamically.
-	self needRebuild: false. "tells the interpreter to keep my current UI element"
-	self buildWithSpecLayout: newLayout. "rebuilds me with the new layout"
-]]]
+- First, create the new layout.
+- Second, the ==needRebuild== flag is set to ==false== to prohibit the creation of a new UI element (and reuse the existing one).
+- Third, the rebuilding of the user interface is performed.
 
 One widget can also keep the UI elements of its sub widgets which do not need to be rebuilt.
 The message ==needRebuild: false== needs to be sent to any of those sub widgets.
-For example, if a model comprising a ''button'' and a ''list'' just wants to rearrange the position of these UI elements, there is no need to rebuild them, i.e. instantiate new UI elements for them.
-To prevent this, the message ==needRebuild: false== should be send to them, as shown in the example *@ex_needRebuild*.
+
+For example, if a model comprising a ''button'' and a ''list'' just wants to rearrange the position of these UI elements, there is no need to rebuild them. As shown in the example *@ex_needRebuild*
 
 [[[label=ex_needRebuild|caption=How to need rebuild sub widgets|language=Smalltalk 
 rebuildWithNewLayout
@@ -51,6 +40,8 @@ rebuildWithNewLayout
 	theList needRebuild: false.
 	self buildWithSpecLayout: newLayout.
 ]]]
+
+
 
 !!! Dynamic adding and removal of subwidgets
 
@@ -90,50 +81,62 @@ This exemple shows in three parts how to buid a simple code browser.
 
 First a simple list widget is created displaying all the subclasses of AstractWidgetModel.
 
-[[[label=ex_dyn_list|caption=Defining a list widget|language=Smalltalk 
-m := DynamicComposableModel new.
-m instantiateModels: #( list ListModel ).
-m list items: (AbstractWidgetModel allSubclasses sorted: [:a :b | a name < b name ]).
-m layout: (SpecLayout composed
-	add: #list;
-	yourself).
-m openWithSpec.
-]]]
-
 Then the list widget is reused to build a viewer widget displaying the protocol methods of the selected class.
-
-[[[label=ex_dyn_protocols|caption=Definition of a protocol methods viewer|language=Smalltalk 
-m2 := DynamicComposableModel new.
-m2 assign: m to: #classes.
-m2 instantiateModels: #( methods ListModel ).
-m list whenSelectedItemChanged: [ :item | 
-	item 
-		ifNil: [ m2 methods: #() ]
-		ifNotNil: [ m2 methods items: ((item selectorsInProtocol: 'protocol') sorted) ] ].
-m2 layout: (SpecLayout composed
-	newRow: [ :r | r add: #classes; add: #methods ];
-	yourself).
-m2 openWithSpec.
-]]]
 
 Finally the last widget is defined with the previously created viewer.
 In addition, a text zone is added to show the selected methods source code.
 
-[[[label=ex_dyn_browser|caption=Definition of a Protocol Browser|language=Smalltalk 
-m3 := DynamicComposableModel new.
-m3 assign: m2 to: #top.
-m3 instantiateModels: #( text TextModel ).
-m2 methods whenSelectedItemChanged: [ :selector | 
-	selector ifNil: [ m3 text text: '' ] ifNotNil: [ m3 text text: (m list selectedItem >> selector ) sourceCode ] ].
-m3 layout: (SpecLayout composed
-	newColumn: [ :c | c add: #top; add: #text ];
-	yourself).
-	
-m3 openWithSpec.
-m3 title: 'Protocol browser'
-]]]
-
 The final result looks like the Figure *@fig_browser*.
+
+[[[label=code_to_integrate|caption=Code to integrate|language=Smalltalk
+
+
+| dynamicWidgetClassList dynamicProtocolViewer dynamicProtoclBrowser |
+	dynamicWidgetClassList := DynamicComposableModel new.
+	dynamicWidgetClassList instantiateModels: #(#list #ListModel).
+	dynamicWidgetClassList list items: (AbstractWidgetModel allSubclasses sorted: [ :a :b | a name < b name ]).
+	dynamicWidgetClassList
+		layout:
+			(SpecLayout composed
+				add: #list;
+				yourself).
+	dynamicWidgetClassList openWithSpec.
+	dynamicProtocolViewer := DynamicComposableModel new.
+	dynamicProtocolViewer assign: dynamicWidgetClassList to: #classes.
+	dynamicProtocolViewer instantiateModels: #(#methods #ListModel).
+	dynamicWidgetClassList list
+		whenSelectedItemChanged: [ :item | 
+			item
+				ifNil: [ dynamicProtocolViewer methods items: #() ]
+				ifNotNil: [ dynamicProtocolViewer methods items: (item selectorsInProtocol: 'api') sorted ] ].
+	dynamicProtocolViewer
+		layout:
+			(SpecLayout composed
+				newRow: [ :r | 
+					r
+						add: #classes;
+						add: #methods ];
+				yourself).
+	dynamicProtocolViewer openWithSpec.
+	dynamicProtoclBrowser := DynamicComposableModel new.
+	dynamicProtoclBrowser assign: dynamicProtocolViewer to: #top.
+	dynamicProtoclBrowser instantiateModels: #(#text #TextModel).
+	dynamicProtocolViewer methods
+		whenSelectedItemChanged: [ :selector | 
+			selector
+				ifNil: [ dynamicProtoclBrowser text text: '' ]
+				ifNotNil: [ dynamicProtoclBrowser text text: (dynamicWidgetClassList list selectedItem >> selector) sourceCode ] ].
+	dynamicProtoclBrowser
+		layout:
+			(SpecLayout composed
+				newColumn: [ :c | 
+					c
+						add: #top;
+						add: #text ];
+				yourself).
+	dynamicProtoclBrowser openWithSpec.
+	dynamicProtoclBrowser title: 'Protocol browser'
+]]]
 
 +Prototype of Protocol Browser>file://figures/Dyn_Protocol_Browser.png|width=50|label=fig_browser+
 
