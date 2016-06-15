@@ -27,7 +27,7 @@ ComposableModel subclass: #WidgetClassList
 
 In the method ==initializeWidgets==, we create the list and populates it with the required classes, in alphabetical order.
 
-[[[label=ex_WidgetClassList_initializeWidgets|caption=Code of WidgetClassList>>initializeWidgets|language=Smalltalk 
+[[[label=ex_WidgetClassList_initializeWidgets|caption=Code of WidgetClassList >> initializeWidgets|language=Smalltalk 
 WidgetClassList >> initializeWidgets
 	list := self newList.
 	list items: (AbstractWidgetModel allSubclasses 

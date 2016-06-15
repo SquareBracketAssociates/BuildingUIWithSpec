@@ -1,19 +1,53 @@
 { "title" : "The Layouts Construction"}
 @cha_layout_construction
 
-As layouts can become quite complex, this section provides a list of examples of the construction of layouts.
-- First two examples are given of the use of rows and columns *@sec_layout_rows_and_column*.
-- This is followed by two examples that explain how to set a fixed size *@sec_layout_set_size_pixels* for rows and columns.
-- Next is an example that explains how to specify a widget proportionally *@sec_layout_percentage*.
-- The last example presents the expert *@sec_layout_expert* mode in case everything else fails.
-- To conclude, this section ends with a little explanation *@sec_layout_specify* of how to specify which layout to use when a model defines multiple layouts.
+This chapter explain how construct the layout method to display a widget.
+
+
+!! Only One Widget
+
+The simpliest example of such a method is laying out just one widget. Example *@ex_layout1* presents such a layout.
+
+It returns a layout in which just one widget is added: the widget contained in ==theList== instance variable.
+
+[[[label=ex_layout1|caption=Code of a Layout with only one widget|language=Smalltalk 
+^ SpecLayout composed
+		add: #theList;
+		yourself
+]]]
+
++Render of only one widget>file://figures/OnlyOneWidget.png|width=50|label=fig_OnlyOneWidget+
+
+The symbol ==theList== refers to an instance side method returning a widget.
+This is because instance variables are private, so the layout class needs to use an accessor to obtain it when building the UI.
+
+Note that by default, a widget will take all the space available in its container.
 
 All the methods for adding sub widgets can be found in the ''commands'' and ''commands-advanced'' protocols of ""SpecLayout"".
 
 
+!! Reorganize SubWidgets
+
+These methods are ''not'' restricted to laying out sub widgets.
+
+It can also refer to sub widgets contained in sub widgets, i.e. when
+reusing an existing UI, specify a new layout for the sub widgets that
+comprise this UI.
+
+To do this, instead of giving a symbol, an array with 2 (or more) symbols must
+be given.
+
+The first symbol identifies the UI being reused and the second the sub
+widget within this UI whose new layout position is being specified.
+
+We have seen an example of this reuse in *@sec_protocolbrowser*.
+
+
 !! Rows and Column
 @sec_layout_rows_and_column
+
 Often the layout of user interfaces can be described in rows and columns, and ""Spec"" provides for an easy way to specify such layouts.
+
 The example *@ex_layout_row* shows how to build a row of widgets.
 
 [[[label=ex_layout_row|caption=Code of a Row of widgets|language=Smalltalk 
@@ -42,8 +76,13 @@ Having the widgets rendered as a column is similar, as shown in the example *@ex
 
 +Render of a Column of Widgets>file://figures/ColumnOfWidgets.png|width=50|label=fig_ColumnOfWidgets+
 
+
+!!! Rows and Columns Combination
+
 Rows and columns can be combined to build more complex layouts, and splitters between cells can be added.
+
 The example *@ex_three_columns* shows how to create a 3 columns layout, containing three buttons in each column.
+
 This example also shows the ==addSplitter== message, which adds a splitter between the element added before it and the element added after.
 
 [[[label=ex_three_columns|caption=Code of a 3-column layout|language=Smalltalk 
@@ -75,7 +114,9 @@ This example also shows the ==addSplitter== message, which adds a splitter betwe
 
 !! Set Size in pixels
 @sec_layout_set_size_pixels
+
 The height of rows as well as the width of columns can be specified, to prevent them to take all the available space.
+
 The example *@ex_row_height* shows how to specify the height of a row in pixels while the example *@ex_column_width* shows how to specify the column width.
 
 [[[label=ex_row_height|caption=Code of a Row of 30 pixels|language=Smalltalk 
@@ -104,16 +145,17 @@ The example *@ex_row_height* shows how to specify the height of a row in pixels 
 
 Note that it is generally considered a bad habit to hardcode the size of the widgets.
 Methods are available on ''ComposableModel'' providing sensible default sizes, like the width of a button.
+
 When specifying custom widget sizes, care should be taken to take in account the current font size.
 
 
 !! Percentage
 @sec_layout_percentage
-It is also possible to specify the percentage of the container, e.g. the window, that a widget should occupy.
-As a result of this, the widget size will change accordingly when the container is resized.
-To do so, the proportional position of the four sides of a widget can be specified, as shown in the example *@ex_layout_proportional*.
 
-For each edge, the proportion indicates at what percentage of the overall container the edge should be placed.
+It is also possible to specify the percentage of the container, e.g. the window, that a widget should occupy. As a result of this, the widget size will change accordingly when the container is resized.
+
+To do so, the proportional position of the four sides of a widget can be specified, as shown in the example *@ex_layout_proportional*. For each edge, the proportion indicates at what percentage of the overall container the edge should be placed.
+
 Zero percent is the container edge, 100 percent is the opposite container edge.
 For example, for the top edge, the percentage is counted from the top down: 0 is the top edge, and 1 is the bottom edge.
 
@@ -131,14 +173,21 @@ The number of pixels should be positive, as it indicates a distance from the cor
 
 !! Expert Mode
 @sec_layout_expert
+
+!!! origin: corner:
+
 The previous examples should cover most of the cases of layout of widgets.
-For the remaining cases there is a last way to specify a widget by specifying its position.
+For the remaining cases there is a last way to specify a widget by specifying its position, in case everything else fails.
 
 The method ==add: origin: corner: == of ==SpecLayout== specifies the layout of a widget, percentage-wise from the origin point to the corner point.
-These two points represent respectively the top left corner and the bottom right corner of the widget.
-The arguments express a percentage of the container, so these __must__ be between ''0@0'' and ''1@1'' .
 
-In addition to those points, two offsets can be also be specified, using the method ==add: origin: corner:  offsetOrigin: offsetCorner: ==.
+These two points represent respectively the top left corner and the bottom right corner of the widget. The arguments express a percentage of the container, so these __must__ be between ''0@0'' and ''1@1'' .
+
+
+!!! Addition offsetOrigin: offsetCorner: 
+
+In addition to those points, two offsets can be also be specified, using the method ==add: origin: corner: offsetOrigin: offsetCorner: ==.
+
 The offsets specify the number of pixels that the origin and the corner should be moved.
 
 Contrary to the previous way to define layouts, while using ==add: origin: corner:  offsetOrigin: offsetCorner: == the offset can be negative.

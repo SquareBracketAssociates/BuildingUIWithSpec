@@ -23,6 +23,7 @@ CustomerStatisfaction new openDialogWithSpec
 +Render of CustomerStatisfaction in a Dialog Window>file://figures/Customers_Dialog.png|width=50|label=fig_Customers_Dialog+
 
 
+
 !! Methods provided by ComposableModel
 
 !!! The Title
@@ -41,19 +42,19 @@ CustomerStatisfaction >> title
 
 Similarly at the setting of the title, overide the ==initialExtent== method set the initial size of the window. ==ComposableModel== provide the message ==extent:== to do that, but it must be called before the method to instanciate the window.
 
+@@todo may explain the following methods of ==ComposableModel==:
+- hasWindow
+- isDisplayed
+- windowIcon: (spirita: i have try it without see any change)
+- askOkToClose:
+
+
 
 !! The Window
 
 ==ComposableModel== provide the accessor ==window== to access at the instance of the created window.
 - ==openWithSpec== create an instance of WindowModel
 - ==openDialogWithSpec== create an instance of DialogWindowModel (a subclass of WindowModel)
-
-
-@@todo may explain the following methods of ==ComposableModel==:
-- hasWindow
-- isDisplayed
-- windowIcon: (spirita: i have try it without see any change)
-- askOkToClose:
 
 
 @@todo may explain the API methods of windows
