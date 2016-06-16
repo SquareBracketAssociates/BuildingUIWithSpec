@@ -1,4 +1,4 @@
-{ "title" : "The three Pillars of Spec"}
+{ "title" : "The Three Pillars of Spec"}
 @cha_pillars_of_spec
 
 All user interfaces in ''Spec'' are constructed through the composition of existing user interfaces.
