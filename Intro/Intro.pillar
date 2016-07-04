@@ -1,32 +1,14 @@
 { "title" : "Todo"}
 
-- Intro Motivation is a bit short and not really a nice section. 
-
-- Chapitre trois FirstContact
--- Un vrai example customersatifaction: label + button
--- Missing conclusion
-
-- Pillars of Spec
--- layout plus court
--- layout -> Missing conclusion
-
-- Chapitre 5
--- on bouge WidgetClassList et ProtocolList dans Chapitre 3
--- missing step back part. 
-
-- Chapitre Layout
-
 - Advanced Widgets
 -- chapitre menu on list or text + menubar
 -- Other widgets: textinputfield, radio, tab
 -- popup -> dynamic
 
-
 - chapitre dynamic 
 -- on reecrit
 
 - chapitre tips and tricks
-
 - (in Tips, temporarly) We should add a section on how to find example in the image: in Chapter two. 
 -- ComposableModel subclasses
 -- opening modal
@@ -34,10 +16,7 @@
 - Chapitre Windown
 -- add DialogModel
 -- open any spec model in modal : openWithDialogSpec: 
-
---initialExtent should be put into (do not forget to say that this is only for window)
-
-- (in progress) revisit the examples  (and : rename it, place it in better package, revisit the help of pharo about Spec)
+--initialExtent should be put into (do not forget to say that this is only for window
 
 
 - chpaitre 9 Spec Internal t the end  (done)
