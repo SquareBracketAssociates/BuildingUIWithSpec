@@ -1,6 +1,8 @@
 { "title" : "Dynamic Spec"}
 @cha_dynamic_spec
 
+To be rewritten
+
 !! ProtocolBrowser dynamic Version
 
 Having an user interface with a well known number of sub widgets and a static layout is not always sufficient. 

@@ -1,11 +1,12 @@
 { "title" : "Todo"}
 
-- Motivation is a bit short and not really a nice section. 
+- Intro Motivation is a bit short and not really a nice section. 
+
 - Chapitre trois FirstContact
 -- Un vrai example customersatifaction: label + button
 -- Missing conclusion
 
-- Pillar of Spec
+- Pillars of Spec
 -- layout plus court
 -- layout -> Missing conclusion
 
@@ -15,11 +16,10 @@
 
 - Chapitre Layout
 
-- 8 
+- Advanced Widgets
 -- chapitre menu on list or text + menubar
 -- Other widgets: textinputfield, radio, tab
 -- popup -> dynamic
-
 
 
 - chapitre dynamic 
@@ -27,26 +27,20 @@
 
 - chapitre tips and tricks
 
-
-- chpaitre 9 at the end 
-
-- (done) rename preface into intro/motivation
-
-
-- (done) ModelList should be renamed in Pharo WidgetClassList
-
 - (in Tips, temporarly) We should add a section on how to find example in the image: in Chapter two. 
 -- ComposableModel subclasses
 -- opening modal
 
 - Chapitre Windown
-- - add DialogModel
+-- add DialogModel
 -- open any spec model in modal : openWithDialogSpec: 
 
 --initialExtent should be put into (do not forget to say that this is only for window)
 
 - (in progress) revisit the examples  (and : rename it, place it in better package, revisit the help of pharo about Spec)
 
+
+- chpaitre 9 Spec Internal t the end  (done)
 
 %{ "title" : "Spec: a framework for describing user interfaces"}
 ! Spec: a framework for describing user interfaces

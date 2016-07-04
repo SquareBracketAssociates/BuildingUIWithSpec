@@ -4,12 +4,111 @@
 This chapter presents Spec over a list of examples that highlight some characteristics of Spec. 
 It will guide you through examples of increasing complexity. 
 
+
+!! Create Customer Satisfaction Wigets
+@sec_buttonModel
+
+This example shows how to create a widget and how to basically control the window and the layout used for the render.
+
+!!! Create the widget
+
+That example is a bit more complex, it associates four basic widgets and we have to create a widget to manage them. That widget must be a subclass of ==ComposableModel==.
+
+[[[label=ex_CustomerStatisfaction_classcreation|caption=Creation of the class to manage subwidgets|language=Smalltalk
+ComposableModel subclass: #CustomerSatisfaction
+	instanceVariableNames: 'screen buttonHappy buttonNeutral buttonBad'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec-FirstContact'
+]]]
+
+Basically, at the instance side of the class we will declare the widgets that we will be using, some aspects of these widgets like labels, actions, states, and the logic of the application and the glue between these widgets. On the other hand, at class side, we will set up the basic design of our GUI -how the widgets are laid out- and its title.
+
+Summarizing:
+- instance side: widget instantiation along with actions performed by these and application logic.
+- class side: widget layout i.e., how all our widgets will be laid out in a window.
+
+!!! Instanciate subwidgets
+
+A subclass of ==ComposableModel== have responsibility to define the ==initializeWidgets== method and defaultSpec class method. In which we will instanciate buttons and the screen with methods provided by the superclass.
+
+First, the message ==instantiate:== can be used to instanciate basics widgets or widgets, it will configure some variable like ==owner== which is use to keep the hierachy of widgets.
+
+==ComposableModel== provides the message ==instantiateModels:== to instanciates several models at once. It takes as argument an array of pairs, where each pair is composed of the unique name of the widget, and the name of class of the widget to instanciate.
+
+Then, we define buttons :
+- Message ==label:== define the label which will be display on them
+- Message ==action:== define the block to perform when they are acliked
+- Message ==icon:== define an icon which will be display near the label
+Note that ==label:== is used to define the default text on the screen. Then, it used by buttons to change this text.
+
+Finally, its a good practice to define the focus order, it use for keyboard navigation.
+
+[[[label=ex_CustomerStatisfaction_initializewidgets|caption=Code of CustomerStatisfaction >> initializeWidgets
+CustomerSatisfaction >> initializeWidgets
+
+	"widgets instanciation"
+	screen := self instantiate: LabelModel.
+	buttonHappy := self instantiate: ButtonModel.
+	buttonNeutral := self instantiate: ButtonModel.
+	buttonBad := self instantiate: ButtonModel.
+
+	"widgets configuration specification"
+	screen label: 'Tell us ?'.
+	buttonHappy
+		label: 'Happy';
+		icon: (self iconNamed: #thumbsUp).
+	buttonNeutral
+		label: 'Neutral';
+		icon: (self iconNamed: #user).
+	buttonBad
+		label: 'Bad';
+		icon: (self iconNamed: #thumbsDown).
+
+	"specification of order of focus"
+	self focusOrder
+		add: buttonHappy;
+		add: buttonNeutral;
+		add: buttonBad
+]]]
+
+[[[label=ex_CustomerStatisfaction_initializewidgets|caption=Code of CustomerStatisfaction >> initializePresenters
+CustomerSatisfaction >> initializeWidgets
+
+	buttonHappy action: [ screen label: buttonHappy label ];
+	buttonNeutral action: [ screen label: buttonNeutral label ].
+	buttonBad action: [ screen label: buttonBad label ];
+]]]
+
+In the following class side method ==defaultSpec==, the ==newRow:origin:corner:== is important to let enought place at the screen. Further informations about methods to define the layout are given in the chapter *@cha_layouts_construction*. Pay attention the argument of the ==add:== messages are accessors refered by their symbols.
+
+[[[label=ex_CustomerStatisfaction_defaultspec|caption=Code of CustomerStatisfaction class >> defaultSpec|language=Smalltalk|
+CustomerStatisfaction >> defaultSpec
+	<spec: #default>
+	^ SpecLayout composed
+		newRow: [ :row | row add: #screen ] origin: 0 @ 0 corner: 1 @ 0.2;
+		newRow: [ :row | 
+			row
+				add: #buttonHappy;
+				add: #buttonNeutral;
+				add: #buttonBad ]
+			origin: 0 @ 0.2
+			corner: 1 @ 1;
+		yourself
+]]]
+
+
++Render of CustomerStatisfaction>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
+
+
+
+
+
 !! ListModel
 @sec_listModel
 
 We start with some example of lists: list with background colored item and icons. 
 
-!!! Registered Colors in background
+!!! Registered colors in background
 
 Here is an example of a ==ListModel== with elements having different colors. 
 We want to that each element (displaying the name of the messsage to create a color) has such color as background as shown in Figure *@fig_modified_background*. 
@@ -37,7 +136,7 @@ Finally this example shows that the message ==openWithSpec== open and place the 
 
 !!! List of icons
 
-In this example, we are going to build a list containing icons of the current theme and their respective selector using a subclass of ListModel : IconListModel.
+In this example, we are going to build a list containing icons of the current theme and their respective selector using a subclass of ListModel: IconListModel.
 
 - Message ==displayBlock:== wrap your domain specific items and should return something that can be displayed in a list, like a String. See the tips section *@sec_scrollable_buttons* for an example of displaying widgets.
 
@@ -56,7 +155,7 @@ In this example, we are going to build a list containing icons of the current th
 +Render of the List of Icons>file://figures/IconList.png|width=50|label=fig_IconList+
 
 
-!!! Shortcut Instanciation
+!!! Shortcut for instanciation
 
 In the previous example, we explicitly referred to the class ==ListModel==. Note that the 
 superclass ==ComposableModel== provides shorcut methods for the most used basics widget.
@@ -70,94 +169,4 @@ ComposableModel >> newList
 Similarly ==ComposableModel== defines message for ==newButton==, ==newCheckBox==, ==newDropList==,...
 Note that the interest of having such methods is unclear and can be revisited in future versions of Spec.
 
-
-!! ButtonModel and LabelModel
-@sec_buttonModel
-
-This example shows how to create a widget and how to basically control the window and the layout used for the render.
-
-!!! Create the widget
-
-That example is a bit more complex, it associates four basic widgets and we have to create a widget to manage them. That widget must be a subclass of ==ComposableModel==.
-
-[[[label=ex_CustomerStatisfaction_classcreation|caption=Creation of the class to manage subwidgets|language=Smalltalk
-ComposableModel subclass: #CustomerStatisfaction
-	instanceVariableNames: 'screen buttonHappy buttonNeutral buttonBad'
-	classVariableNames: ''
-	package: 'Spec-BuildUIWithSpec-FirstContact'
-]]]
-
-Basically, at the instance side of the class we will declare the widgets that we will be using, some aspects of these widgets like labels, actions, states, and the logic of the application and the glue between these widgets. On the other hand, at class side, we will set up the basic design of our GUI -how the widgets are laid out- and its title.
-
-Summarizing:
-- instance side: widget instantiation along with actions performed by these and application logic.
-- class side: widget layout i.e., how all our widgets will be laid out in a window.
-
-!!! Instanciate Subwidgets
-
-A subclass of ==ComposableModel== have responsibility to define the ==initializeWidgets== method and defaultSpec class method. In which we will instanciate buttons and the screen with methods provided by the superclass.
-
-First, the message ==instantiate:== can be used to instanciate basics widgets or widgets, it will configure some variable like ==owner== which is use to keep the hierachy of widgets.
-
-==ComposableModel== provides the message ==instantiateModels:== to instanciates several models at once. It takes as argument an array of pairs, where each pair is composed of the unique name of the widget, and the name of class of the widget to instanciate.
-
-Then, we define buttons :
-- Message ==label:== define the label which will be display on them
-- Message ==action:== define the block to perform when they are acliked
-- Message ==icon:== define an icon which will be display near the label
-Note that ==label:== is used to define the default text on the screen. Then, it used by buttons to change this text.
-
-Finally, its a good practice to define the focus order, it use for keyboard navigation.
-
-[[[label=ex_CustomerStatisfaction_initializewidgets|caption=Code of CustomerStatisfaction >> initializeWidgets|language=Smalltalk|
-CustomerStatisfaction >> initializeWidgets
-
-	"widgets instanciation"
-	screen := self instantiate: LabelModel.
-	buttonHappy := self instantiate: ButtonModel.
-	buttonNeutral := self instantiate: ButtonModel.
-	buttonBad := self instantiate: ButtonModel.
-
-	"widgets configuration specification"
-	screen label: 'Tell us ?'.
-	buttonHappy
-		label: 'Happy';
-		action: [ screen label: buttonHappy label ];
-		icon: (Smalltalk ui icons iconNamed: #thumbsUp).
-	buttonNeutral
-		label: 'Neutral';
-		action: [ screen label: buttonNeutral label ];
-		icon: (Smalltalk ui icons iconNamed: #user).
-	buttonBad
-		label: 'Bad';
-		action: [ screen label: buttonBad label ];
-		icon: (Smalltalk ui icons iconNamed: #thumbsDown).
-
-	"specification of order of focus"
-	self focusOrder
-		add: buttonHappy;
-		add: buttonNeutral;
-		add: buttonBad
-]]]
-
-
-In the following class side method ==defaultSpec==, the ==newRow:origin:corner:== is important to let enought place at the screen. Further informations about methods to define the layout are given in the chapter *@cha_layouts_construction*. Pay attention the argument of the ==add:== messages are accessors refered by their symbols.
-
-[[[label=ex_CustomerStatisfaction_defaultspec|caption=Code of CustomerStatisfaction class >> defaultSpec|language=Smalltalk|
-CustomerStatisfaction >> defaultSpec
-	<spec: #default>
-	^ SpecLayout composed
-		newRow: [ :row | row add: #screen ] origin: 0 @ 0 corner: 1 @ 0.2;
-		newRow: [ :row | 
-			row
-				add: #buttonHappy;
-				add: #buttonNeutral;
-				add: #buttonBad ]
-			origin: 0 @ 0.2
-			corner: 1 @ 1;
-		yourself
-]]]
-
-
-+Render of CustomerStatisfaction>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
 

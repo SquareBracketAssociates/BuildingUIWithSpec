@@ -1,9 +1,9 @@
-{ "title" : "Reusing Elements"}
+{ "title" : "Reusing and composing elements"}
 @cha_reuse
 
 In this chapter we will show the power of Spec at work to build complex applications by reusing existing widgets and managed their interactions.
 
-It's structured in four parts that will result in the browser shown in figure *@fig_protocol_browser*:
+It's structured in four parts that will result in the browser shown in Figure *@fig_protocol_browser*:
 - First, the ""WidgetClassList"" : a widget dedicated to render ==ListModel== displaying AbstractWidgetModel subclasses.
 - Second, the ""ProtocolList"" : a widget composed of a ==ListModel== and a ==LabelModel==.
 - Third, the ""ProtocolViewer"" : defined by combining a ==WidgetClassList== with two ==ProtocolList==, it will browse the methods in protocols named ''api'' and ''api-events''.
@@ -15,7 +15,7 @@ This composition is shown by the diagram *@fig_protocolbrowser_hierarchy*.
 
 
 
-!! Using a Basic Widget 
+!! Using a basic widget 
 @sec_WidgetClassList
 
 [[[label=ex_WidgetClassList_classcreation|caption=Creation of the class WidgetClassList|language=Smalltalk 
@@ -30,8 +30,7 @@ In the method ==initializeWidgets==, we create the list and populates it with th
 [[[label=ex_WidgetClassList_initializeWidgets|caption=Code of WidgetClassList >> initializeWidgets|language=Smalltalk 
 WidgetClassList >> initializeWidgets
 	list := self newList.
-	list items: (AbstractWidgetModel allSubclasses 
-		sorted: [:a :b | a name < b name ]).
+	list items: (AbstractWidgetModel allSubclasses sorted: [:a :b | a name < b name ]).
 	self focusOrder add: list
 ]]]
 
@@ -48,7 +47,7 @@ WidgetClassList class >> defaultSpec
 The three last methods to define on WidgetClassList are the getter of the list, a method to display the UI title and a method to register to list selection changes.
 
 [[[label=ex_WidgetClassList_register|caption=WidgetClassList other methods|language=Smalltalk 
-WidgetClassList>>whenSelectedItemChanged: aBlock
+WidgetClassList >> whenSelectedItemChanged: aBlock
 	list whenSelectedItemChanged: aBlock
 ]]]
 
@@ -60,7 +59,7 @@ The result can be seen by executing the following snippet of code: ==WidgetClass
 
 
 
-!! Render of two Basic Widgets
+!! Render of two basic widgets
 @sec_protocollist
 
 This UI combines two widgets: a list and a label.
@@ -103,7 +102,7 @@ The ""ProtocolList"" UI can be seen by evaluating ==ProtocolList new openWithSpe
 +Render of the ProtocolList>file://figures/ProtocolList.png|width=50|label=fig_protocollist+
 
 
-!! Managing three Widgets and their interactions
+!! Managing three widgets and their interactions
 @sec_protocolviewer
 
 The third user interface is a composition of the two previous user interfaces.
@@ -180,37 +179,36 @@ ProtocolViewer >> initializePresenter
 The remaining methods are getters, methods to delegate to sub widgets, one method to compute the methods in a specific class for a specific protocol, and methods to register to sub widget events.
 Those methods are given in the code in *@ex_viewer_others*.
 
-[[[label=ex_viewer_others|caption=Code of ProtocolViewer other methods|language=Smalltalk 
-	ProtocolViewer>>events
-		^ events
+[[[label=ex_viewer_others|caption=Code of ProtocolViewer other methods 
+ProtocolViewer >> events
+	^ events
 
-	ProtocolViewer>>models
-		^ models
+ProtocolViewer >> models
+	^ models
 
-	ProtocolViewer>>protocols
-		^ protocols
+ProtocolViewer >> protocols
+	^ protocols
 
-	"private"
-	ProtocolViewer>>methodsIn: class for: protocol
-		^ (class methodsInProtocol: protocol) sorted: [ :a :b | a selector < b selector ]
+ProtocolViewer >> methodsIn: class for: protocol
+	^ (class methodsInProtocol: protocol) sorted: [ :a :b | a selector < b selector ]
 
-	ProtocolViewer>>resetEventSelection
-		events resetSelection
+ProtocolViewer >> resetEventSelection
+	events resetSelection
 
-	ProtocolViewer>>resetProtocolSelection
-		protocols resetSelection
+ProtocolViewer >> resetProtocolSelection
+	protocols resetSelection
 
-	ProtocolViewer>>title
-		^ 'Protocol viewer'
+ProtocolViewer >> title
+	^ 'Protocol viewer'
 
-	ProtocolViewer>>whenClassChanged: aBlock
-		models whenSelectedItemChanged: aBlock
+ProtocolViewer >> whenClassChanged: aBlock
+	models whenSelectedItemChanged: aBlock
 
-	ProtocolViewer>>whenEventChangedDo: aBlock
-		events whenSelectedItemChanged: aBlock
+ProtocolViewer >> whenEventChangedDo: aBlock
+	events whenSelectedItemChanged: aBlock
 
-	ProtocolViewer>>whenProtocolChangedDo: aBlock
-		protocols whenSelectedItemChanged: aBlock
+ProtocolViewer >> whenProtocolChangedDo: aBlock
+	protocols whenSelectedItemChanged: aBlock
 ]]]
 
 As previously, the result can be seen by executing the following snippet of code: ==ProtocolViewer new openWithSpec==.
@@ -219,13 +217,13 @@ As previously, the result can be seen by executing the following snippet of code
 
 
 
-!! TextModel and basic Change of the Layout
+!! TextModel and basic change of the layout
 @sec_protocolbrowser
 
 The last user interface reuses a ==ProtocolViewer== with a different layout and adds a text zone to edit the source code of the selected method.
 
-[[[label=ex_browser_initializeWidgets|caption=Code of ProtocolBrowser >> initializeWidgets|language=Smalltalk 
-initializeWidgets
+[[[label=ex_browser_initializeWidgets|caption=Code of ProtocolBrowser >> initializeWidgets 
+ProtocolBrowser >> initializeWidgets
 	text := self instantiate: TextModel.
 	viewer := self instantiate: ProtocolViewer.
 	text
@@ -242,7 +240,7 @@ The following messages are dedicated at code:
 
 Now the user interface mainly lays out widgets that are contained in its ==viewer== sub widget (the list of models and the two protocol browsers).
 
-[[[label=ex_browser_layout|caption=Code of ProtocolBrowser class >> defaultSpec|language=Smalltalk 
+[[[label=ex_browser_layout|caption=Code of ProtocolBrowser class >> defaultSpec
 ProtocolBrowser class >> defaultSpec
 	<spec: #default>
 	
@@ -264,7 +262,7 @@ ProtocolBrowser class >> defaultSpec
 The ==initalizePresenter== method is used to make the text zone react to a selection in the lists.
 When a method is seleted, the text zone updates its contents to show the source code  of the selected method.
 
-[[[label=ex_browser_presenter|caption=Code of ProtocolBrowser >> initializePresenter|language=Smalltalk 
+[[[label=ex_browser_presenter|caption=Code of ProtocolBrowser >> initializePresenter
 ProtocolBrowser >> initializePresenter
 	viewer whenClassChanged: [ :class | text behavior: class ].
 	viewer whenProtocolChangedDo: [ :item | 
