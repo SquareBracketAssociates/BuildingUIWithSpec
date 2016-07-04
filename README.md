@@ -1,6 +1,6 @@
 To install 
 
- ./download.sh
+ ./subdownload.sh
 
  To compile all chapters
  
