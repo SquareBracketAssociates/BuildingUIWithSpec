@@ -1,15 +1,95 @@
 { "title" : "Tips and Tricks"}
 @cha_tips_and_tricks
 
-This chapter will present some little examples that may help you for building interfaces with Spec. 
+This chapter collects many small examples of features that may be of
+use when building user interfaces with Spec. For the sake of brevity,
+many examples use dynamic Spec (see chapter XXX), but these 
+of course also work with normal Spec.
+
+! Various Window Tips
+
+
+!! Setting the About text of a Window
+
+To set the about text of a window, either override the ==aboutText==
+method of the corresponding
+==ComposableModel== so that it returns the new about text, or send the 
+instance the ==aboutText:== message before opening, for example like
+below.
+
+[[[
+	| inputField |
+	inputField := TextInputFieldModel new.
+	inputField
+		aboutText: 'This is an empty text Field'.
+	inputField openWithSpec
+]]]
+
+
+!! Setting the Initial size of a Window When it Opens
+
+To set the initial size of a window when it opens, either override the ==extent==
+method of the corresponding
+==ComposableModel== so that it returns a Point, or send the 
+instance the ==extent::== message before opening, for example like
+this:
+
+[[[
+	| inputField |
+	inputField := TextInputFieldModel new.
+	inputField
+		extent: 500@600.
+	inputField openWithSpec
+]]]
+
+!! Make a fixed size window, without any window control widgets
+
+@@todo write some nice text here
+
+[[[
+	| win |
+	win := TextInputFieldModel new openWithSpec window.
+	win beUnresizeable;
+		removeCollapseBox;
+		removeExpandBox;
+		removeCloseBox;
+		removeMenuBox
+]]]
+
+@@note This window is still closable using the halo menus.
+
+!! Dynamically Change the Size of a Window
+
+Windows can be dynamically resized by sending the corresponding
+==WindowModel== the ==extent:== message. To get a handle on the
+==WidowModel== of a ==ComposableModel== instance, send it the
+==window== message (after is has been opened with
+==openWithSpec==). For example, below a window that resizes itself
+depending on what button is clicked.
+
+[[[
+		 |container|
+		 container := DynamicComposableModel new.
+		 container instantiateModels:  #(#plus ButtonModel #minus ButtonModel).
+		 container plus label: 'Bigger!'.
+		 container minus label: 'Smaller!'.
+		 container plus action: [ container window extent: 500@500].
+		 container minus action: [ container window extent: 200@200].
+		 container layout: 
+		 		   	(SpecColumnLayout composed
+								add: #plus; add: #minus; yourself).
+		container openWithSpec
+]]]
+
+!Unclassified tips
 
 !! Non-editable text field
-@sec_noneditable_textfield
 
-In That tip we create a non-editable text field using ==TextInputFieldModel== and disable it to don't let the possibility of editing it.
 
-[[[label=ex_noneditable_textfield|caption=Non-Editable Textfield|language=Smalltalk|
-SmallTips>>exampleNonEditableTextField
+In this tip we create a non-editable text field using a
+==TextInputFieldModel== and make it non-editable by sending it ==enabled: false ==.
+
+[[[
 	| inputField |
 	inputField := TextInputFieldModel new.
 	inputField
@@ -18,36 +98,181 @@ SmallTips>>exampleNonEditableTextField
 	inputField openWithSpec
 ]]]
 
-+The non-editable text field>file://figures/noneditable_textfield.png|width=30|label=fig_noneditable_textfield+
 
+!! Scrollable List of Widgets
 
-!! Scrollable List of Buttons
-@sec_scrollable_buttons
+==ListModel== can show more than just text, it can also visualize any
+kind of widgets. To do this, all that is needed is to set the
+==displayBlock:== to display the widgets. This allows to create,
+e.g. a scrollable list of buttons that reveal information about the classes in the ''Files'' package:
 
-In That example we create a scrollable list of buttons using ==ListModel== which is already able to manage scrollbar, and use the ==displayBlock:== to display widgets correctly, whatever their complexity.
-
-Here, it's a simple collection of Button created with classes' informations of the package ''Files''.
-
-[[[label=ex_scrollable_buttons|caption=A Scrollable List of Widgets|language=Smalltalk|
-SmallTips>>exampleButtonScrollable
-	ListModel new
-		items:
-			('Files' asPackage classes
-				collect: [ :class | 
-					ButtonModel new
-						icon: class systemIcon;
-						label: class name;
-						action: [ UIManager default alert: class comment title: class name ] ]);
-		displayBlock: [ :x | x buildWithSpec ];
-		openWithSpec
+[[[
+ListModel new
+	items:
+		('Files' asPackage classes
+			collect: [ :class | 
+				ButtonModel new
+					icon: class systemIcon;
+					label: class name;
+					action: [ UIManager default alert: class comment title: class name ] ]);
+	displayBlock: [ :x | x buildWithSpec ];
+	openWithSpec
 ]]]
 
 +The Scrollable List of Widgets>file://figures/scrollable_buttons.png|width=30|label=fig_scrollable_buttons+
 
-+The Result of a Click on a Button>file://figures/scrollable_result.png|width=30|label=fig_scrollable_result+
+!! Include a Morph in a Spec UI
 
+Any morph can be included as a widget in a Spec UI. To do this, send
+the Morph instance the ==asSpecAdapter== message, it will return a
+Spec widget that can be used in your UI.
 
-!! Found more Examples
+As an example, we open the ==CalendarMorph== as a Spec widget.
+
+[[[
+|container|
+container := DynamicComposableModel new.
+container assign: (CalendarMorph openOn: Date today) asSpecAdapter to: #cal.
+container layout:
+			(SpecLayout composed add: #cal; yourself).
+container openWithSpec.
+]]]
+
+@@note This code does not work yet due to issues with ==DynamicComposableModel== and the ==MorphicGenericAdapter==.
+
+!! Include a Glamour UI in a Spec Window
+
+Infinite recursion between Spec and Glamour Inspector needs to be shown.
+
+!! Testing the Functionality of a Spec UI
+
+@@todo FIXME
+
+This code literally runs the tests sequences over the calculator GUI’s key buttons and checks the result in the display input field — pretty cool, no ?
+
+[[[
+setUp
+  calculator := HP35CalculatorUIModel new.
+  calculator openWithSpec 
+
+tearDown
+  calculator window close
+
+runSequence: script
+  script pairsDo: [ :key :result | 
+    (calculator perform: key) performAction.
+    self 
+      assert: calculator display text 
+      equals: result asString asUppercase ]
+]]]
+
+!! Customize the Appearance of a Widget
+
+If Spec does not allow you to customize the appearance of a widget,
+but the underlying widget library does, you can send messages to the
+widget just after it has been built. For this, configure the widget
+with the ==whenBuiltDo:== message. The argument is a block that takes
+1 argument, this will be an instance of a ==WidgetBuilt== announcement.
+
+For example, assuming the label below is a Morphic label, it will be
+rendered in red, and use the Balloon font in Italic.
+
+[[[
+		 |container|
+		 container := DynamicComposableModel new.
+		 container instantiateModels:  #(#red LabelModel).
+		 container red label: 'I am red'.
+		container red whenBuiltDo: [:ann|
+				  ann widget color: (Color red);
+				  	  font: BalloonMorph balloonFont emphasis: 2].
+		 container layout: 
+		 		   	(SpecLayout composed add: #red; yourself).
+		container openWithSpec
+]]]
+
+@@note Warning: By doing the above you are tightly coupling your UI to the underlying widget library. As a result, your UI may break if there are changes in this library, or if Spec uses another library for its underlying widgets.
+
+!! Show a Table-Like View
+
+There are multiple ways in which a table-like widget can be shown to the user. The most straightforward way is the ==MultiColumnListModel==, for example as below:
+
+[[[
+MultiColumnListModel new 
+	items: #(
+		('Origin' 'Destination' 'Start Time' 'Stop Time')
+		('Santiago' 'Paris' '15:30' '11:15')
+		('Paris' 'Santiago' '23:30' '8:00')
+		);
+	displayBlock: [ :x | x collect: #asString ];
+	openWithSpec.
+]]]
+
+Alternatively, a ==TreeModel== can be used, which allows for more fancy formatting options. (This example thanks to Nicolai Hess)
+
+[[[
+|r m col1 col2 col3|
+r := FileLocator vmDirectory.
+    m := TreeModel new.
+    m roots: r allFiles.
+    m rootNodeHolder: [ :item | 
+        TreeNodeModel new
+            content: item;
+            icon: Smalltalk ui icons smallLeftFlushIcon
+    ];
+    title: r fullName.
+    col1 := TreeColumnModel new
+        displayBlock: [ :node | node content basename ];
+        headerLabel:'Name'.        
+    col2 := TreeColumnModel new
+        displayBlock: [ :node | node content creationTime ];
+        headerLabel:'Time'.
+    col3 := TreeColumnModel new
+        displayBlock: [ :node | node content permissions];
+        headerLabel:'Permissions'.
+    m columns: {col1. col2 . col3}.
+    m openWithSpec.
+]]]
+
+!! Non-Editable Multi-Line Text
+
+The ==TextInputFieldModel== can be configured such that the text it contains is not editable, by disabling it: 
+
+[[[
+TextInputFieldModel new
+	text: ('qwerty\asdfgh\zxcvbn' withCRs );
+	enabled: false;
+	openWithSpec
+]]]
+
+!! List items do not update
+
+Adding items to a collection held in a list does not update the widget. To do that, you need to set the items of the list, using the ==items:== message. This is required because it also sorts the list items (if required)
+
+[[[
+|container count|
+		count :=0.
+		container := DynamicComposableModel new.
+		container instantiateModels:  #(#list ListModel #plus ButtonModel).
+		container plus label: '+1'. 
+		container plus action: [ | items |
+			count := count + 1.
+			items := container list getList asOrderedCollection.
+			items add: count asString.
+			container list items: items ].
+		container layout: 
+		 		   	(SpecRowLayout composed
+						add: #list ; add: #plus ; yourself).
+		container openWithSpec
+]]]
+
+! JF Todos
+
+- ComposableModel class defaults category
+- SpecColumnLayout and SpecRowLayout (SpecRowLayout composed
+        newColumn: [...   ]; newColumn: [...].)
+- What about keyboard shortcuts? (see pharo-users mail 28/10/15)
+
+! Found more Examples
 
 - Package Spec-BuildUIWithSpec
 - Package Spec-Examples
