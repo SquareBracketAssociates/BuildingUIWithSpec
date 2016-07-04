@@ -40,7 +40,7 @@
 -- opening modal
 
 - Chapitre Windown
--- add DialogModel
+- - add DialogModel
 -- open any spec model in modal : openWithDialogSpec: 
 
 --initialExtent should be put into (do not forget to say that this is only for window)
