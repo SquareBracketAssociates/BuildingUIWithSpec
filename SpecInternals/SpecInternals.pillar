@@ -1,54 +1,7 @@
 { "title" : "Spec Internals"}
 @cha_spec_internals
 
-@@todo integrate explanation of focus order
-
-
-!! The Focusorder
-@sec_focusorder
-
-==ComposableModel== provides a variable '''focusOrder''' and its accessors to managed the path followed by the focus. If it lets nil the default Object is set.
-
-[[[label=ex_focusOrder_acessor|caption=The getter ComposableModel focusOrder|language=Smalltalk 
-ComposableModel>>focusOrder
-	^ focusOrder ifNil: [ focusOrder := SpecFocusOrder new ]
-]]]
-
-SpecFocusOrder manages models in an OrderedCollection (presenters) and provides a getter for it and some methods like:
-- ==add:== to add a model in its collection
-- ==giveFocusToNextFrom:for:== to transfert the focus at the next model
-
-
-
-@@todo check if for: aModel is mandatory
-
-[[[label=ex_focusOrder_giveFocusToNextFrom|caption=The method SpecFocusOrder giveFocusToNextFrom|language=Smalltalk 
-SpecFocusOrder>>giveFocusToNextFrom: aPresenter for: aModel
-	| focus |
-	focus := self presenters.
-	(focus includes: aPresenter)
-		ifTrue: [ | index next |
-			index := (focus indexOf: aPresenter) + 1.
-			index <= focus size
-				ifTrue: [ next := focus at: index.
-					next takeKeyboardFocus.
-					^ true ] ].
-	^ aModel owner
-		ifNil: [ | next |
-			next := focus at: 1 ifAbsent: [ ^ false ].
-			next takeKeyboardFocus.
-			true ]
-		ifNotNil: [ aModel owner giveFocusToNextFrom: aModel.
-			true ]	
-]]]
-
-That method looks for the next model to give the focus through these steps:
-- It looks in its collection for the index of the object (aPresenter) currently having the focus. If it finds it, it increments the index by one.
-- If it does not find it or if the new index is out of its collection bounds, it tries to give the focus to the next parent in the subwidgets' hierarchy (using aModel).
-- If there is no parent, it loops at the beginning of its collection to give the focus at its first model)
-
-
-
+@@todo JF remove this from the booklet?
 
 !! title needed
 
