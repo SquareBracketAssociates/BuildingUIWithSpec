@@ -1,25 +1,12 @@
 { "title" : "Tips and Tricks"}
 @cha_tips_and_tricks
 
+@@todo JF write some sections, check last section for more refs, do an editorial pass
+
 This chapter collects many small examples of features that may be of
 use when building user interfaces with Spec. For the sake of brevity,
 many examples use dynamic Spec (see chapter XXX), but these 
 of course also work with normal Spec.
-
-!! Non-editable text field
-
-
-In this tip we create a non-editable text field using a
-==TextInputFieldModel== and make it non-editable by sending it ==enabled: false ==.
-
-[[[
-	| inputField |
-	inputField := TextInputFieldModel new.
-	inputField
-		enabled: false;
-		text: 'Hello Spec !'.
-	inputField openWithSpec
-]]]
 
 
 !! Scrollable List of Widgets
@@ -65,11 +52,11 @@ container openWithSpec.
 
 !! Include a Glamour UI in a Spec Window
 
-@@todo Infinite recursion between Spec and Glamour Inspector needs to be shown.
+@@todo JF WRITE ME: Infinite recursion between Spec and Glamour Inspector needs to be shown.
 
 !! Testing the Functionality of a Spec UI
 
-@@todo FIXME
+@@todo JF WRITE ME
 
 This code literally runs the tests sequences over the calculator GUI’s key buttons and checks the result in the display input field — pretty cool, no ?
 
@@ -187,10 +174,6 @@ Adding items to a collection held in a list does not update the widget. To do th
 						add: #list ; add: #plus ; yourself).
 		container openWithSpec
 ]]]
-
-!! JF Todos
-
-- What about keyboard shortcuts? (see pharo-users mail 28/10/15)
 
 !! Found more Examples
 

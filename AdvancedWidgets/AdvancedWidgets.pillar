@@ -65,6 +65,8 @@ In Widgets configuration specification,
 ==ComposableModel== provides:
 - Message ==bindKeyCombination:== set a shortcut associate at a block to perfom, here it make the entry key the same effect than a click on the ''Ok'' button.
 
+@@todo JF also see pharo-users mail 28/10/15 wrt overriding existing shortcuts.
+
 ==TextModel== provides:
 - Message ==autoAccept:== specify that the text field should automatically accept the text on each keystroke, such that it does not show the yellow 'edited' triangle on the top right and content don't need to be saved.
 
