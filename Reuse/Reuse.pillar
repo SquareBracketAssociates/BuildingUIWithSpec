@@ -1,7 +1,16 @@
 { "title" : "Reusing and composing elements"}
 @cha_reuse
 
+@@todo JF editorial pass
+
+
+@@todo JF add the emphasis on reuse and how it shapes design of spec and that your UIs should be compliant so they can be reused
+
+@@todo JF the code for the 2 first examples can be treated quickly since we just saw stuff like this in the previous chapter.
+
 In this chapter we will show the power of Spec at work to build complex applications by reusing existing widgets and managed their interactions.
+
++Render of the ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_protocol_browser+
 
 It's structured in four parts that will result in the browser shown in Figure *@fig_protocol_browser*:
 - First, the ""WidgetClassList"" : a widget dedicated to render ==ListModel== displaying AbstractWidgetModel subclasses.
@@ -18,7 +27,7 @@ This composition is shown by the diagram *@fig_protocolbrowser_hierarchy*.
 !! Using a basic widget 
 @sec_WidgetClassList
 
-[[[label=ex_WidgetClassList_classcreation|caption=Creation of the class WidgetClassList|language=Smalltalk 
+[[[
 ComposableModel subclass: #WidgetClassList
 	instanceVariableNames: 'list'
 	classVariableNames: ''
@@ -27,16 +36,17 @@ ComposableModel subclass: #WidgetClassList
 
 In the method ==initializeWidgets==, we create the list and populates it with the required classes, in alphabetical order.
 
-[[[label=ex_WidgetClassList_initializeWidgets|caption=Code of WidgetClassList >> initializeWidgets|language=Smalltalk 
+[[[
 WidgetClassList >> initializeWidgets
 	list := self newList.
-	list items: (AbstractWidgetModel allSubclasses sorted: [:a :b | a name < b name ]).
+	list items: (AbstractWidgetModel allSubclasses
+		 							 sorted: [:a :b | a name < b name ]).
 	self focusOrder add: list
 ]]]
 
 The layout contains only the list.
-
-[[[label=ex_WidgetClassList_layout|caption=Code of WidgetClassList class >> defaultSpec|language=Smalltalk 
+x
+[[[
 WidgetClassList class >> defaultSpec
 	<spec: #default>
 	^ SpecLayout composed
@@ -46,12 +56,17 @@ WidgetClassList class >> defaultSpec
 
 The three last methods to define on WidgetClassList are the getter of the list, a method to display the UI title and a method to register to list selection changes.
 
-[[[label=ex_WidgetClassList_register|caption=WidgetClassList other methods|language=Smalltalk 
+[[[
+WidgetClassList >> title
+	^'Widgets'
+]]]
+
+[[[
 WidgetClassList >> whenSelectedItemChanged: aBlock
 	list whenSelectedItemChanged: aBlock
 ]]]
 
-Note that this ==whenSelectedItemChanged: aBlock== will probably be deprecated in the future, since clients can simply send the message to the list directly.
+@@note ==whenSelectedItemChanged: aBlock== will probably be deprecated in the future, since clients can simply send the message to the list directly.
 
 The result can be seen by executing the following snippet of code: ==WidgetClassList new openWithSpec== as shown in figure *@fig_WidgetClassList*
 
@@ -59,21 +74,21 @@ The result can be seen by executing the following snippet of code: ==WidgetClass
 
 
 
-!! Render of two basic widgets
+!! Combining two basic widgets
 @sec_protocollist
 
 This UI combines two widgets: a list and a label.
 
-[[[label=ex_protocolList_definition|caption=Creation of the class ProtocolList|language=Smalltalk 
+[[[
 ComposableModel subclass: #ProtocolList
 	instanceVariableNames: 'label protocols'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec-Reuse'
 ]]]
 
-The ==initializeWidgets== method for this UI is quite similar to the method in WidgetClassList, as the code in *@ex_protocolList_init* shows.
+The ==initializeWidgets== method for this UI is quite similar to the method in WidgetClassList:
 
-[[[label=ex_protocolList_init|caption=Code of ProtocolList >> initializeWidgets|language=Smalltalk 
+[[[
 ProtocolList >> initializeWidgets
 	protocols := self instantiate: ListModel.
 	label :=  self instantiate: LabelModel.
@@ -81,9 +96,11 @@ ProtocolList >> initializeWidgets
 	self focusOrder add: protocols
 ]]]
 
-The code *@ex_protocolList_layout* shows how to build a column with the label on top and the list taking all the space that is left.
+The code below shows how to build a column with the label on top and the list taking all the space that is left.
 
-[[[label=ex_protocolList_layout|caption=Code of ProtocolList class >> defaultSpec|language=Smalltalk 
+@@todo JF SpecColumnLayout use
+
+[[[
 ProtocolList class >> defaultSpec
 	<spec: #default>
 	^ SpecLayout composed
@@ -110,7 +127,7 @@ It is composed of a ==WidgetClassList== and two ==ProtocolList==, and manage the
 
 The code in *@ex_viewer_definition* shows the definition of the class ==ProtocolViewer==.
 
-[[[label=ex_viewer_definition|caption=Creation of the class ProtocolViewer|language=Smalltalk 
+[[[
 ComposableModel subclass: #ProtocolViewer
 	instanceVariableNames: 'models protocols events'
 	classVariableNames: ''
@@ -119,7 +136,7 @@ ComposableModel subclass: #ProtocolViewer
 
 The ==initializeWidgets== method now initializes the ==ProtocolList==, but not the ==WidgetClassList== as it already intiialize itself.
 
-[[[label=ex_viewer_initializeWidgets|caption=Code of ProtocolViewer >> initializeWidgets|language=Smalltalk 
+[[[
 ProtocolViewer >> initializeWidgets
 
 	models := self instantiate: WidgetClassList.
@@ -141,7 +158,9 @@ ProtocolViewer >> initializeWidgets
 
 The layout puts the sub widgets in one column, with all sub widgets taking the same amount of space.
 
-[[[label=ex_viewer_layout|caption=Code of ProtocolViewer class >> defaultSpe|language=Smalltalk 
+@@todo ColumnLayout composed
+
+[[[
 ProtocolViewer class >> defaultSpec
 	<spec: #default>
 	
@@ -158,7 +177,7 @@ To describe the interactions between the sub widgets, the method ==initializePre
 - Here, it specifies that when a class is selected, the selections in the protocol list are reset and both protocol lists are populated.
 - Additionally, when a method is selected in one protocol list, the selection in the other list is reset.
 
-[[[label=ex_viewer_presenter|caption=Code of ProtocolViewer >> initializePresenter|language=Smalltalk
+[[[
 ProtocolViewer >> initializePresenter
 
 	models whenSelectedItemChanged: [ :class |
@@ -179,7 +198,7 @@ ProtocolViewer >> initializePresenter
 The remaining methods are getters, methods to delegate to sub widgets, one method to compute the methods in a specific class for a specific protocol, and methods to register to sub widget events.
 Those methods are given in the code in *@ex_viewer_others*.
 
-[[[label=ex_viewer_others|caption=Code of ProtocolViewer other methods 
+[[[
 ProtocolViewer >> events
 	^ events
 
@@ -217,12 +236,14 @@ As previously, the result can be seen by executing the following snippet of code
 
 
 
-!! TextModel and basic change of the layout
+!! Changing the layout of a reused widget
 @sec_protocolbrowser
+
+@@todo JF emphasize that this is about changing the layout of a widget that is being reused.
 
 The last user interface reuses a ==ProtocolViewer== with a different layout and adds a text zone to edit the source code of the selected method.
 
-[[[label=ex_browser_initializeWidgets|caption=Code of ProtocolBrowser >> initializeWidgets 
+[[[
 ProtocolBrowser >> initializeWidgets
 	text := self instantiate: TextModel.
 	viewer := self instantiate: ProtocolViewer.
@@ -240,8 +261,7 @@ The following messages are dedicated at code:
 
 Now the user interface mainly lays out widgets that are contained in its ==viewer== sub widget (the list of models and the two protocol browsers).
 
-[[[label=ex_browser_layout|caption=Code of ProtocolBrowser class >> defaultSpec
-ProtocolBrowser class >> defaultSpec
+[[[
 	<spec: #default>
 	
 	^ SpecLayout composed
@@ -262,8 +282,7 @@ ProtocolBrowser class >> defaultSpec
 The ==initalizePresenter== method is used to make the text zone react to a selection in the lists.
 When a method is seleted, the text zone updates its contents to show the source code  of the selected method.
 
-[[[label=ex_browser_presenter|caption=Code of ProtocolBrowser >> initializePresenter
-ProtocolBrowser >> initializePresenter
+[[[
 	viewer whenClassChanged: [ :class | text behavior: class ].
 	viewer whenProtocolChangedDo: [ :item | 
 		item 
@@ -279,5 +298,7 @@ The other methods are getters, a method to set the default size of the window, a
 
 The final user interface can be opened with the following snippet: ==ProtocolBrowser new openWithSpec==. The result can be seen in figure *@fig_protocol_browser*.
 
-+Render of the ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_protocol_browser+
 
+!! Conclusion
+
+@@todo JF Reinforce the reuse story and what you should do to comply
