@@ -1,14 +1,20 @@
 { "title" : "Advanced Widgets"}
 @cha_advanced_widgets
 
-!! TextInputFieldModel and Dynamic Widget
+@@todo JF REWRITE almost completely
+
+@@todo JF add motivating intro
+
+!! TextInputFieldModel
 @sec_textInputFieldModel
+
+@@todo JF REWRITE with new example. Salvage "Messages of TextInputFieldModel" section. Full code for this is in http://smalltalkhub.com/#!/~Spirita/BacASableSpirita/packages/Spec-BuildUIWithSpec
 
 This example shows how to design a popup window asking for an input, created dynamically.
 
 The widget is an instance of a subclass of ==ComposableModel== named ==DynamicComposableModel==.
 
-[[[label=ex_popup_classcreation|caption=Creation of the class DynamicalPopup|language=Smalltalk|
+[[[
 DynamicComposableModel subclass: #DynamicalPopup
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -23,7 +29,7 @@ DynamicComposableModel subclass: #DynamicalPopup
 - specialize ==instantiateModels:== to put widgets instanciated in the Dictionary using their names as keys and created instance as values.
 - specialize ==doesNotUnderstand:== to access these widgets by a search on the Dictionary before rise an exception, so creating acessors is not required (and could break the widget). Notice that this mechanism is used in the code *@ex_popup_initializewidget* to specified the focusOrder.
 
-[[[label=ex_popup_initializewidget|caption=Code of DynamicalPopup >> initializeWidgets|language=Smalltalk|
+[[[
 DynamicalPopup >> initializeWidgets
 	"Widgets instanciation"
 	self instantiateModels: #(#label #LabelModel #textInput #TextInputFieldModel).
@@ -73,7 +79,7 @@ The API of ==TextInputFieldModel== provides:
 
 !!! Set an Action at ''Ok''
 
-[[[label=ex_popup_defaulttoolbar|caption=Code of DynamicalPopup >> defaultToolbarConfiguration|language=Smalltalk|
+[[[
 DynamicalPopup >> defaultToolbarConfiguration
 	self window okAction: [ Transcript show: self inputText text ]
 ]]]
@@ -82,7 +88,7 @@ The message ==okAction:== set a block to perform when the ''Ok'' button is click
 
 That method must be called after the instanciation of the window.
 
-[[[label=ex_popup_exampledefaulttoolbar|caption=Code to launch the DynamicalPopup with the Default Toolbar|language=Smalltalk|
+[[[
 DynamicalPopup >> exampleDefaultToolbar
 	| example |
 	example := self new.
@@ -97,7 +103,7 @@ DynamicalPopup >> exampleDefaultToolbar
 
 To get a widget with a single button ''Ok'', the toolbar to use should be defined explicitly using the window's accessor ==toolbar:==.
 
-[[[label=ex_popup_newtoolbar|caption=Code of a New Toolbar for the popup|language=Smalltalk|
+[[[
 DynamicalPopup >> alternativeToolbar
 	"Instanciate the alternative toolbar"
 	self instantiateModels: #(#toolbar #OkToolbar).
@@ -111,7 +117,7 @@ DynamicalPopup >> alternativeToolbar
 
 That method must be called after the instanciation of the window.
 
-[[[label=ex_popup_examplenewtoolbar|caption=Code to launch the Example with the Alternative Toolbar|language=Smalltalk|
+[[[
 DynamicalPopup >> exampleAlternativeToolbar
 	| example |
 	example := self new.
@@ -125,11 +131,13 @@ DynamicalPopup >> exampleAlternativeToolbar
 
 !! RadioButtonModel
 
+@@todo JF REWRITE
+
 That example show the use of ==RadioButtonGroupModel== to managed radiobuttons.
 
 Notice that ==MrAndMrsRadioButton== is a subclass of ==ComposableModel== have a subwidget ==RadioButtonGroupModel== which is a subclass of ==DynamicComposableModel==, they are compatible.
 
-[[[label=ex_radio_classcreation|caption=Creation of the class MrAndMrsRadioButton|language=Smalltalk|
+[[[
 ComposableModel subclass: #MrAndMrsRadioButton
 instanceVariableNames: 'labelGreeting textName buttonGreet groupRadio'
 classVariableNames: ''
@@ -146,7 +154,7 @@ Here, the buttons created are not subwidgets of ==MrAndMrsRadioButton== but of t
 - Message ==default:== activates the specified button. Here, we use the accessor created by ==addRadioButton:==, it's equivalent at ''default: radioMr''.
 - ValueHolder ==currentActevated== and its accessors, what contains the last activated button, and provide an hook ==whenCurrentActivatedChanged:== which propagate an event when a change happend
 
-[[[label=ex_radio_initializewidget|caption=Code of MrAndMrsRadioButton >> InitializeWidget|language=Smalltalk|
+[[[
 MrAndMrsRadioButton >> initializeWidgets
 	| radioMr radioMs radioMrs |
 	"Widgets instanciation"
@@ -185,7 +193,7 @@ MrAndMrsRadioButton >> initializeWidgets
 
 ==AbstractWidgetModel==, whom subclasses are basics widgets, provide the accessors ==enabled== and ==enabled:==, and the shortcuts ==enable== and ==disable==. It can be used to create tricks like in the section @sec_noneditable_textfield.
 
-[[[label=ex_radio_initializepresenter|caption=Code of MrAndMrsRadioButton >> initializePresenter|language=Smalltalk|
+[[[
 MrAndMrsRadioButton >> initializePresenter
 	"Hook for events"
 	textName whenTextChanged: [ buttonGreet enable ].
@@ -199,11 +207,9 @@ In the code of ==initializePresenter== *@ex_radio_initializepresenter*,
 - Message ==action:== set a block to perform when the button is clicked.
 - ==currentActivated== and its acessors are provided by ==RadioButtonGroupModel==, it contains the button activated.
 
-!!! Another way to make a simple layout
-
 ==SpecColumnLayout== is the object created by ==newColumn:==.
 
-[[[label=ex_radio_layout|caption=Code of another way to define the Layout of MrAndMrsRadioButton|language=Smalltalk|
+[[[
 MrAndMrsRadioButton >> defaultSpec
 	<spec: #default>
 	^ SpecColumnLayout new
@@ -220,14 +226,16 @@ MrAndMrsRadioButton >> defaultSpec
 !! Menus
 @sec_littletoolbar
 
-That example expose the creation of menu, a menu is the collaboration between three classes:
+@@todo JF a less in-depth rewrite is feasible
+
+This example shows the creation of menu, a menu is the collaboration between three classes:
 - ==MenuModel== containing ==MenuGoupModel== and displaying them spepareted by a splitter.
 - ==MenuGoupModel== containing ==MenuItemModel==.
 - ==MenuItemModel==, each of them will be a button in the menu, they wears their behaviour and their appearence.
 
 The message ==applyTo:== links the shorcuts of the menu at a model. Making them usable, even if the menu is not displayed.
 
-[[[label=ex_littletoolbar_initializeWidgets|caption=Code of LittleToolbar >> initializeWidgets|language=Smalltalk|
+[[[
 LittleToolbar >> initializeWidgets
 	menu := self instantiate: MenuModel.
 	self configMainMenu.
@@ -236,7 +244,7 @@ LittleToolbar >> initializeWidgets
 
 Here, the layout dislay simply the menu.
 
-[[[label=ex_littletoolbar_defaultSpec|caption=Code of LittleToolbar >> defaultSpec|language=Smalltalk|
+[[[
 LittleToolbar >> defaultSpec
 	<spec: #default>
 	^ SpecLayout composed
@@ -257,7 +265,7 @@ And to control the following methods its behaviour, it should be defined only on
 - ==subMenu:== to open the specified menu.
 - ==action:== to perform the specified block.
 
-[[[label=ex_littletoolbar_configMainMenu|caption=Code of LittleToolbar >> configMainMenu|language=Smalltalk|
+[[[
 LittleToolbar >> configMainMenu
 	menu
 		addGroup: [ :group1 | 
@@ -283,7 +291,7 @@ LittleToolbar >> configMainMenu
 
 ==createSubMenu== return a new MenuModel with two items.
 
-[[[label=ex_littletoolbar_createSubMenu|caption=Code of LittleToolbar >> createSubMenu|language=Smalltalk|
+[[[
 LittleToolbar >> createSubMenu
 	^ MenuModel new
 		addGroup: [ :group | 
@@ -303,9 +311,11 @@ LittleToolbar >> createSubMenu
 						action: [ self inform: 'Print' ] ] ]
 ]]]
 
+@@todo JF move this to dynamic spec
+
 ==dynamicalAdding:== creates a new item, configures the item to remove itself when is clicked and adds the item to the specified group.
 
-[[[label=ex_littletoolbar_dynamicalAdding|caption=Code of LittleToolbar >> dynamicalAdding:|language=Smalltalk|
+[[[
 LittleToolbar >> dynamicalAdding: aGroup
 	aGroup
 		addItem: [ :item | 
@@ -322,4 +332,9 @@ LittleToolbar >> dynamicalAdding: aGroup
 The figure *@fig_LittleToolbar* show the result after two clicks on the button to add an item and a click on the button displaying a submenu
 
 +Render of LittleToolbar>file://figures/LittleToolbar.png|width=50|label=fig_LittleToolbar+
+
+!! TabModel
+@sec_TabModel
+
+@@todo JF write me
 
