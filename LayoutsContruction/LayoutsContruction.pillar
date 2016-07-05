@@ -1,22 +1,22 @@
-{ "title" : "The Layouts Construction"}
+{ "title" : "Layout Construction"}
 @cha_layout_construction
 
-This chapter explain how construct the layout method to display a widget.
+@@todo JF editorial pass
 
+This chapter explains how construct the layout method to display a widget.
+
+@@todo JF add explanation of what class we are using and what are the widgets it has: almost all use one button (==theButton==) and a list (==theList==)
 
 !! Only One Widget
 
-The simpliest example of such a method is laying out just one widget. Example *@ex_layout1* presents such a layout.
+The simpliest example of such a method is laying out just one widget. Below we present such a layout.
 
 It returns a layout in which just one widget is added: the widget contained in ==theList== instance variable.
 
-[[[label=ex_layout1|caption=Code of a Layout with only one widget|language=Smalltalk 
-^ SpecLayout composed
+[[[^ SpecLayout composed
 		add: #theList;
 		yourself
 ]]]
-
-+Render of only one widget>file://figures/OnlyOneWidget.png|width=50|label=fig_OnlyOneWidget+
 
 The symbol ==theList== refers to an instance side method returning a widget.
 This is because instance variables are private, so the layout class needs to use an accessor to obtain it when building the UI.
@@ -27,6 +27,8 @@ All the methods for adding sub widgets can be found in the ''commands'' and ''co
 
 
 !! Reorganize SubWidgets
+
+@@todo JF This text is an orphan. Needs to be moved or expanded or link made clear
 
 These methods are ''not'' restricted to laying out sub widgets.
 
@@ -43,14 +45,18 @@ widget within this UI whose new layout position is being specified.
 We have seen an example of this reuse in *@sec_protocolbrowser*.
 
 
-!! Rows and Column
+!! Rows and Columns
 @sec_layout_rows_and_column
+
+@@todo JF RowLayout and ColumnLayout
+
+@@todo JF addSplitter is better here
 
 Often the layout of user interfaces can be described in rows and columns, and ""Spec"" provides for an easy way to specify such layouts.
 
-The example *@ex_layout_row* shows how to build a row of widgets.
+The example below shows how to build a row of widgets.
 
-[[[label=ex_layout_row|caption=Code of a Row of widgets|language=Smalltalk 
+[[[
 ^ SpecLayout composed
 	newRow: [ :row |
 		row
@@ -62,9 +68,9 @@ The example *@ex_layout_row* shows how to build a row of widgets.
 
 +Render of a Row of Widgets>file://figures/RowOfWidgets.png|width=50|label=fig_RowOfWidgets+
 
-Having the widgets rendered as a column is similar, as shown in the example *@ex_layout_column*
+Having the widgets rendered as a column is similar:
 
-[[[label=ex_layout_column|caption=Code of a Column of widgets|language=Smalltalk 
+[[[
 ^ SpecLayout composed
 	newColumn: [ :column |
 		column
@@ -81,11 +87,11 @@ Having the widgets rendered as a column is similar, as shown in the example *@ex
 
 Rows and columns can be combined to build more complex layouts, and splitters between cells can be added.
 
-The example *@ex_three_columns* shows how to create a 3 columns layout, containing three buttons in each column.
+The example below shows how to create a 3 column layout, containing three buttons in each column.
 
 This example also shows the ==addSplitter== message, which adds a splitter between the element added before it and the element added after.
 
-[[[label=ex_three_columns|caption=Code of a 3-column layout|language=Smalltalk 
+[[[
 ^ SpecLayout composed
 				newRow: [ :row | 
 					row
@@ -112,14 +118,14 @@ This example also shows the ==addSplitter== message, which adds a splitter betwe
 +Render of three Columns of Widgets>file://figures/ThreeColumns.png|width=50|label=fig_ThreeColumns+
 
 
-!! Set Size in pixels
+!! Set row and column size in pixels
 @sec_layout_set_size_pixels
 
 The height of rows as well as the width of columns can be specified, to prevent them to take all the available space.
 
 The example *@ex_row_height* shows how to specify the height of a row in pixels while the example *@ex_column_width* shows how to specify the column width.
 
-[[[label=ex_row_height|caption=Code of a Row of 30 pixels|language=Smalltalk 
+[[[
 ^ SpecLayout composed
 	newRow: [ :row |
 		row
@@ -131,7 +137,7 @@ The example *@ex_row_height* shows how to specify the height of a row in pixels 
 
 +Render of a Row of 30 pixels>file://figures/Row30pixels.png|width=50|label=fig_Row30pixels+
 
-[[[label=ex_column_width|caption=Code of a Column of 50 pixels|language=Smalltalk 
+[[[
 ^ SpecLayout composed
 				newColumn: [ :column | 
 					column
@@ -146,10 +152,12 @@ The example *@ex_row_height* shows how to specify the height of a row in pixels 
 Note that it is generally considered a bad habit to hardcode the size of the widgets.
 Methods are available on ''ComposableModel'' providing sensible default sizes, like the width of a button.
 
+@@todo JF Add more precise indications on where these methods are.
+
 When specifying custom widget sizes, care should be taken to take in account the current font size.
 
 
-!! Percentage
+!! Proportional layout
 @sec_layout_percentage
 
 It is also possible to specify the percentage of the container, e.g. the window, that a widget should occupy. As a result of this, the widget size will change accordingly when the container is resized.
@@ -159,7 +167,7 @@ To do so, the proportional position of the four sides of a widget can be specifi
 Zero percent is the container edge, 100 percent is the opposite container edge.
 For example, for the top edge, the percentage is counted from the top down: 0 is the top edge, and 1 is the bottom edge.
 
-[[[label=ex_layout_proportional|caption=Code of a Button centered in, and half the size of its container|language=Smalltalk 
+[[[
 ^ SpecLayout composed
 	add: #theButton top: 0.25 bottom: 0.25 left: 0.25 right: 0.25;
 	yourself
@@ -167,11 +175,13 @@ For example, for the top edge, the percentage is counted from the top down: 0 is
 
 +Render of a centrered Button>file://figures/CentreredButton.png|width=50|label=fig_CentreredButton+
 
+!! Absolute offsets
+
+@@todo Missing an example
 Also, the argument can be an integer if the offset has to be a fixed number of pixels.
 The number of pixels should be positive, as it indicates a distance from the corresponding edge, going to the opposite edge.
 
-
-!! Expert Mode
+!! Proportional with offsets
 @sec_layout_expert
 
 !!! origin: corner:
@@ -186,7 +196,7 @@ These two points represent respectively the top left corner and the bottom right
 
 !!! Addition offsetOrigin: offsetCorner: 
 
-In addition to those points, two offsets can be also be specified, using the method ==add: origin: corner: offsetOrigin: offsetCorner: ==.
+In addition to origin and corner , two offsets can be also be specified, using the method ==add: origin: corner: offsetOrigin: offsetCorner: ==.
 
 The offsets specify the number of pixels that the origin and the corner should be moved.
 
@@ -195,10 +205,10 @@ The offset expresses the number of pixels from the corresponding corner, in the 
 Note that this approach is similar to the ProportionalLayout of ""Morphic"".
 
 
-The example *@ex_layout_expert* shows how to add a widget looking like a toolbar.
-Here we reuse theButton for simplicity, we specifie that it take all the window width but only 30 pixels in height.
+The example below shows how to add a widget looking like a toolbar.
+Here we reuse theButton for simplicity, we specify that it take all the window width but only 30 pixels in height.
 
-[[[label=ex_layout_expert|caption=Code using Expert Mode to specify a Toolbar|language=Smalltalk 
+[[[
 ^ SpecLayout composed
 				add: #theButton
 					origin: 0 @ 0
