@@ -1,7 +1,11 @@
-{ "title" : "The Methods to control the window"}
+{ "title" : "Managing windows"}
 @cha_managing_window
 
-!! Instanciate the Window
+@@todo JF REWRITE
+
+@@todo JF we need to present an existing CM to customize as the example here. We can use customerSatisfaction of the first section.
+
+!! Open the Window
 
 ==ComposableModel== provides methods to open a window containing a widget.
 ==openWithSpec== is the most basic.
@@ -38,7 +42,7 @@ CustomerStatisfaction >> title
 ]]]
 
 
-!!! The initail size
+!!! The initial size
 
 Similarly at the setting of the title, overide the ==initialExtent== method set the initial size of the window. ==ComposableModel== provide the message ==extent:== to do that, but it must be called before the method to instanciate the window.
 
@@ -63,3 +67,82 @@ Similarly at the setting of the title, overide the ==initialExtent== method set 
 The default toolbar of the ==DialogWindowModel== has an ''Ok'' button and a ''Cancel'' button.
 In *@sec_textInputFieldModel*, acessor of the window is use.
 
+
+
+@@note JF ALL BELOW IS CUT-PASTE FROM TIPS AND TRICKS
+
+@@note JF what is the story of initialExtent versus extent redefine? The latter does not allow for reuse of the CM since it hardcodes the size?
+
+!! Setting the About text of a Window
+
+To set the about text of a window, either override the ==aboutText==
+method of the corresponding
+==ComposableModel== so that it returns the new about text, or send the 
+instance the ==aboutText:== message before opening, for example like
+below.
+
+[[[
+	| inputField |
+	inputField := TextInputFieldModel new.
+	inputField
+		aboutText: 'This is an empty text Field'.
+	inputField openWithSpec
+]]]
+
+
+!! Setting the Initial size of a Window When it Opens
+
+To set the initial size of a window when it opens, either override the ==extent==
+method of the corresponding
+==ComposableModel== so that it returns a Point, or send the 
+instance the ==extent:== message before opening, for example like
+this:
+
+[[[
+	| inputField |
+	inputField := TextInputFieldModel new.
+	inputField
+		extent: 500@600.
+	inputField openWithSpec
+]]]
+
+!! Make a fixed size window, without any window control widgets
+
+@@todo write some nice text here
+
+[[[
+	| win |
+	win := TextInputFieldModel new openWithSpec window.
+	win beUnresizeable;
+		removeCollapseBox;
+		removeExpandBox;
+		removeCloseBox;
+		removeMenuBox
+]]]
+
+@@note This window is still closable using the halo menus.
+
+!! Dynamically Change the Size of a Window
+
+@@todo JF change this example so that it does not use dynamic spec
+
+Windows can be dynamically resized by sending the corresponding
+==WindowModel== the ==extent:== message. To get a handle on the
+==WidowModel== of a ==ComposableModel== instance, send it the
+==window== message (after it has been opened with
+==openWithSpec==). For example, below a window that resizes itself
+depending on what button is clicked.
+
+[[[
+		 |container|
+		 container := DynamicComposableModel new.
+		 container instantiateModels:  #(#plus ButtonModel #minus ButtonModel).
+		 container plus label: 'Bigger!'.
+		 container minus label: 'Smaller!'.
+		 container plus action: [ container window extent: 500@500].
+		 container minus action: [ container window extent: 200@200].
+		 container layout: 
+		 		   	(SpecColumnLayout composed
+								add: #plus; add: #minus; yourself).
+		container openWithSpec
+]]]

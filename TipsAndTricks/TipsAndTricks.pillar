@@ -6,84 +6,7 @@ use when building user interfaces with Spec. For the sake of brevity,
 many examples use dynamic Spec (see chapter XXX), but these 
 of course also work with normal Spec.
 
-!! Various Window Tips
-
-
-!!! Setting the About text of a Window
-
-To set the about text of a window, either override the ==aboutText==
-method of the corresponding
-==ComposableModel== so that it returns the new about text, or send the 
-instance the ==aboutText:== message before opening, for example like
-below.
-
-[[[
-	| inputField |
-	inputField := TextInputFieldModel new.
-	inputField
-		aboutText: 'This is an empty text Field'.
-	inputField openWithSpec
-]]]
-
-
-!!! Setting the Initial size of a Window When it Opens
-
-To set the initial size of a window when it opens, either override the ==extent==
-method of the corresponding
-==ComposableModel== so that it returns a Point, or send the 
-instance the ==extent::== message before opening, for example like
-this:
-
-[[[
-	| inputField |
-	inputField := TextInputFieldModel new.
-	inputField
-		extent: 500@600.
-	inputField openWithSpec
-]]]
-
-!!! Make a fixed size window, without any window control widgets
-
-@@todo write some nice text here
-
-[[[
-	| win |
-	win := TextInputFieldModel new openWithSpec window.
-	win beUnresizeable;
-		removeCollapseBox;
-		removeExpandBox;
-		removeCloseBox;
-		removeMenuBox
-]]]
-
-@@note This window is still closable using the halo menus.
-
-!!! Dynamically Change the Size of a Window
-
-Windows can be dynamically resized by sending the corresponding
-==WindowModel== the ==extent:== message. To get a handle on the
-==WidowModel== of a ==ComposableModel== instance, send it the
-==window== message (after is has been opened with
-==openWithSpec==). For example, below a window that resizes itself
-depending on what button is clicked.
-
-[[[
-		 |container|
-		 container := DynamicComposableModel new.
-		 container instantiateModels:  #(#plus ButtonModel #minus ButtonModel).
-		 container plus label: 'Bigger!'.
-		 container minus label: 'Smaller!'.
-		 container plus action: [ container window extent: 500@500].
-		 container minus action: [ container window extent: 200@200].
-		 container layout: 
-		 		   	(SpecColumnLayout composed
-								add: #plus; add: #minus; yourself).
-		container openWithSpec
-]]]
-
-!!Unclassified tips
-
-!!! Non-editable text field
+!! Non-editable text field
 
 
 In this tip we create a non-editable text field using a
@@ -99,7 +22,7 @@ In this tip we create a non-editable text field using a
 ]]]
 
 
-!!! Scrollable List of Widgets
+!! Scrollable List of Widgets
 
 ==ListModel== can show more than just text, it can also visualize any
 kind of widgets. To do this, all that is needed is to set the
@@ -121,7 +44,7 @@ ListModel new
 
 +The Scrollable List of Widgets>file://figures/scrollable_buttons.png|width=30|label=fig_scrollable_buttons+
 
-!!! Include a Morph in a Spec UI
+!! Include a Morph in a Spec UI
 
 Any morph can be included as a widget in a Spec UI. To do this, send
 the Morph instance the ==asSpecAdapter== message, it will return a
@@ -140,11 +63,11 @@ container openWithSpec.
 
 @@note This code does not work yet due to issues with ==DynamicComposableModel== and the ==MorphicGenericAdapter==.
 
-!!! Include a Glamour UI in a Spec Window
+!! Include a Glamour UI in a Spec Window
 
 @@todo Infinite recursion between Spec and Glamour Inspector needs to be shown.
 
-!!! Testing the Functionality of a Spec UI
+!! Testing the Functionality of a Spec UI
 
 @@todo FIXME
 
@@ -166,7 +89,7 @@ runSequence: script
       equals: result asString asUppercase ]
 ]]]
 
-!!! Customize the Appearance of a Widget
+!! Customize the Appearance of a Widget
 
 If Spec does not allow you to customize the appearance of a widget,
 but the underlying widget library does, you can send messages to the
@@ -192,7 +115,7 @@ rendered in red, and use the Balloon font in Italic.
 
 @@note Warning: By doing the above you are tightly coupling your UI to the underlying widget library. As a result, your UI may break if there are changes in this library, or if Spec uses another library for its underlying widgets.
 
-!!! Show a Table-Like View
+!! Show a Table-Like View
 
 There are multiple ways in which a table-like widget can be shown to the user. The most straightforward way is the ==MultiColumnListModel==, for example as below:
 
@@ -233,7 +156,7 @@ r := FileLocator vmDirectory.
     m openWithSpec.
 ]]]
 
-!!! Non-Editable Multi-Line Text
+!! Non-Editable Multi-Line Text
 
 The ==TextInputFieldModel== can be configured such that the text it contains is not editable, by disabling it: 
 
@@ -244,7 +167,7 @@ TextInputFieldModel new
 	openWithSpec
 ]]]
 
-!!! List items do not update
+!! List items do not update
 
 Adding items to a collection held in a list does not update the widget. To do that, you need to set the items of the list, using the ==items:== message. This is required because it also sorts the list items (if required)
 
@@ -267,9 +190,6 @@ Adding items to a collection held in a list does not update the widget. To do th
 
 !! JF Todos
 
-- ComposableModel class defaults category
-- SpecColumnLayout and SpecRowLayout (SpecRowLayout composed
-        newColumn: [...   ]; newColumn: [...].)
 - What about keyboard shortcuts? (see pharo-users mail 28/10/15)
 
 !! Found more Examples
