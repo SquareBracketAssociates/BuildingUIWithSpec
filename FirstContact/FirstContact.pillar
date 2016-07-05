@@ -87,6 +87,8 @@ CustomerSatisfaction >> initializePresenter
 	buttonBad action: [ screen label: buttonBad label ];
 ]]]
 
+@@todo JF Missing the generate accessors story !!
+
 In the following class side method ==defaultSpec==, the ==newRow:origin:corner:== is important to let enough place at the screen. Further informations about methods to define the layout are given in the chapter *@cha_layouts_construction*.
 
 @@note The argument of the ==add:== messages are accessors refered by their symbols. WHY?
@@ -165,7 +167,7 @@ iconList openWithSpec
 
 
 
-@@todo this is there to clearly show the interaction between 2 widgets. Plus it will be of use when we have the dynamic widget example
+@@todo JF this is there to clearly show the interaction between 2 widgets. Plus it will be of use when we have the dynamic widget example
 
 List + textpane 
 List shows x characters of the text
