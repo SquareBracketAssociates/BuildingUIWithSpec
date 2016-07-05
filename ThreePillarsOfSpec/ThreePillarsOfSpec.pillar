@@ -1,6 +1,8 @@
 { "title" : "The Three Pillars of Spec"}
 @cha_pillars_of_spec
 
+@@todo JF editorial pass
+
 All user interfaces in ''Spec'' are constructed through the composition of existing user interfaces.
 To define a user interface, it is sufficient to define the model of the user interface.
 
@@ -20,7 +22,7 @@ These methods are hence typically found in the model for each user interface.
 In this section we describe the responsibility for each method, i.e. how these three work together to build the overall UI.
 
 
-!! the ''initializeWidgets'' method
+!! The ''initializeWidgets'' method
 @sec_initializeWidgets
 
 This method is used to instantiate the models for the different widgets that will be part of the UI and store them in their respective instance variables.
@@ -39,12 +41,12 @@ In general the ==initializeWidgets== method should follow the pattern:
 The last step is not mandatory but ""highly"" recommended.
 Indeed, without this final step keyboard navigation will not work at all.
 
-The code in figure *@pattern* shows an example of an ==initializeWidgets== method.
+The code below shows an example of an ==initializeWidgets== method.
 It first instantiates a button and a list widget, storing each in an instance variable.
 It second configures the button it by setting its label.
 Third it specifies the focus order of all the widgets: first the button and then the list.
 
-[[[label=pattern|caption=Code of a simple initializeWidgets|
+[[[
 initializeWidgets
 
 	theButton := self newButton.
@@ -57,9 +59,7 @@ initializeWidgets
 		add: theList.
 ]]]
 
-[[[caption:Hint|
-Specifying this method is mandatory, as without it the UI would have no widgets.
-]]]
+@@note Specifying this method is mandatory, as without it the UI would have no widgets.
 
 
 !!! Widget instantiation
@@ -78,7 +78,7 @@ For example, to reuse a ''MessageBrowser''  widget, the code is == self instanti
 This method specifies the layout of the different widgets in the UI.
 It also specifies how a widget reacts when the window is resized.
 
-Specifying this method is mandatory, as without it the UI would show no widgets to the user.
+@@note Specifying this method is mandatory, as without it the UI would show no widgets to the user.
 
 
 !!! Layout Lookup
@@ -91,7 +91,7 @@ If no such specific layout is given, the following lookup mechanism will be used
 # Otherwise the class-side ==defaultSpec== method will be called, which will raise ==subclassResponsibility== if it is not overriden.
 
 So, in order to retrieve the correct method to apply, these methods need to be flagged with a pragma.
-The pragma can be either ==<spec: default>== for the layout to use by default, or ==<spec>== for the other layouts.
+The pragma can be either ==<spec: #default>== for the layout to use by default, or ==<spec>== for the other layouts.
 
 This method is on class side because it returns a value that usually is the same for all the instances.
 Put differently, usually all the instances of the same user interface have the same layout and hence this can be considered as being a class-side accessor for a class variable.
@@ -99,15 +99,15 @@ Put differently, usually all the instances of the same user interface have the s
 
 !!! Specify Layout
 
-@@todo may give more informations about modal (setModal: aWindow)
+@@todo may give more informations about modal (setModal: aWindow). JF This does not seem to be the correct place for this. Add in tips and tricks?
 
-As seen in section *@sec_buttonModel*, ==ComposableModel== provides methods to specify the layout to use at the openning, like ==openWithSpec:==. But notice it does not let the possibility to choose the layout of subwidgets.
+As seen in section *@sec_buttonModel*, ==ComposableModel== provides methods to specify the layout to use at the opening, like ==openWithSpec:==. But notice it does not allow for the possibility to choose the layout of subwidgets.
 
 In that aim, all the methods seen in the previous examples come with a variant used to specify which selector to use for the layout method. By example, for the ==add:== method the variant is  ==add:withSpec:==.
 
 In the following example, ==SubWidgetButtons== manages two ButtonModel and provides two layout to display them.
 
-[[[label=ex_SubWidgetButtons|caption=Code of SubWidgetButtons|language=Smalltalk 
+[[[
 SubWidgetButtons>>initializeWidgets
 	button1 := self instantiate: ButtonModel.
 	button2 := self instantiate: ButtonModel.
@@ -138,7 +138,7 @@ SubWidgetButtons>>onALine
 
 ==SubWidgetList== is very simple, and manages a ListModel.
 
-[[[label=ex_SubWidgetList|caption=Code of SubWidgetList|language=Smalltalk 
+[[[
 SubWidgetList>>initializeWidgets
 	list := self instantiate: ListModel.
 	list items: (1 to: 10).
@@ -149,7 +149,7 @@ SubWidgetList>>initializeWidgets
 ==SuperWidget== reuses them and provides two layout. One using the default layout of ==SubWidgetButtons== as result the figure *@fig_SuperWidget*.
 
  
-[[[label=ex_SuperWidget|caption=Code of SuperWidget|language=Smalltalk 
+[[[
 SuperWidget>>initializeWidgets
 	subButtons := self instantiate: SubWidgetButtons.
 	subList := self instantiate: SubWidgetList.
@@ -200,12 +200,16 @@ In addition to this primitive  ==whenChangedDo:== method, the basic widgets prov
 
 The example *@ex_button* shows how to use one of the registration methods of the list widget to change the label of the button according to the selection in the list.
 
-[[[label=ex_button|caption=Code of How to change a button label according to a list selection|language=Smalltalk 
+[[[
 theList whenSelectedItemChanged: [ :item | 
 	item 
 		ifNil: [ theButton text: 'No selected item' ]
 		ifNotNil: [ theButton text: 'An item is selected'] ]
 ]]]
+
+!! A note on reuse
+
+@@todo JF expand here
 
 If a programmer wants his or her widgets to be reused, they should provide a comprehensive API.
 
