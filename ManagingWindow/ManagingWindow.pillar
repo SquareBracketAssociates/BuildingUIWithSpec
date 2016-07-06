@@ -7,6 +7,8 @@
 
 !! Open the Window
 
+@@todo JF This should clarify the situation of opening a normal window vs opening a dialog box vs opening a modal dialog box + what's up with DialogModel.
+
 ==ComposableModel== provides methods to open a window containing a widget.
 ==openWithSpec== is the most basic.
 Here, it will use the layout provide by the method containing the pragma "<spec: #default>" and should give the figure *@fig_Customers_Basic*.
@@ -71,7 +73,7 @@ In *@sec_textInputFieldModel*, acessor of the window is use.
 
 @@note JF ALL BELOW IS CUT-PASTE FROM TIPS AND TRICKS
 
-@@note JF what is the story of initialExtent versus extent redefine? The latter does not allow for reuse of the CM since it hardcodes the size?
+@@note JF what is the story of initialExtent versus extent redefine? The latter does not allow for reuse of the CM since it hardcodes the size? Note text from Stef: "initialExtent should be put into (do not forget to say that this is only for window"
 
 !! Setting the About text of a Window
 

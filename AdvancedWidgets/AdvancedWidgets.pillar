@@ -230,6 +230,8 @@ MrAndMrsRadioButton >> defaultSpec
 
 @@todo JF a less in-depth rewrite is feasible
 
+@@todo JF missing explanation of menu on a text field or on a list.
+
 This example shows the creation of menu, a menu is the collaboration between three classes:
 - ==MenuModel== containing ==MenuGoupModel== and displaying them spepareted by a splitter.
 - ==MenuGoupModel== containing ==MenuItemModel==.

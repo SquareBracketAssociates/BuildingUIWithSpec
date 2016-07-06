@@ -1,28 +1,6 @@
-{ "title" : "Todo"}
+@cha_introduction
 
-- Advanced Widgets
--- chapitre menu on list or text + menubar
--- Other widgets: textinputfield, radio, tab
--- popup -> dynamic
-
-- chapitre dynamic 
--- on reecrit
-
-- chapitre tips and tricks
-- (in Tips, temporarly) We should add a section on how to find example in the image: in Chapter two. 
--- ComposableModel subclasses
--- opening modal
-
-- Chapitre Windown
--- add DialogModel
--- open any spec model in modal : openWithDialogSpec: 
---initialExtent should be put into (do not forget to say that this is only for window
-
-
-- chpaitre 9 Spec Internal t the end  (done)
-
-%{ "title" : "Spec: a framework for describing user interfaces"}
-! Spec: a framework for describing user interfaces
+@@todo JF REWRITE
 
 !! Introduction
 
@@ -72,11 +50,6 @@ Writing user interfaces is notoriously a tedious task. It often requires time an
 !! Structure of the document
 
 The structure of this document is as follows:
-- 
-- 
-- 
-- 
-
-
-@@todo should be update after the work on the book
+- a
+- b
 
