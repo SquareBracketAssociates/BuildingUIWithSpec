@@ -1,67 +1,70 @@
 { "title" : "First Contact With Examples"}
 @cha_first_contact
 
-@@todo JF write intro and editorial pass.
+To start this booklet we use a couple of examples to explain the use of Spec. We will first construct a small but complete user interface, and then show some more examples of how existing widgets can be configured. This will already allow you to build basic user interfaces.
 
-This chapter presents Spec with a list of examples that highlight some characteristics of Spec. 
+After completing this chapter you should at least read the following chapter about reuse of Spec widgets, which is the key reason behind the power of Spec. With these two chapters read you should be able to construct Spec user interfaces as intended. You could can use the rest of this booklet just as reference material, but nonetheless we recommend you to at least give a brief look at the other chapters as well.
 
 !! A customer satisfaction UI
-@sec_buttonModel
+@sec_customer_satisfaction
 
-This example shows how to create a widget and how to basically control the window and the layout used for the render.
++A screen shot of the customer satisfaction UI.>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
 
-
-+Render of CustomerSatisfaction.>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
-
+In this first example of a Spec UI we will construct a simple customer satisfaction UI, which will allow a user to give feedback about a service by clicking on one of three buttons. (This feedback should be recorded and processed, but this is outside of the scope of this text). We show a screenshot of the UI in Figure *@fig_Customers_Basic*.
 
 
-!!! Create the widget
+!!! Create the class of the UI and variable accessors
 
-This example associates four basic widgets and we have to create a widget to manage them. That widget must be a subclass of ==ComposableModel==.
+All user interfaces in Spec are subclasses of ==ComposableModel==, so
+the first step in creating the UI is creating a subclass:
 
 [[[
 ComposableModel subclass: #CustomerSatisfaction
-	instanceVariableNames: 'screen buttonHappy buttonNeutral buttonBad'
+	instanceVariableNames: 'buttonHappy buttonNeutral buttonBad screen'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
 ]]]
 
-Basically, at the instance side of the class we will declare the widgets that we will be using, some aspects of these widgets like labels, actions, states, and the logic of the application and the glue between these widgets. On the other hand, at class side, we will set up the basic design of our GUI -how the widgets are laid out- and its title.
+The instance variables of the class hold the widgets that the UI
+contains. In this case we have three buttons and a text screen. Accessors for these instance variables also need to be defined, the Spec interpreter will use them in the UI construction process.
 
-Summarizing:
-- instance side: widget instantiation along with actions performed by these and application logic.
-- class side: widget layout i.e., how all our widgets will be laid out in a window.
+@@note Always remember to generate the accessors for the instance variables of the widgets of the UI.
 
-!!! Instantiate subwidgets
+The methods of the class provide their initialization and configuration, e.g. 
+labels and actions, as well as the logic of their interaction. The
+basic design of our GUI, i.e. how the widgets are laid out, is defined by a method 
+at class side.
 
-A subclass of ==ComposableModel== has the responsibility to define the ==initializeWidgets== method and ==defaultSpec== class method. In which we will instanciate buttons and the screen with methods provided by the superclass.
+!!! Instantiate and configure subwidgets
 
-@@todo JF inline code and example
+A subclass of ==ComposableModel== has the responsibility to define the
+==initializeWidgets== method, which instantiates and configures the
+widgets used in the user interface. We now discuss it piece by piece.
 
-First, the message ==instantiate:== can be used to instanciate basic widgets or widgets, it will configure some variable like ==owner== which is used to keep the hierachy of widgets.
-
-==ComposableModel== provides the message ==instantiateModels:== to instanciates several models at once. It takes as argument an array of pairs, where each pair is composed of the unique name of the widget, and the name of class of the widget to instanciate.
-
-@@note The superclass ==ComposableModel== provides shorcut methods for the most used basics widget. Similarly ==ComposableModel== defines message for ==newButton==, ==newCheckBox==, ==newDropList==,... See XXX protocol. We will use these throughout this text from now on.
-
-Then, we configure the buttons :
-- Message ==label:== define the label which will be display on them
-- Message ==action:== define the block to perform when they are acliked
-- Message ==icon:== define an icon which will be display near the label
-Note that ==label:== is used to define the default text on the screen. Then, it used by buttons to change this text.
-
-Finally, its a good practice to define the focus order, it use for keyboard navigation.
+First we show widget instantiation:
 
 [[[
 CustomerSatisfaction >> initializeWidgets
-	"widgets instanciation"
-	screen := self instantiate: LabelModel.
-	buttonHappy := self instantiate: ButtonModel.
-	buttonNeutral := self instantiate: ButtonModel.
-	buttonBad := self instantiate: ButtonModel.
 
-	"widgets configuration specification"
-	screen label: 'Tell us ?'.
+	"widget instantiation"
+	screen := self newLabel.
+	buttonHappy := self newButton.
+	buttonNeutral := self newButton.
+	buttonBad := self newButton.
+]]]
+
+==ComposableModel== defines messages for the creation of the standard widgets: ==newButton==, ==newCheckBox==, ==newDropList==, ... All of these are defined in the ==widgets== protocol.
+
+@@note ""Do not"" call ==new== to instantiate a widget that is part of your UI. 
+
+@@note An alternative way to instantiate widgets is by using the message ==instantiate:== with a class as argument. For example ==screen := self instantiate: LabelModel.== This allows to instantiate non-standard widgets, but can of course also be used for the standard widgets.
+
+Second, we configure the buttons of our UI. The message ==label:== defines their label and the message ==icon:== specifies the icon that will be displayed near the label.
+
+[[[
+[ ... continued ... ]
+	"widget configuration"
+	screen label: 'Please give us your feedback.'.
 	buttonHappy
 		label: 'Happy';
 		icon: (self iconNamed: #thumbsUp).
@@ -71,7 +74,12 @@ CustomerSatisfaction >> initializeWidgets
 	buttonBad
 		label: 'Bad';
 		icon: (self iconNamed: #thumbsDown).
+]]]
 
+Third and last, it is a good practice to define the focus order, which is useful for keyboard navigation.
+
+[[[
+[ ... continued ... ]
 	"specification of order of focus"
 	self focusOrder
 		add: buttonHappy;
@@ -79,45 +87,78 @@ CustomerSatisfaction >> initializeWidgets
 		add: buttonBad
 ]]]
 
+A ==ComposableModel== subclass may also define an ==initializePresenter== method. The purpose of this method is to configure the interactions between the different widgets. 
+
 [[[
 CustomerSatisfaction >> initializePresenter
 
-	buttonHappy action: [ screen label: buttonHappy label ];
+	buttonHappy action: [ screen label: buttonHappy label ].
 	buttonNeutral action: [ screen label: buttonNeutral label ].
-	buttonBad action: [ screen label: buttonBad label ];
+	buttonBad action: [ screen label: buttonBad label ].
 ]]]
 
-@@todo JF Missing the generate accessors story !!
+We use the message ==action:== to specify the action that is performed when the buttons are clicked. In this case, we change the content of what is shown on the screen, to provide feedback that the choice has been registered.
 
-In the following class side method ==defaultSpec==, the ==newRow:origin:corner:== is important to let enough place at the screen. Further informations about methods to define the layout are given in the chapter *@cha_layouts_construction*.
+@@note To summarize: the configuration of a widget `on its own' goes in ==initializeWidgets== and the configuration of a widget `in cooperation with others' goes in ==initializePresenter==.
 
-@@note The argument of the ==add:== messages are accessors refered by their symbols. WHY?
+The widgets have now been defined and configured, but their placement in the UI has not yet been specified. This is the role of the class side method ==defaultSpec==.
 
 [[[
-CustomerStatisfaction class >> defaultSpec
-	<spec: #default>
+CustomerSatisfaction class >> defaultSpec
 	^ SpecLayout composed
-		newRow: [ :row | row add: #screen ] origin: 0 @ 0 corner: 1 @ 0.2;
 		newRow: [ :row | 
 			row add: #buttonHappy; add: #buttonNeutral; add: #buttonBad ]
-			origin: 0 @ 0.2 corner: 1 @ 1;
+		origin: 0 @ 0 corner: 1 @ 0.7;
+		newRow: [ :row | row add: #screen ]
+		origin: 0 @ 0.7 corner: 1 @ 1;
 		yourself
 ]]]
 
+In this layout, we add two rows to the UI, one with the buttons and one with the screen of text. Defining widget layout is a complex process with many different possible requirements, hence in this chapter we do not talk in detail about layout specification. Instead for more information we refer to Chapter *@cha_layouts_construction*.
 
+@@note The argument of the ==add:== messages are the symbols for the accessors. This is because the Spec interpreter will call these methods to retrieve the widgets when performing the layout.
 
-!! Fun with ListModel
+!!! Define a title and window size, open and close the UI
+
+To set the window title and the initial size, two more methods need to be defined:
+
+[[[
+title
+	^ 'Customer Satisfaction Survey'.
+
+extent
+	^ 400@100
+]]]
+
+The ==title== method returns a string that will be used as a title, and the ==extent== method returns a point that specifies the size of the window. 
+
+To open a UI, an instance of the class needs to be created and it needs to be sent the ==openWithSpec== message. This will open a window and return an instance of ==WindowModel==, which allows the window to be closed from code. 
+
+[[[
+| ui |
+  ui := CustomerSatisfaction new openWithSpec.
+  [ ... do a lot of stuff until the UI needs to be closed ...]
+  ui close.
+]]]
+
+More information about managing windows: e.g. opening dialog boxes or setting the about text is present in Chapter *@cha_managing_windows*.
+
+This concludes our first example of a Spec user interface. We now continue with more examples on how to configure the different widgets that can be used in such a user interface.
+
+!! Fun with Lists
 @sec_listModel
 
-To show XXX, we have two examples of lists: list with background colored items and icons. 
+As an illustration of how widgets can be configured, we now show two examples of lists: a list using different background colors and a list that also shows icons. 
+
+These example shows two important features of Spec:
+# All widgets can be opened as a window. This is because there is no fundamental difference between a complex UI as shown above and the standard widgets.
+# All widgets can be configured, and their configuration methods are classified in ==api== protocols.
 
 !!! Registered colors as item background
 
-@@note this shows that any widget can be configured from the outside and opened as a window (hints at reuse)
+We start with an example of a ==ListModel== where the elements have different background colors, shown in Figure *@fig_modified_background*. The items held in the list are the names of different colors, and the list shows them using a background of that color.
 
-Here is an example of a ==ListModel== with elements having different colors. 
-We want to that each element (displaying the name of the messsage to create a color) has such color as background as shown in Figure *@fig_modified_background*. 
-The following code shows how to build a list widget using a ==ListModel== containing all registered color names.
+The following code shows how this is done:
 
 [[[
 | registeredColorsList |
@@ -129,51 +170,43 @@ registeredColorsList
 registeredColorsList openWithSpec
 ]]]
 
-+Render of the ListModel with modified background colors>file://figures/RegisteredColors.png|width=50|label=fig_modified_background+
++Screen shot of the list with modified background colors>file://figures/RegisteredColors.png|width=50|label=fig_modified_background+
 
 Here we see the following messages that are part of the ==ListModel== API. 
 
-- Message ==items:== sets the elements of the list. 
-- Message ==backgroundColorBlock:== specifies a block that is executed to determine the background color of the current element.  It takes a block with a single parameter that is the item concerned by the background color.
-- Message ==title:== sets the title of the window containing the list.
+- The message ==items:== sets the elements of the list. 
+- The message ==backgroundColorBlock:== specifies a block that is executed to determine the background color of the current element.  It takes a block with a single parameter: the list item.
+- The message ==title:== sets the title of the window containing the list.
 
-Finally this example shows that the message ==openWithSpec== open and place the resulting widget on the screen. 
 
 !!! List of icons
 
-In this example, we are going to build a list containing icons of the current theme and their respective selector using a subclass of ListModel: IconListModel.
-
-- Message ==displayBlock:== wraps your domain specific items and should return something that can be displayed in a list, like a String. See the tips section *@sec_scrollable_buttons* for an example of displaying widgets.
-
-- Message ==sortingBlock:== sorts the elements of the list before displaying them.
+The second example shows a list containing the icons of the current theme and their respective selector in an ==IconListModel==. The list items are associations of the icon names and the icons themselves, the text that is shown in the list is the icon name, and the icon shown in the list is the icon itself. We also sort the items in the list alphabetically according to their name. 
 
 [[[
 | iconList |
+| iconList |
 iconList := IconListModel new.
 iconList
-	items: Smalltalk ui icons allIconNames asSortedCollection;
-	displayBlock: [ :selector | selector asString ];
-	sortingBlock: [ :selectorA :selectorB | selectorA < selectorB ];
-	icons: [ :each | Smalltalk ui icons iconNamed: each ];
+	items: Smalltalk ui icons icons associations;
+	displayBlock: [ :assoc | assoc key];
+	sortingBlock: [ :assocA :assocB | assocA key < assocB key ];
+	icons: [ :assoc | assoc value ];
 	title: 'Availiable icons for the current theme.'.
 iconList openWithSpec
 ]]]
 
-+Render of the List of Icons>file://figures/IconList.png|width=50|label=fig_IconList+
++Screen shot of the list of Icons>file://figures/IconList.png|width=50|label=fig_IconList+
 
-
-
-!! Building a text overview widget
-
-
-
-@@todo JF this is there to clearly show the interaction between 2 widgets. Plus it will be of use when we have the dynamic widget example
-
-List + textpane 
-List shows x characters of the text
+The following messages of the ==ListModel== API are noteworthy: 
+- The message ==displayBlock:== takes a block that receives a domain specific item and should return something that can be displayed in a list, like a String. 
+- The message ==sortingBlock:== takes a block that is used to sort the elements of the list before displaying them.
 
 
 !! Conclusion
 
-@@todo JF missing a: where to find info: what are the widgets and what is their API + examples in the image
-@@todo JF missing a: where to next + you should really read the next chapter
+In this chapter we have given you a first contact with Spec user interfaces. We have first shown you what the different steps are to build a user interface with Spec, and then shown you two examples of how to configure existing Spec widgets.
+
+More examples of Spec user interfaces are found in the Pharo Image itself. Since all Spec user interfaces are subclasses of ==ComposableModel==, they are easy to find and each of them may serve as an example. Furthermore, experimentation with widgets and user interfaces is made easy because all widgets can be opened as standalone windows, and their configuration methods are classified in the ==api== protocol.
+
+We recommend that you at least read the next chapter about reuse of Spec widgets, which is the key reason behind the power of Spec. This knowledge will help you in building UIs faster through better reuse, and also allow your own UIs to be reused. The chapter after that on the three pillars of Spec gives a more complete overview of the functioning of Spec and is worthwhile to read in its entirety. Later chapters are intended more as reference material for specific problems or use cases, but can of course be read in full as well.
