@@ -57,7 +57,7 @@ CustomerSatisfaction >> initializeWidgets
 
 @@note ""Do not"" call ==new== to instantiate a widget that is part of your UI. 
 
-@@note An alternative way to instantiate widgets is by using the message ==instantiate:== with a class as argument. For example ==screen := self instantiate: LabelModel.== This allows to instantiate non-standard widgets, but can of course also be used for the standard widgets.
+@@note An alternative way to instantiate widgets is by using the message ==instantiate:== with a class as argument. For example ==screen := self instantiate: LabelModel.== This allows one to instantiate non-standard widgets, but can of course also be used for the standard widgets.
 
 Second, we configure the buttons of our UI. The message ==label:== defines their label and the message ==icon:== specifies the icon that will be displayed near the label.
 
@@ -97,7 +97,7 @@ CustomerSatisfaction >> initializePresenter
 	buttonBad action: [ screen label: buttonBad label ].
 ]]]
 
-We use the message ==action:== to specify the action that is performed when the buttons are clicked. In this case, we change the content of what is shown on the screen, to provide feedback that the choice has been registered.
+We use the message ==action:== to specify the action that is performed when the buttons are clicked. In this case, we change the content of what is shown on the screen, to provide feedback that the choice has been registered. Note that the message ==action:== is part of the button API. In other situations, you will specify that when a given event occurs, another message should be send to a widget subpart. 
 
 @@note To summarize: the configuration of a widget `on its own' goes in ==initializeWidgets== and the configuration of a widget `in cooperation with others' goes in ==initializePresenter==.
 
@@ -123,10 +123,10 @@ In this layout, we add two rows to the UI, one with the buttons and one with the
 To set the window title and the initial size, two more methods need to be defined:
 
 [[[
-title
+CustomerSatisfaction >> title
 	^ 'Customer Satisfaction Survey'.
 
-extent
+CustomerSatisfaction >> extent
 	^ 400@100
 ]]]
 
@@ -141,7 +141,7 @@ To open a UI, an instance of the class needs to be created and it needs to be se
   ui close.
 ]]]
 
-More information about managing windows: e.g. opening dialog boxes or setting the about text is present in Chapter *@cha_managing_windows*.
+More information about managing windows: e.g., opening dialog boxes or setting the about text is present in Chapter *@cha_managing_windows*.
 
 This concludes our first example of a Spec user interface. We now continue with more examples on how to configure the different widgets that can be used in such a user interface.
 
@@ -150,7 +150,7 @@ This concludes our first example of a Spec user interface. We now continue with 
 
 As an illustration of how widgets can be configured, we now show two examples of lists: a list using different background colors and a list that also shows icons. 
 
-These example shows two important features of Spec:
+These examples show two important features of Spec:
 # All widgets can be opened as a window. This is because there is no fundamental difference between a complex UI as shown above and the standard widgets.
 # All widgets can be configured, and their configuration methods are classified in ==api== protocols.
 
