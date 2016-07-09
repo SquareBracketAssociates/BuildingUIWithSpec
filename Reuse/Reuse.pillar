@@ -1,249 +1,226 @@
 { "title" : "Reusing and composing elements"}
 @cha_reuse
 
-@@todo JF editorial pass
+A key design goal of Spec is to enable the seamless reuse of user interfaces as widgets for the user interface you are building. The reason for this is that it results in a significant productivity boost when creating user interfaces.
+
+This focus on reuse was actually already visible in the previous chapter, where we have seen that basic widgets can be used as if they were a complete user interface. In this section we focus on the reuse and composition of widgets, showing that it basically comes for free. The only requirement when building a UI is to consider how the user interface should be parameterized when it is being reused, and there is only one concrete rule that needs to be followed in that respect.
 
 
-@@todo JF add the emphasis on reuse and how it shapes design of spec and that your UIs should be compliant so they can be reused
-
-@@todo JF the code for the 2 first examples can be treated quickly since we just saw stuff like this in the previous chapter.
-
-In this chapter we will show the power of Spec at work to build complex applications by reusing existing widgets and managed their interactions.
-
-+Render of the ProtocolBrowser>file://figures/Protocol_Browser.png|width=50|label=fig_protocol_browser+
-
-It's structured in four parts that will result in the browser shown in Figure *@fig_protocol_browser*:
-- First, the ""WidgetClassList"" : a widget dedicated to render ==ListModel== displaying AbstractWidgetModel subclasses.
-- Second, the ""ProtocolList"" : a widget composed of a ==ListModel== and a ==LabelModel==.
-- Third, the ""ProtocolViewer"" : defined by combining a ==WidgetClassList== with two ==ProtocolList==, it will browse the methods in protocols named ''api'' and ''api-events''.
-- Finally, the ""ProtocolBrowser"" : reuse a ==ProtocolViewer== and adding a ==TextModel==.
-
-This composition is shown by the diagram *@fig_protocolbrowser_hierarchy*.
-
-+Diagram of hierarchy of parents of ProtocolBrowser>file://figures/ProtocolBrowserHierarchy.png|label=fig_protocolbrowser_hierarchy+
++Screen shot of the ProtocolBrowser>file://figures/Protocol_Browser.png|width=80|label=fig_protocol_browser+
 
 
+To show how Spec enables the composition and reuse of user interfaces, in this chapter we build the user interface shown in Figure *@fig_protocol_browser* as a composition of four parts:
+# The ""WidgetClassList"": a widget containing a ==ListModel== specifically for displaying the subclasses of ==AbstractWidgetModel==.
+# The ""ProtocolMethodList"": a widget composed of a ==ListModel== and a ==LabelModel== for displaying methods of a protocol.
+# The ""ProtocolViewer"":  a composition of one ==WidgetClassList== and two ==ProtocolMethodList==, it will browse the methods in the protocols ==api== and ==api-events== of all subclasses of ==AbstractWidgetModel==.
+# The ""ProtocolBrowser"" : reuses a ==ProtocolViewer==, changes its layout and adds a ==TextModel== to see the source code of the methods.
 
-!! Using a basic widget 
+
+!! Creating a basic UI to be reused as a widget 
 @sec_WidgetClassList
+
+The first custom UI we build will show a list of all subclasses of
+==AbstractWidgetModel==. This UI will later be reused as a widget for a more complete UI. The code is as follows (we do not include code for accessors):
 
 [[[
 ComposableModel subclass: #WidgetClassList
 	instanceVariableNames: 'list'
 	classVariableNames: ''
-	package: 'Spec-BuildUIWithSpec-Reuse'
+	package: 'Spec-BuildUIWithSpec
 ]]]
 
-In the method ==initializeWidgets==, we create the list and populates it with the required classes, in alphabetical order.
+In the method ==initializeWidgets==, we create the list and populate it with the required classes, in alphabetical order. We also add a title for the window.
 
 [[[
 WidgetClassList >> initializeWidgets
 	list := self newList.
 	list items: (AbstractWidgetModel allSubclasses
 		 							 sorted: [:a :b | a name < b name ]).
-	self focusOrder add: list
+	self focusOrder add: list.
+
+WidgetClassList >> title
+	^'Widgets'
 ]]]
 
-The layout contains only the list.
-x
+The layout contains only the list:
+
 [[[
 WidgetClassList class >> defaultSpec
-	<spec: #default>
 	^ SpecLayout composed
 		add: #list;
 		yourself
 ]]]
 
-The three last methods to define on WidgetClassList are the getter of the list, a method to display the UI title and a method to register to list selection changes.
+The resulting UI is shown in figure *@fig_WidgetClassList*
 
-[[[
-WidgetClassList >> title
-	^'Widgets'
-]]]
++Screen shot of the WidgetClassList>file://figures/WidgetClassList.png|width=50|label=fig_WidgetClassList+
+
+Since this UI will later be used together with other widgets to provide a more complete user interface, some actions will need to occur when a list item is clicked. However, we cannot know beforehand what all these possible actions will be everywhere that it will be reused. The best solution therefore is to place this responsibility on the reuser of the widget. Every time this UI is reused as a widget, it will be configured by the reuser. To allow this, we add a configuration method, in the ==api== protocol:
 
 [[[
 WidgetClassList >> whenSelectedItemChanged: aBlock
 	list whenSelectedItemChanged: aBlock
 ]]]
 
-@@note ==whenSelectedItemChanged: aBlock== will probably be deprecated in the future, since clients can simply send the message to the list directly.
+Now, whoever reuses this widget can parameterize it with a block that will be executed whenever the selected item is changed. 
 
-The result can be seen by executing the following snippet of code: ==WidgetClassList new openWithSpec== as shown in figure *@fig_WidgetClassList*
-
-+Render of the WidgetClassList>file://figures/WidgetClassList.png|width=50|label=fig_WidgetClassList+
+@@note The only rule for reuse of Spec widgets is that all configuration methods of your UI should be contained in a ==api== protocol. This is to make it easier for reusers of this widget to discover how it can be parameterized.
 
 
-
-!! Combining two basic widgets
+!! Combining two basic widgets into a reusable UI
 @sec_protocollist
 
-This UI combines two widgets: a list and a label.
+The UI we build now will show a list of all methods of a given protocol, and it combines two widgets: a list and a label. Considering reuse, there is no difference with the previous UI. This is because the reuse of a UI as a widget is ""not impacted at all"" by the number of widgets it contains (nor by their position). Large and complex UIs are reused in the same way as simple widgets.
 
 [[[
-ComposableModel subclass: #ProtocolList
-	instanceVariableNames: 'label protocols'
+ComposableModel subclass: #ProtocolMethodList
+	instanceVariableNames: 'label methods
 	classVariableNames: ''
-	package: 'Spec-BuildUIWithSpec-Reuse'
+	package: 'Spec-BuildUIWithSpec'
 ]]]
 
-The ==initializeWidgets== method for this UI is quite similar to the method in WidgetClassList:
+The ==initializeWidgets== method for this UI is quite straightforward. We specify the default label text as 'protocol', which will be changed when the widget is reused. We also give this UI a title.
 
 [[[
-ProtocolList >> initializeWidgets
-	protocols := self instantiate: ListModel.
-	label :=  self instantiate: LabelModel.
+ProtocolMethodList >> initializeWidgets
+	methods := self newList.
+	methods displayBlock: [ :m | m selector ].
+	label :=  self newLabel.
 	label label: 'Protocol'.
-	self focusOrder add: protocols
+	self focusOrder add: methods.
+
+ProtocolMethodList >> title
+	^ 'Protocol widget'
 ]]]
 
-The code below shows how to build a column with the label on top and the list taking all the space that is left.
-
-@@todo JF SpecColumnLayout use
+The layout code builds a column with the fixed-height label on top and the list taking all the space that remains. (See Chapter  *@cha_layouts_construction* for more layout information).
 
 [[[
-ProtocolList class >> defaultSpec
-	<spec: #default>
-	^ SpecLayout composed
-		newColumn: [ :column |
-			column
-				add: #label
-				height: self toolbarHeight;
-				add: #protocols ];
-		yourself
+ProtocolMethodList class >> defaultSpec
+	^ SpecColumnLayout composed
+			add: #label height: self toolbarHeight;
+			add: #methods;
+			yourself
 ]]]
 
-The remaining methods are getters, sub widget delegation methods, a method to display the title, and a method to register to list selection changes.
+This UI can be seen by evaluating ==ProtocolMethodList new openWithSpec==. As shown in Figure *@fig_protocollist* the list is empty. This is normal since we did not set any items.
 
-The ""ProtocolList"" UI can be seen by evaluating ==ProtocolList new openWithSpec==. As shown in Figure *@fig_protocollist* the widgets is empty. This is normal since we did not initialize it. 
++Screen shot of the ProtocolMethodList>file://figures/ProtocolList.png|width=50|label=fig_protocollist+
 
-+Render of the ProtocolList>file://figures/ProtocolList.png|width=50|label=fig_protocollist+
+Our protocol method list will need to be configured when it is used, for example to fill the list of methods and to specify what the name is of the protocol. To allow this, we add a number of configuration methods in the ==api== protocol:
+
+[[[
+ProtocolMethodList >> items: aCollection
+	methods items: aCollection
+
+ProtocolMethodList >> label: aText
+	label label: aText
+
+ProtocolMethodList >> resetSelection
+	methods resetSelection
+
+ProtocolMethodList >> whenSelectedItemChanged: aBlock
+	methods whenSelectedItemChanged: aBlock
+]]]
+
 
 
 !! Managing three widgets and their interactions
 @sec_protocolviewer
 
-The third user interface is a composition of the two previous user interfaces.
-It is composed of a ==WidgetClassList== and two ==ProtocolList==, and manage the reaction when a model class is selected in the ==WidgetClassList==, to make the methods in the protocol ''api'' and in the protocol ''api-events'' listed in the two ==ProtocolList==.
+The third user interface we build is a composition of the two previous user interfaces. We will see that there is no difference between configuring custom UIs and configuring system widgets: both kinds of widgets are configured by calling methods of the ==api== protocol.
 
-The code in *@ex_viewer_definition* shows the definition of the class ==ProtocolViewer==.
+This UI is composed of a ==WidgetClassList== and two ==ProtocolMethodList== and specifies that when a model class is selected in the ==WidgetClassList==, the methods in the protocols ==api== and ==api-events== will be shown in the two ==ProtocolMethodList== widgets.
 
 [[[
 ComposableModel subclass: #ProtocolViewer
-	instanceVariableNames: 'models protocols events'
+	instanceVariableNames: 'models api events'
 	classVariableNames: ''
-	package: 'Spec-BuildUIWithSpec-Reuse'
+	package: 'Spec-BuildUIWithSpec'
 ]]]
 
-The ==initializeWidgets== method now initializes the ==ProtocolList==, but not the ==WidgetClassList== as it already intiialize itself.
+The ==initializeWidgets== method shows the use of ==instantiate:== to instantiate widgets, and some of the different parametrization methods of the ==ProtocolMethodList== class.
 
 [[[
 ProtocolViewer >> initializeWidgets
-
 	models := self instantiate: WidgetClassList.
-	protocols := self instantiate: ProtocolList.
-	events := self instantiate: ProtocolList.
+	api := self instantiate: ProtocolMethodList.
+	events := self instantiate: ProtocolMethodList.
 	
-	protocols
-		label: 'api';
-		displayBlock: [ :m | m selector ].
-	events
-		label: 'api-events';
-		displayBlock: [ :m | m selector ].
+	api label: 'api'.
+	events label: 'api-events'.
 		
-	self focusOrder 
-		add: models;
-		add: protocols;
-		add: events
-]]]
-
-The layout puts the sub widgets in one column, with all sub widgets taking the same amount of space.
-
-@@todo ColumnLayout composed
-
-[[[
-ProtocolViewer class >> defaultSpec
-	<spec: #default>
-	
-	^ SpecLayout composed
-		newColumn: [ :column |
-			column 
-				add: #models; 
-				add: #protocols; 
-				add: #events ];
-		yourself
-]]]
-
-To describe the interactions between the sub widgets, the method ==initializePresenter== needs to be defined.
-- Here, it specifies that when a class is selected, the selections in the protocol list are reset and both protocol lists are populated.
-- Additionally, when a method is selected in one protocol list, the selection in the other list is reset.
-
-[[[
-ProtocolViewer >> initializePresenter
-
-	models whenSelectedItemChanged: [ :class |
-		protocols resetSelection.
-		events resetSelection.
-		class
-			ifNil: [ 
-				protocols items: #().
-				events items: #() ]
-			ifNotNil: [ 
-				protocols items: (self methodsIn: class for: 'api').
-				events items: (self methodsIn: class for: 'api-events') ] ].
-	
-	protocols whenSelectedItemChanged: [ :method | method ifNotNil: [ self resetEventSelection ] ].
-	events whenSelectedItemChanged: [ :method | method ifNotNil: [ self resetProtocolSelection ] ].
-]]]
-
-The remaining methods are getters, methods to delegate to sub widgets, one method to compute the methods in a specific class for a specific protocol, and methods to register to sub widget events.
-Those methods are given in the code in *@ex_viewer_others*.
-
-[[[
-ProtocolViewer >> events
-	^ events
-
-ProtocolViewer >> models
-	^ models
-
-ProtocolViewer >> protocols
-	^ protocols
-
-ProtocolViewer >> methodsIn: class for: protocol
-	^ (class methodsInProtocol: protocol) sorted: [ :a :b | a selector < b selector ]
-
-ProtocolViewer >> resetEventSelection
-	events resetSelection
-
-ProtocolViewer >> resetProtocolSelection
-	protocols resetSelection
+	self focusOrder add: models; add: api; add: events.
 
 ProtocolViewer >> title
 	^ 'Protocol viewer'
+]]]
 
+To describe the interactions between the different widgets we create the ==initializePresenter== method. It specifies that when a class is selected, the selections in the method lists are reset and both method lists are populated. Additionally, when a method is selected in one method list, the selection in the other list is reset.
+
+[[[
+ProtocolViewer >> initializePresenter
+	models whenSelectedItemChanged: [ :class |
+		api resetSelection.
+		events resetSelection.
+		class
+			ifNil: [ api items: #(). events items: #() ]
+			ifNotNil: [ 
+				api items: (self methodsIn: class for: 'api').
+				events items: (self methodsIn: class for: 'api-events') ] ].
+	
+	api whenSelectedItemChanged: [ :method |
+		method ifNotNil: [ events resetSelection ] ].
+	events whenSelectedItemChanged: [ :method |
+		method ifNotNil: [ api resetSelection ] ].
+
+ProtocolViewer >> methodsIn: class for: protocol
+	^ (class methodsInProtocol: protocol) sorted:
+	  		 [ :a :b | a selector < b selector ].
+]]]
+
+Lastly, the layout puts the sub widgets in one column, with all sub widgets taking the same amount of space.
+
+[[[
+ProtocolViewer class >> defaultSpec
+	^ SpecColumnLayout composed
+			add: #models; add: #api; add: #events;
+			yourself
+]]]
+
+
+As previously, the result can be seen by executing the following snippet of code: ==ProtocolViewer new openWithSpec==, and the result is shown in Figure *@fig_protocol_Viewer*. This user interface is functional, clicking on a class will show the methods of the ==api== and the ==api-events== protocols of that class.
+
++Render of the ProtocolViewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
+
+Similar to the second user interface, when this UI is reused it will probably need to be configured. The relevant configuration here is what to do when a selection change happens in any of the three lists. We hence add the following three methods to the ==api== protocol.
+
+[[[
 ProtocolViewer >> whenClassChanged: aBlock
 	models whenSelectedItemChanged: aBlock
 
-ProtocolViewer >> whenEventChangedDo: aBlock
+ProtocolViewer >> whenEventChanged: aBlock
 	events whenSelectedItemChanged: aBlock
 
-ProtocolViewer >> whenProtocolChangedDo: aBlock
-	protocols whenSelectedItemChanged: aBlock
+ProtocolViewer >> whenAPIChanged: aBlock
+	api whenSelectedItemChanged: aBlock
 ]]]
-
-As previously, the result can be seen by executing the following snippet of code: ==ProtocolViewer new openWithSpec==.
-
-+Render of the ProtocolViewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
 
 
 
 !! Changing the layout of a reused widget
 @sec_protocolbrowser
 
-@@todo JF emphasize that this is about changing the layout of a widget that is being reused.
+Sometimes, when you want to reuse an existing UI as a widget, the layout of that UI is not appropriate to your needs. Spec allows you to nonetheless reuse such a UI by overriding the layout of its widgets, and we show this here.
 
-The last user interface reuses a ==ProtocolViewer== with a different layout and adds a text zone to edit the source code of the selected method.
+Our last user interface reuses the ==ProtocolViewer== with a different layout and adds a text zone to edit the source code of the selected method.
 
 [[[
+ComposableModel subclass: #ProtocolBrowser
+	instanceVariableNames: 'text viewer'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+
 ProtocolBrowser >> initializeWidgets
 	text := self instantiate: TextModel.
 	viewer := self instantiate: ProtocolViewer.
@@ -252,53 +229,51 @@ ProtocolBrowser >> initializeWidgets
 		isCodeCompletionAllowed: true.
 	self focusOrder 
 		add: viewer;
-		add: text
+		add: text.
+
+ProtocolBrowser >> title
+	^'Spec Protocol Browser'
 ]]]
 
-The following messages are dedicated at code:
-- ==aboutToStyle:== stylised the text according to the syntaxe.
-- ==isCodeCompletionAllowed:==, argument '''true''' enables the completion of the tipping code.
+The text field is configured to show source code:
+- ==aboutToStyle: true== enables syntax highlighting.
+- ==isCodeCompletionAllowed: true== enables code completion.
 
-Now the user interface mainly lays out widgets that are contained in its ==viewer== sub widget (the list of models and the two protocol browsers).
-
-[[[
-	<spec: #default>
-	
-	^ SpecLayout composed
-		newColumn: [ :col | 
-			col 
-				newRow: [ :r | 
-					r 
-						add: #(viewer models);
-					 	newColumn: [ :c | 
-							c 
-								add: #(viewer protocols);
-								add: #(viewer events) ] ];
-				add: #text
-		];
-		yourself
-]]]
-
-The ==initalizePresenter== method is used to make the text zone react to a selection in the lists.
-When a method is seleted, the text zone updates its contents to show the source code  of the selected method.
+The ==initalizePresenter== method is used to make the text zone react to a selection in the lists. When a method is selected, the text zone updates its contents to show the source code of the selected method.
 
 [[[
+ProtocolBrowser >> initializePresenter
 	viewer whenClassChanged: [ :class | text behavior: class ].
-	viewer whenProtocolChangedDo: [ :item | 
+	viewer whenAPIChanged: [ :item | 
 		item 
 			ifNil: [ text text: '' ]
 			ifNotNil: [ text text: item sourceCode ] ].
-	viewer whenEventChangedDo: [ :item | 
+	viewer whenEventChanged: [ :item | 
 		item 
 			ifNil: [ text text: '' ]
 			ifNotNil: [ text text: item sourceCode ] ]
 ]]]
 
-The other methods are getters, a method to set the default size of the window, and a method to set the UI title.
+The last piece of the puzzle is the layout of the different widgets that we are reusing. We combine columns and rows in this UI. The first row is special because we reuse the internal widgets of the ==viewer== widget in a different layout. To do this, we specify the sequence of accessor messages that need to be sent (as an array of symbols): for example, for the list of classes first the ==viewer== message and then the ==models== message.
 
-The final user interface can be opened with the following snippet: ==ProtocolBrowser new openWithSpec==. The result can be seen in figure *@fig_protocol_browser*.
+[[[
+ProtocolBrowser class >> defaultSpec
+	^ SpecLayout composed newColumn: [:col |
+			col newRow: [ :row | 
+				row add: #(viewer models);
+					 	newColumn: [ :col2 | 
+							col2 add: #(viewer api);
+								   add: #(viewer events) ] ];
+					  add: #text];
+			yourself
+]]]
 
+@@note To layout internal widgets of a widget you are reusing (instead of the widget in its entirety), give an array of symbols: it states the sequence of accessors that need to be sent to get to the internal widget.
+
+This concludes the last example of this chapter, and the result can be seen in the first figure of this chapter, Figure *@fig_protocol_browser*.
 
 !! Conclusion
 
-@@todo JF Reinforce the reuse story and what you should do to comply
+In this chapter we have discussed a key point of Spec: the ability to seamlessly reuse existing UIs as widgets. This ability comes with no significant cost to the creator of a UI. The only thing that needs to be taken into account is how a UI can (or should) be customized, and these customization methods should be placed in a ==api== protocol for discoverability.
+
+The reuse of complex widgets at no significant cost was a key design goal of Spec because it is an important productivity boost for the writing process of UIs. The boost firstly comes from being able to reuse existing nontrivial widgets, and secondly because it allows you to structure your UI in coherent and more easily manageable sub-parts with clear interfaces. We therefore encourage you to think of your UI as a composition of such sub-parts and construct it modularly, to yield greater productivity.
