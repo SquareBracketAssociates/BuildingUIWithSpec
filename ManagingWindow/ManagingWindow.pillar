@@ -5,6 +5,8 @@
 
 @@todo JF we need to present an existing CM to customize as the example here. We can use customerSatisfaction of the first section.
 
+@@todo JF give more informations about modal (setModal: aWindow).
+
 !! Open the Window
 
 @@todo JF This should clarify the situation of opening a normal window vs opening a dialog box vs opening a modal dialog box + what's up with DialogModel.
