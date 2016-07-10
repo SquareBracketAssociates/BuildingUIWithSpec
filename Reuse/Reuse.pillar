@@ -5,8 +5,11 @@ A key design goal of Spec is to enable the seamless reuse of user interfaces as 
 
 This focus on reuse was actually already visible in the previous chapter, where we have seen that basic widgets can be used as if they were a complete user interface. In this section we focus on the reuse and composition of widgets, showing that it basically comes for free. The only requirement when building a UI is to consider how the user interface should be parameterized when it is being reused, and there is only one concrete rule that needs to be followed in that respect.
 
+In this chapter, you will learn how we can build a new UI by reusing already defined elements. 
 
-+Screen shot of the ProtocolBrowser>file://figures/Protocol_Browser.png|width=80|label=fig_protocol_browser+
+!! First requirements
+
++Screen shot of the ProtocolBrowser.>file://figures/Protocol_Browser.png|width=80|label=fig_protocol_browser+
 
 
 To show how Spec enables the composition and reuse of user interfaces, in this chapter we build the user interface shown in Figure *@fig_protocol_browser* as a composition of four parts:
@@ -19,9 +22,10 @@ To show how Spec enables the composition and reuse of user interfaces, in this c
 !! Creating a basic UI to be reused as a widget 
 @sec_WidgetClassList
 
-The first custom UI we build will show a list of all subclasses of
+The first custom UI we build should display a list of all subclasses of
 ==AbstractWidgetModel==. This UI will later be reused as a widget for a more complete UI. The code is as follows (we do not include code for accessors):
 
+First we create a subclass of ==ComposableModel== with one instance variable ==list== which will hold an instance of ==ListModel==.
 [[[
 ComposableModel subclass: #WidgetClassList
 	instanceVariableNames: 'list'
@@ -51,11 +55,11 @@ WidgetClassList class >> defaultSpec
 		yourself
 ]]]
 
-The resulting UI is shown in figure *@fig_WidgetClassList*
+The resulting UI is shown in Figure *@fig_WidgetClassList*.
 
-+Screen shot of the WidgetClassList>file://figures/WidgetClassList.png|width=50|label=fig_WidgetClassList+
++Screen shot of the WidgetClassList.>file://figures/WidgetClassList.png|width=50|label=fig_WidgetClassList+
 
-Since this UI will later be used together with other widgets to provide a more complete user interface, some actions will need to occur when a list item is clicked. However, we cannot know beforehand what all these possible actions will be everywhere that it will be reused. The best solution therefore is to place this responsibility on the reuser of the widget. Every time this UI is reused as a widget, it will be configured by the reuser. To allow this, we add a configuration method, in the ==api== protocol:
+Since this UI will later be used together with other widgets to provide a more complete user interface, some actions will need to occur when a list item is clicked. However, we cannot know beforehand what all these possible actions will be everywhere that it will be reused. The best solution therefore is to place this responsibility on the reuser of the widget. Every time this UI is reused as a widget, it will be configured by the reuser. To allow this, we add a configuration method namd ==wheSelectedItemChanged:==, in the ==api== protocol:
 
 [[[
 WidgetClassList >> whenSelectedItemChanged: aBlock
@@ -65,6 +69,8 @@ WidgetClassList >> whenSelectedItemChanged: aBlock
 Now, whoever reuses this widget can parameterize it with a block that will be executed whenever the selected item is changed. 
 
 @@note The only rule for reuse of Spec widgets is that all configuration methods of your UI should be contained in a ==api== protocol. This is to make it easier for reusers of this widget to discover how it can be parameterized.
+
+@@todo are we sure that we want API and that we want to force to define such method.
 
 
 !! Combining two basic widgets into a reusable UI
@@ -105,7 +111,7 @@ ProtocolMethodList class >> defaultSpec
 
 This UI can be seen by evaluating ==ProtocolMethodList new openWithSpec==. As shown in Figure *@fig_protocollist* the list is empty. This is normal since we did not set any items.
 
-+Screen shot of the ProtocolMethodList>file://figures/ProtocolList.png|width=50|label=fig_protocollist+
++Screen shot of the ProtocolMethodList.>file://figures/ProtocolList.png|width=50|label=fig_protocollist+
 
 Our protocol method list will need to be configured when it is used, for example to fill the list of methods and to specify what the name is of the protocol. To allow this, we add a number of configuration methods in the ==api== protocol:
 
@@ -191,7 +197,7 @@ ProtocolViewer class >> defaultSpec
 
 As previously, the result can be seen by executing the following snippet of code: ==ProtocolViewer new openWithSpec==, and the result is shown in Figure *@fig_protocol_Viewer*. This user interface is functional, clicking on a class will show the methods of the ==api== and the ==api-events== protocols of that class.
 
-+Render of the ProtocolViewer>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
++Render of the ProtocolViewer.>file://figures/Protocol_Viewer.png|width=50|label=fig_protocol_Viewer+
 
 Similar to the second user interface, when this UI is reused it will probably need to be configured. The relevant configuration here is what to do when a selection change happens in any of the three lists. We hence add the following three methods to the ==api== protocol.
 
