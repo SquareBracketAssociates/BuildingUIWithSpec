@@ -135,10 +135,10 @@ The ==title== method returns a string that will be used as a title, and the ==ex
 To open a UI, an instance of the class needs to be created and it needs to be sent the ==openWithSpec== message. This will open a window and return an instance of ==WindowModel==, which allows the window to be closed from code. 
 
 [[[
-| ui |
-  ui := CustomerSatisfaction new openWithSpec.
-  [ ... do a lot of stuff until the UI needs to be closed ...]
-  ui close.
+ | ui |
+ ui := CustomerSatisfaction new openWithSpec.
+ [ ... do a lot of stuff until the UI needs to be closed ...]
+ ui close.
 ]]]
 
 More information about managing windows: e.g., opening dialog boxes or setting the about text is present in Chapter *@cha_managing_windows*.
@@ -161,13 +161,13 @@ We start with an example of a ==ListModel== where the elements have different ba
 The following code shows how this is done:
 
 [[[
-| registeredColorsList |
-registeredColorsList := ListModel new.
-registeredColorsList
+ | registeredColorsList |
+ registeredColorsList := ListModel new.
+ registeredColorsList
 	items: Color registeredColorNames;
 	backgroundColorBlock: [ :item | Color named: item ];
 	title: 'Registered colors'.
-registeredColorsList openWithSpec
+ registeredColorsList openWithSpec
 ]]]
 
 +Screen shot of the list with modified background colors>file://figures/RegisteredColors.png|width=50|label=fig_modified_background+
@@ -184,16 +184,15 @@ Here we see the following messages that are part of the ==ListModel== API.
 The second example shows a list containing the icons of the current theme and their respective selector in an ==IconListModel==. The list items are associations of the icon names and the icons themselves, the text that is shown in the list is the icon name, and the icon shown in the list is the icon itself. We also sort the items in the list alphabetically according to their name. 
 
 [[[
-| iconList |
-| iconList |
-iconList := IconListModel new.
-iconList
+ | iconList |
+ iconList := IconListModel new.
+ iconList
 	items: Smalltalk ui icons icons associations;
 	displayBlock: [ :assoc | assoc key];
 	sortingBlock: [ :assocA :assocB | assocA key < assocB key ];
 	icons: [ :assoc | assoc value ];
 	title: 'Availiable icons for the current theme.'.
-iconList openWithSpec
+ iconList openWithSpec
 ]]]
 
 +Screen shot of the list of Icons>file://figures/IconList.png|width=50|label=fig_IconList+

@@ -1,75 +1,55 @@
-{ "title" : "The Three Pillars of Spec"}
-@cha_pillars_of_spec
+{ "title" : "The fundamentals of Spec"}
+@cha_fundamentals_of_spec
 
-@@todo JF editorial pass
+A key aspect of Spec is that all user interfaces are constructed through the reuse and composition of existing user interfaces.
+To allow this, defining a user interface consists of defining the ""model"" of the user interface, and ""not"" the user interface elements that will be shown on screen.
+These UI elements are instantiated by Spec, taking into account the underlying UI framework.
 
-All user interfaces in ''Spec'' are constructed through the composition of existing user interfaces.
-To define a user interface, it is sufficient to define the model of the user interface.
+In the end, it is the composition of the model and the UI elements that makes up the resulting user interface that is shown.
+This also explains the name of the root component of Spec: since all UIs are constructed through ""composition"" of other UI's, and it is sufficient to define the ""model"" to define the UI, the root class of all UIs is named ==ComposableModel==.
+Consequently, to define a new user interface, a subclass of ==ComposableModel== needs to be created.
 
-The UI elements that correspond to this model are instantiated by ''Spec'', depending on the underlying UI framework.
-It is the composition of this model and these UI elements that makes up the resulting widget that is shown to the user, i.e. the resulting user interface.
-
-Hence, since all UIs are constructed through ""composition"" of other UI's, and it is sufficient to define the ""model"" to define the UI, the root class of all UIs is named ==ComposableModel==.
-So, to define a new user interface, a subclass of ==ComposableModel== needs to be created.
-
-Spec is inspired by the MVP pattern.
-It is built around three axes that materialize themselves as the following three methods in ==ComposableModel==:
-- ==initializeWidgets==
-- ==initializePresenter==
-- ==defaultSpec==
+Considering the construction and orchestration of the different widgets in a user interface, Spec is inspired by the Model-View-Presenter pattern.
+Fundamentally, it is built around three concerns that materialize themselves as the following three methods in ==ComposableModel==:
+- ==initializeWidgets== treats the widgets themselves
+- ==initializePresenter== treats the interactions between widgets
+- ==defaultSpec== treats the layout of the widgets
 
 These methods are hence typically found in the model for each user interface.
-In this section we describe the responsibility for each method, i.e. how these three work together to build the overall UI.
-
+In this chapter we describe the finer points of each method and how these three work together to build the overall UI.
 
 !! The ''initializeWidgets'' method
 @sec_initializeWidgets
 
-This method is used to instantiate the models for the different widgets that will be part of the UI and store them in their respective instance variables.
-Instantiation of the models will in turn result in the instantiation and initialization of the different widgets that make up the UI.
-Consequently, configuration and default values of each widget are specified here as well, which is why this method is called ""initializeWidgets"".
+This method instantiates, saves in instance variables, and partially configures the different widgets that will be part of the UI.
+Instantiation of the models will cause the instantiation and initialization of the different lower-level user interface components, constructing the UI that is shown to the user.
+A first part of the configuration of each widget is specified here as well, which is why this method is called ==initializeWidgets==.
 This focus in this method is to specify what the widgets will look like and what their self-contained behavior is.
-The behavior to update model state, e.g. when pressing a ==Save== button, is described in this method as well.
+The behavior to update model state, e.g., when pressing a ==Save== button, is described in this method as well.
 It is explicitly ""not"" the responsibility of this method to define the interactions ""between"" the widgets.
 
 In general the ==initializeWidgets== method should follow the pattern:
 
-- widgets instantiation
-- widgets configuration specification
-- specification of order of focus
+- widget instantiation
+- widget configuration specification
+- specification of focus order
 
 The last step is not mandatory but ""highly"" recommended.
-Indeed, without this final step keyboard navigation will not work at all.
-
-The code below shows an example of an ==initializeWidgets== method.
-It first instantiates a button and a list widget, storing each in an instance variable.
-It second configures the button it by setting its label.
-Third it specifies the focus order of all the widgets: first the button and then the list.
-
-[[[
-initializeWidgets
-
-	theButton := self newButton.
-	theList := self newList.
-
-	theButton label: 'I am a button'.
-	
-	self focusOrder
-		add: theButton;
-		add: theList.
-]]]
+Indeed, without this final step keyboard navigation will not work reliably.
 
 @@note Specifying this method is mandatory, as without it the UI would have no widgets.
 
 
 !!! Widget instantiation
 
-The instantiation of the model for a widget (and hence the widget) can be done in two ways: through the use of an creation method or through the use of the ==instantiate:== method.
+The instantiation of the model for a widget can be done in two ways: through the use of a creation method or through the use of the ==instantiate:== method.
+
 Considering the first option, the framework provides unary messages for the creation of all basic widgets.
-The format of these messages is ==new[Widget]==, for example ==newButton== creates a button widget, and ==newList== creates a list widget, as we have seen above.
-The complete list of available widget creation methods can be found in the class ''ComposableModel'' in the protocol ''widgets''.
-Considering the second option, to reuse any composite widgets, i.e. a subclass of ''ComposableModel'', the widget needs to be initialized using the ==instantiate:== method.
-For example, to reuse a ''MessageBrowser''  widget, the code is == self instantiate: MessageBrowser.==
+The format of these messages is ==new[Widget]==, for example ==newButton== creates a button widget, and ==newList== creates a list widget.
+The complete list of available widget creation methods can be found in the class ==ComposableModel== in the protocol ==widgets==.
+
+The second option is more general: to reuse a  ==ComposableModel== subclass (other than the ones handled by the first option) the widget needs to be instantiated using the ==instantiate:== method.
+For example, to reuse a ==MessageBrowser==  widget, the code is ==self instantiate: MessageBrowser.==
 
 
 !! The ''layout'' method
@@ -77,139 +57,127 @@ For example, to reuse a ''MessageBrowser''  widget, the code is == self instanti
 
 This method specifies the layout of the different widgets in the UI.
 It also specifies how a widget reacts when the window is resized.
+The layout method is placed at the class side because it typically returns a value that is the same for all the instances.
+Put differently, typically all the instances of the same user interface have the same layout and hence this can be considered as being a class-side accessor for a class variable.
 
 @@note Specifying this method is mandatory, as without it the UI would show no widgets to the user.
 
+!!! Having multiple layouts for a widget
 
-!!! Layout Lookup
-
-For the same UI multiple layouts can be described, and when the UI is built a specific layout to use can be specified.
-If no such specific layout is given, the following lookup mechanism will be used to obtain the layout method:
-# Search on class side, throughout the whole class hierarchy, for a method with the pragma ==<spec: #default>==.
-# If multiple such methods exist, the first one found is used.
-# If none such methods exist and if there is exactly one method with the pragma ==<spec>==, this method is used.
-# Otherwise the class-side ==defaultSpec== method will be called, which will raise ==subclassResponsibility== if it is not overriden.
-
-So, in order to retrieve the correct method to apply, these methods need to be flagged with a pragma.
-The pragma can be either ==<spec: #default>== for the layout to use by default, or ==<spec>== for the other layouts.
-
-This method is on class side because it returns a value that usually is the same for all the instances.
-Put differently, usually all the instances of the same user interface have the same layout and hence this can be considered as being a class-side accessor for a class variable.
-
-
-!!! Specify Layout
-
-@@todo may give more informations about modal (setModal: aWindow). JF This does not seem to be the correct place for this. Add in tips and tricks?
-
-As seen in section *@sec_buttonModel*, ==ComposableModel== provides methods to specify the layout to use at the opening, like ==openWithSpec:==. But notice it does not allow for the possibility to choose the layout of subwidgets.
-
-In that aim, all the methods seen in the previous examples come with a variant used to specify which selector to use for the layout method. By example, for the ==add:== method the variant is  ==add:withSpec:==.
-
-In the following example, ==SubWidgetButtons== manages two ButtonModel and provides two layout to display them.
+For the same UI multiple layouts can be described, and when the UI is built the use of a specific layout can be indicated. To do this, instead of calling ==openWithSpec== (as we have done until now), use the ==openWithSpec:== message with the name of the layout method as argument. For example, consider the following artificial example of a two button UI that has two different layout methods:
 
 [[[
-SubWidgetButtons>>initializeWidgets
-	button1 := self instantiate: ButtonModel.
-	button2 := self instantiate: ButtonModel.
+ComposableModel subclass: #TwoButtons
+	instanceVariableNames: 'button1 button2'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+
+TwoButtons >> initializeWidgets
+	button1 := self newButton.
+	button2 := self newButton.
+
 	button1 label: '1'.
 	button2 label: '2'.
+
 	self focusOrder
 		add: button1;
-		add: button2
+		add: button2.
 
-SubWidgetButtons>>defaultSpec
+TwoButtons class >> buttonRow
 	<spec: #default>
-	^ SpecLayout composed
-		newColumn: [ :column | 
-			column
-				add: #button1 origin: 0 @ 0 corner: 1 @ 0.5;
-				add: #button2 origin: 0 @ 0.5 corner: 1 @ 1 ];
+	^SpecRowLayout composed
+		add: #button1; add: #button2;
 		yourself
 
-SubWidgetButtons>>onALine
-	<spec>
-	^ SpecLayout composed
-		newRow: [ :row | 
-			row
-				add: #button1 origin: 0 @ 0 corner: 0.5 @ 1;
-				add: #button2 origin: 0.5 @ 0 corner: 1 @ 1 ];
+TwoButtons class >> buttonCol
+	^SpecColumnLayout composed
+		add: #button1; add: #button2;
 		yourself
 ]]]
 
-==SubWidgetList== is very simple, and manages a ListModel.
+This UI can be opened in multiple ways: ==TwoButtons new openWithSpec: #buttonRow== places the buttons in a row and ==TwoButtons new openWithSpec: #buttonCol== places them in a column. Note that the ==buttonRow== layout method has a ==<spec: #default>== pragma. As a result, the ==buttonRow== layout will be used when executing ==TwoButtons new openWithSpec==, as we explain next.
+
+The ==openWithSpec== method uses the following lookup mechanism to obtain the layout method:
+# Search on class side, throughout the whole class hierarchy, for a method with the pragma ==<spec: #default>==.
+# If multiple such methods exist, the first one that is found is used.
+# If no such methods exist and if there is exactly one method with the pragma ==<spec>==, this method is used.
+# Otherwise the class-side ==defaultSpec== method will be called, which will raise ==subclassResponsibility== if it is not overriden.
+
+@@note If there is a method with the ==<spec: #default>== or ==<spec>== pragma in a superclass of the UI you are building, this one will be used instead of a ==defaultSpec== method implemented in your class.
+
+For example, subclasses of ==TwoButtons== cannot use ==defaultSpec== methods since there is a method with the ==<spec: #default>== pragma.
+
+
+!!! Specifying a layout when reusing a widget
+
+Having multiple layouts for a widget implies that there is a way to specify the layout to use when a widget is reused.
+
+Until now, we have used the ==add:== message to add a widget to a layout.
+This uses the mechanism of ==openWithSpec== to determine the layout of the widget that is being reused.
+To use an alternative layout for the widget that is being reused, use the ==add:withSpec:== message.
+It takes as extra argument the name of the layout method to use, as we show below:
 
 [[[
-SubWidgetList>>initializeWidgets
-	list := self instantiate: ListModel.
+ComposableModel subclass: #TBAndListH
+	instanceVariableNames: 'buttons list'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+
+TBAndListH >> initializeWidgets
+	buttons := self instantiate: TwoButtons.
+	list := self newList.
 	list items: (1 to: 10).
-	self focusOrder add: list
+	self focusOrder add: buttons; add: list.
+
+TBAndListH >> title
+	^'SuperWidget'
+
+TBAndListH class >> defaultSpec
+	^ SpecRowLayout composed
+			add: #buttons; add: #list;
+			yourself
 ]]]
 
+This ==TBAndListH== class results in a  ""SuperWidget"" window as shown in Figure *@fig_alternativeButton*. It reuses the ==TwoButton== widget, and places all three widgets in a horizontal order because the ==TwoButton== widget will use the ==buttonRow== layout method.
 
-==SuperWidget== reuses them and provides two layout. One using the default layout of ==SubWidgetButtons== as result the figure *@fig_SuperWidget*.
++Screen shot of the UI with buttons placed horizontally>file://figures/alternativeButton.png|width=50|label=fig_alternativeButton+
 
- 
+Alternatively, we can create ==TBAndListV== class as a subclass of ==TBAndListH== and only change the ==defaultSpec== method as below. It specifies that the reused ==buttons== widget should use the ==buttonCol== layout method, and hence results in the window shown in Figure *@fig_SuperWidget*.
+
++Screen shot of the UI with buttons placed vertically>file://figures/SuperWidget.png|width=50|label=fig_SuperWidget+
+
+
+
 [[[
-SuperWidget>>initializeWidgets
-	subButtons := self instantiate: SubWidgetButtons.
-	subList := self instantiate: SubWidgetList.
-	self focusOrder
-		add: subButtons;
-		add: subList
+TBAndListH subclass: #TBAndListV
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
 
-SuperWidget>>defaultSpec
-	<spec: #default>
-	^ SpecLayout composed
-		newRow: [ :row | 
-			row
-				newColumn: #subButtons;
-				newColumn: #subList ];
-		yourself
-
-SuperWidget>>alternativeButton
-	<spec>
-	^ SpecLayout composed
-		newRow: [ :row | 
-			row
-				newColumn: [ :column | column add: #subButtons withSpec: #onALine ];
-				newColumn: #subList ];
-		yourself
+TBAndListV class >> defaultSpec
+	^ SpecRowLayout composed
+			add: #buttons withSpec: #buttonCol; add: #list;
+			yourself
 ]]]
-
-+Render of SuperWidget using defaultSpec>file://figures/SuperWidget.png|width=50|label=fig_SuperWidget+
-
-The second using ==add:withSpec:== to use the other layout of ==SubWidgetButtons== as result the figure *@fig_alternativeButton*.
-
-+Render of SuperWidget using alternativeButton>file://figures/alternativeButton.png|width=50|label=fig_alternativeButton+
-
-+Diagram of hierarchy of parents of SuperWidget>file://figures/SuperWidgetHierarchy.png|label=fig_superwidget_hierarchy+
 
 
 !! The ''initializePresenter'' method
 @sec_initializePresenter
 
-This method is the only one optional. It takes care of the interactions between the different widgets. By linking the behavior of the different widgets it specifies the overall presentation, i.e. how the overall UI responds to interactions by the user.
-
+This method defines the interactions between the different widgets.
+By connecting the behaviors of the different widgets it specifies the overall presentation, i.e., how the overall UI responds to interactions by the user.
 Usually this method consists of specifications of actions to perform when a certain event is received by a widget.
-From the propagation of those events the whole interaction flow of the UI emerges.
+The whole interaction flow of the UI then emerges from the propagation of those events.
 
-In  ""Spec"", the different UI models are contained in value holders, and the event mechanism relies on the announcements of these value holders to manage the interactions between widgets.
+@@note ==initializePresenter== is the only optional method for a Spec UI.
+
+In  Spec, the different UI models are contained in value holders, and the event mechanism relies on the announcements of these value holders to manage the interactions between widgets.
 Value holders provide a single method ==whenChangedDo:== that is used to register a block to perform on change.
+In addition to this primitive  ==whenChangedDo:== method, the basic widgets provide more specific hooks, e.g., when an item in a list is selected or deselected.
 
-In addition to this primitive  ==whenChangedDo:== method, the basic widgets provide more specific hooks, e.g. when an item in a list is selected or deselected.
 
-The example *@ex_button* shows how to use one of the registration methods of the list widget to change the label of the button according to the selection in the list.
+!! Conclusion
 
-[[[
-theList whenSelectedItemChanged: [ :item | 
-	item 
-		ifNil: [ theButton text: 'No selected item' ]
-		ifNotNil: [ theButton text: 'An item is selected'] ]
-]]]
+In this chapter we have given a more detailed description of how the three fundamental methods of Spec: ==initializeWidgets==, ==defaultSpec== and ==initializePresenter== are each responsible for a different aspect of the user interface building process. Notably, we also discussed in detail the ability to use different layout methods and how the lookup of layout methods is performed.
 
-!! A note on reuse
-
-@@todo JF expand here
-
-If a programmer wants his or her widgets to be reused, they should provide a comprehensive API.
-
+@@note Although reuse is fundamental in Spec, we did not explicitly treat it in this chapter. Instead we refer to the previous chapter for more information.
