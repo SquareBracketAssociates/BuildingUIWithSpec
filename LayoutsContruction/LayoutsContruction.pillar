@@ -3,11 +3,30 @@
 
 @@todo JF editorial pass
 
-This chapter explains how construct the layout method to display a widget.
+@@todo JF complete intro
 
-@@todo JF add explanation of what class we are using and what are the widgets it has: almost all use one button (==theButton==) and a list (==theList==)
+In  this chapter, we use an example class that has two buttons, a list and a text field, the code of which is below:
+
+[[[
+ComposableModel subclass: #LayoutExample
+	instanceVariableNames: 'list button button2 text'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+
+LayoutExample >> initializeWidgets
+	button := self newButton.
+	button2 := self newButton.
+	list := self newList.
+	text := self newText.
+	
+	button label: 'i am a button'.
+	button label: 'me too!'.
+]]]
 
 !! Only One Widget
+
+@@todo JF This text need thorough reworking.
+@@todo JF missing some explanation of always trying to take up all available space
 
 The simpliest example of such a method is laying out just one widget. Below we present such a layout.
 
@@ -21,16 +40,12 @@ It returns a layout in which just one widget is added: the widget contained in =
 The symbol ==theList== refers to an instance side method returning a widget.
 This is because instance variables are private, so the layout class needs to use an accessor to obtain it when building the UI.
 
-Note that by default, a widget will take all the space available in its container.
+@@note By default, a widget will take all the space available in its container.
 
 All the methods for adding sub widgets can be found in the ''commands'' and ''commands-advanced'' protocols of ""SpecLayout"".
 
 
-!! Reorganize SubWidgets
-
-@@todo JF This text is an orphan. Needs to be moved or expanded or link made clear
-
-These methods are ''not'' restricted to laying out sub widgets.
+Also, these methods are ''not'' restricted to laying out sub widgets.
 
 It can also refer to sub widgets contained in sub widgets, i.e. when
 reusing an existing UI, specify a new layout for the sub widgets that
@@ -45,122 +60,292 @@ widget within this UI whose new layout position is being specified.
 We have seen an example of this reuse in *@sec_protocolbrowser*.
 
 
-!! Rows and Columns
-@sec_layout_rows_and_column
+!! Row and column layouts
 
-@@todo JF RowLayout and ColumnLayout
+A straightforward and often used kind of layout is to have widgets aligned in rows or columns.
+Spec provides for an easy way to specify such layouts through the use of the ==newRow:== and ==newColumn:== messages on the ==SpecLayout== class.
+They create, respectively, a row or a column in which all widgets are evenly distributed.
 
-@@todo JF addSplitter is better here
-
-Often the layout of user interfaces can be described in rows and columns, and ""Spec"" provides for an easy way to specify such layouts.
-
-The example below shows how to build a row of widgets.
+For example, the code below lays out the list and the button in a row:
 
 [[[
-^ SpecLayout composed
-	newRow: [ :row |
-		row
-			add: #theList;
-			add: #theButton
-	];
-	yourself
+LayoutExample >> oneRow
+	^ SpecLayout composed
+		newRow: [ :row |
+			row
+				add: #theList;
+				add: #theButton
+		];
+		yourself
 ]]]
 
-+Render of a Row of Widgets>file://figures/RowOfWidgets.png|width=50|label=fig_RowOfWidgets+
++Screen shot of a row of widgets.>file://figures/RowOfWidgets.png|width=50|label=fig_RowOfWidgets+
 
-Having the widgets rendered as a column is similar:
+This code is a layout method that builds a row of widgets using the ==newRow:== message.
+The argument of the message is a one-argument block, and the block argument will contain an instance of a ==SpecRowLayout==.
+The widgets are then added to this layout object, which aligns them all in a row.
+
+The code below opens the example with this layout specification, resulting in the UI shown in Figure *@fig_RowOfWidgets*. (The use of the ==title:== message will be explained in Chapter *@cha_managing_windows*.)
 
 [[[
-^ SpecLayout composed
-	newColumn: [ :column |
-		column
-			add: #theList;
-			add: #theButton
-	];
-	yourself
+| le |
+ le := LayoutExample new.
+ le title: 'RowOfWidgets'.
+ le openWithSpec: #oneRow
 ]]]
 
-+Render of a Column of Widgets>file://figures/ColumnOfWidgets.png|width=50|label=fig_ColumnOfWidgets+
 
-
-!!! Rows and Columns Combination
-
-Rows and columns can be combined to build more complex layouts, and splitters between cells can be added.
-
-The example below shows how to create a 3 column layout, containing three buttons in each column.
-
-This example also shows the ==addSplitter== message, which adds a splitter between the element added before it and the element added after.
+Having the widgets rendered as a column is similar, the only real difference being that instead of the ==newRow:== message, a ==newColumn== message is used.
+This message also takes a one-argument block, and the block argument will contain an instance of a ==SpecColumnLayout==.
 
 [[[
-^ SpecLayout composed
-				newRow: [ :row | 
+LayoutExample >> oneColumn
+	^ SpecLayout composed
+		newColumn: [ :col |
+			col
+				add: #list;
+				add: #button
+		];
+		yourself
+]]]
+
+The code below opens this example, resulting in Figure *@fig_ColumnOfWidgets*. 
+
++Screen shot of a column of widgets>file://figures/ColumnOfWidgets.png|width=50|label=fig_ColumnOfWidgets+
+
+[[[
+| le |
+ le := LayoutExample new.
+ le title: 'ColumnOfWidgets'.
+ le openWithSpec: #oneColumn.
+]]]
+
+Note that for brevity, in the remainder of this chapter we will not include any more UI opening code as it is straightforward.
+
+
+Spec also allows for using the ==SpecRowLayout== and ==SpecColumnLayout== directly instead of using a ==SpecLayout==.
+This makes the above code for the ==oneRow== and ==oneColumn== layout methods more concise:
+
+[[[
+LayoutExample >> oneRowConcise
+	^ SpecRowLayout composed
+			add: #list;
+			add: #button;
+			yourself.
+
+LayoutExample >> oneColumnConcise
+	^ SpecColumnLayout composed
+			add: #list;
+			add: #button;
+			yourself
+]]]
+
+
+!! Combining rows and columns
+
+
+Rows and columns can be combined to build more complex layouts, by sending both the ==newRow:== and ==newColumn:== messages in different combinations. 
+We show some examples here to illustrate the possibilities.
+
+The first example shows how we can have two rows of widgets: we create a column and twice call ==newRow:==. The result is shown in Figure *@fig_TwoRows*.
+
+
++Screen shot of two rows>file://figures/TwoRows.png|width=50|label=fig_TwoRows+
+
+
+[[[
+LayoutExample >> twoRows
+	^ SpecColumnLayout composed
+		newRow: [ :row | row add:#text];
+		newRow: [ :row |
+			row
+				add: #button;
+				add: #button2
+		];
+		yourself
+]]]
+
+@@note To have multiple rows, these need to be added to a ==SpecColumnLayout==, and to have multiple columns, these need to be added to a ==SpecRowLayout==. Sending ==addRow:== or ==addColumn:== to a ==SpecComposedLayout== multiple times will only produce the last row, resp. column.
+
+Rows and columns can of course also be multiply-nested, for example here we add the two buttons in a row that is nested in a column that is nested in a ==SpecRowLayout==. The resulting UI is shown in Figure  *@fig_DoubleNesting*.
+
+
++Screen shot of multiply-nested rows and columns>file://figures/DoubleNesting.png|width=50|label=fig_DoubleNesting+
+
+[[[
+LayoutExample >> nesting1
+	^ SpecRowLayout composed
+		newColumn: [ :col | col add: #list];
+		newColumn: [ :col |
+			col
+				add: #text;
+				newRow: [ :row |
 					row
-						newColumn: [ :column | 
-							column
-								add: #button1;
-								add: #button4;
-								add: #button7 ];
-						addSplitter;
-						newColumn: [ :column | 
-							column
-								add: #button2;
-								add: #button5;
-								add: #button8 ];
-						addSplitter;
-						newColumn: [ :column | 
-							column
-								add: #button3;
-								add: #button6;
-								add: #button9 ] ];
-				yourself
+						add: #button;
+						add: #button2]
+		];
+		yourself
 ]]]
 
-+Render of three Columns of Widgets>file://figures/ThreeColumns.png|width=50|label=fig_ThreeColumns+
+In addition to nesting columns in rows (and vice-versa), rows can also be nested in rows (and columns in columns), which allows the used space per widget to be uniformly halved, as shown in Figure *@fig_DoubleNestingUniform*
 
-
-!! Set row and column size in pixels
-@sec_layout_set_size_pixels
-
-The height of rows as well as the width of columns can be specified, to prevent them to take all the available space.
-
-The example *@ex_row_height* shows how to specify the height of a row in pixels while the example *@ex_column_width* shows how to specify the column width.
++Screen shot of multiply-nested rows>file://figures/DoubleNestingUniform.png|width=50|label=fig_DoubleNestingUniform+
 
 [[[
-^ SpecLayout composed
-	newRow: [ :row |
-		row
-			add: #theList;
-			add: #theButton
-	] height: 30;
-	yourself
+LayoutExample >> nesting2
+	^ SpecColumnLayout composed
+		newRow: [ :row | row add: #list];
+		newRow: [ :row |
+			row
+				add: #text;
+				newRow: [ :inRow |
+					inRow
+						add: #button;
+						add: #button2]
+		];
+		yourself
 ]]]
 
-+Render of a Row of 30 pixels>file://figures/Row30pixels.png|width=50|label=fig_Row30pixels+
+
+!! Setting row and column size
+
+By default, rows and columns take up all available space, and the space in a row (and in a column) is evenly distributed across all elements of that row (or column).
+In this section we show three different ways in which the size of rows and columns can be changed.
+The first is by letting the user resize them and the two last are two different ways in which their size can be specified.
+
+
+!!! Adding UI splitters so the user can resize
+
+A simple resizing option is to allow the user to resize widgets horizontally (for rows) and vertically (for columns).
+This is done by adding an ==addSplitter== message between the ==add:== messages for the widgets of that row or column.
+For example, the code below makes the horizontal line between the list and the button draggable up or down. Visually the result is the same as in Figure *@fig_ColumnOfWidgets*.
 
 [[[
-^ SpecLayout composed
-				newColumn: [ :column | 
-					column
-						add: #theList;
-						add: #theButton ]
-					width: 50;
-				yourself
+LayoutExample >> oneColumnWithSplitter
+	^ SpecColumnLayout composed
+			add: #list;
+			addSplitter;
+			add: #button;
+			yourself
 ]]]
 
-+Render of a Column of 50 pixels>file://figures/Column50pixels.png|width=50|label=fig_Column50pixels+
-
-Note that it is generally considered a bad habit to hardcode the size of the widgets.
-Methods are available on ''ComposableModel'' providing sensible default sizes, like the width of a button.
-
-@@todo JF Add more precise indications on where these methods are.
-
-When specifying custom widget sizes, care should be taken to take in account the current font size.
 
 
-!! Proportional layout
-@sec_layout_percentage
+!!! Size in pixels
 
-It is also possible to specify the percentage of the container, e.g. the window, that a widget should occupy. As a result of this, the widget size will change accordingly when the container is resized.
+Programmatically it is possible to explicitly specify the absolute size of a row or column in pixels by using the ==newRow:height:== and ==newColumn:width:== methods. 
+This is useful, for example, if a row of buttons is to be placed above or below a text field where it can avoid an ugly layout with huge buttons as seen previously in Figure *@fig_TwoRows*.
+
+We show two simple examples of the use of absolute size below, the first leading to the UI of Figure *@fig_Row30pixels* and the second to the UI of Figure *@fig_Column50pixels*.
+
+[[[
+LayoutExample >> rowOf30
+	^ SpecLayout composed
+		newRow: [ :row |
+			row
+				add: #list;
+				add: #button
+		] height: 30;
+		yourself
+]]]
+
+[[[
+LayoutExample >> columnOf50
+	^ SpecLayout composed
+		newColumn: [ :column | 
+			column
+				add: #list;
+				add: #button
+			] width: 50;
+		yourself
+]]]
+
++Screen shot of a row of 30 pixels high.>file://figures/Row30pixels.png|width=50|label=fig_Row30pixels+
+
++Screen shot of a column of 50 pixels wide.>file://figures/Column50pixels.png|width=50|label=fig_Column50pixels+
+
+@@note It is considered a bad practice to hardcode the size of widgets in pixels, as changes in e.g., font size can invalidate this number. To alleviate this, ==ComposableModel class== provides accessors for practical sizes in its ==defaults== protocol. For example ==toolbarHeight== depends on the font size and is useful for sizing button rows.
+
+!!! Proportional layout
+@sec_rows_columns_proportional
+
+A last option is to specify the percentage of the container, e.g. the window, that a row or column should occupy.
+This is performed using the messages ==newRow:top:bottom:== and ==newColumn:left:right:==.
+In contrast with specifying size in pixels, the use of these messages will cause the row or column size to change accordingly when the container is resized.
+
+Both the above messages take two numbers as extra arguments.
+These should be between 0 and 1: they are a percentage that states how far ""towards the other edge"" the element should begin, resp. end.
+For example, a column that starts at the left end of the window and takes 30 percent of the width is a ==newColumn: [:c| ...] left: 0 right: 0.7== because 30 percent of the width is 70 percent away from the right edge.
+
+@@note Both these numbers indicate a percentage that is towards 'the other end' of the containter, ""not"" a percentage from top to bottom or from left to right.
+
+A more complex example is the code below, an arguably artificial variant on Figure *@fig_DoubleNestingUniform* that makes the buttons proportionally smaller.
+(The example is artificial because, e.g., for the row height of the buttons it would make more sense to use sizes in pixels.)
+It states that the top row takes the first 80 percent of the space (since ==top: 0 bottom: 0.2==) and the second row the last 20 percent (since ==top: 0.8 bottom: 0==).
+Furthermore, in the bottom row, the text field takes up the first 55 percent of the space (==left: 0 right: 0.45==) and the two buttons the last 45 percent (==left: 0.55 right:0==).
+The result of this code can be seen in Figure *@fig_ProportionalRowsCols*.
+
+[[[
+nestingTB
+	^ SpecColumnLayout composed
+		newRow: [ :row | row add: #list] top: 0 bottom: 0.2 ;
+		newRow: [ :row |
+			row
+				newColumn: [:c | c add: #text] left: 0 right: 0.45;
+				newColumn: [ :c |
+					c newRow: [ :inRow |
+						inRow
+							add: #button;
+							add: #button2]] left: 0.55 right: 0
+		] top: 0.8 bottom: 0 ;
+		yourself
+]]]
+
++Screen shot of a use of proportional rows and columns.>file://figures/ProportionalRowsCols.png|width=50|label=fig_ProportionalRowsCols+
+
+!! Layouts without rows or columns
+
+
+!!! Absolute widget positions
+
+[[[
+LayoutExample >> oneButtonAbsolute
+	^ SpecLayout composed
+		add: #button top: 10 bottom: 200 left: 10 right: 10;
+		yourself
+]]]
+
+@@note The underlying logic of the arguments is the same as in ==newRow:top:bottom:== and ==newColumn:left:right== of Section *@sec_rows_columns_proportional*: distances are towards the 'other end' of the container.
+
++Screen shot of an absolutely placed Button>file://figures/AbsoluteButton.png|width=50|label=fig_AbsoluteButton+
+
+@@note Obviously, the use of absolute widget positions breaks completely if a window is resized. It is therefore best to use this only in combination with windows that cannot be resized.
+
+!!! Relative widget positions
+
+[[[
+LayoutExample >> oneButtonSmaller
+	^ SpecLayout composed
+		add: #button origin: (0.25 @ 0.25) corner: (0.75 @ 0.75);
+		yourself
+]]]
+
++Screen shot of an always centered Button>file://figures/CentreredButton.png|width=50|label=fig_CentreredButton+
+
+
+!!! Relatives with offsets
+
+
+
+[[[
+LayoutExample >> twoButtonsRelativeOffset
+	^ SpecLayout composed
+		add: #button origin: (0 @ 0) corner: (1 @ 0.5) offsetOrigin: (10 @ 10) offsetCorner: (-10 @ -5) ;
+		add: #button2 origin: (0 @ 0.5 ) corner: (1 @ 1) offsetOrigin: (10 @ 5) offsetCorner: (-10 @ -10);
+		yourself
+]]]
+
+!! ORPHAN
 
 To do so, the proportional position of the four sides of a widget can be specified, as shown in the example *@ex_layout_proportional*. For each edge, the proportion indicates at what percentage of the overall container the edge should be placed.
 
@@ -173,7 +358,7 @@ For example, for the top edge, the percentage is counted from the top down: 0 is
 	yourself
 ]]]
 
-+Render of a centrered Button>file://figures/CentreredButton.png|width=50|label=fig_CentreredButton+
+
 
 !! Absolute offsets
 
