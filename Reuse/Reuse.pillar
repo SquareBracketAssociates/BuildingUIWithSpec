@@ -94,7 +94,8 @@ ProtocolMethodList >> initializeWidgets
 	label :=  self newLabel.
 	label label: 'Protocol'.
 	self focusOrder add: methods.
-
+]]]
+[[[
 ProtocolMethodList >> title
 	^ 'Protocol widget'
 ]]]
@@ -118,17 +119,23 @@ Our protocol method list will need to be configured when it is used, for example
 [[[
 ProtocolMethodList >> items: aCollection
 	methods items: aCollection
-
+]]]
+[[[
 ProtocolMethodList >> label: aText
 	label label: aText
-
+]]]
+[[[
 ProtocolMethodList >> resetSelection
 	methods resetSelection
-
+]]]
+[[[
 ProtocolMethodList >> whenSelectedItemChanged: aBlock
 	methods whenSelectedItemChanged: aBlock
 ]]]
 
+Note that such methods are a bit useless since the clients can use the accessors to access sub-elements. 
+
+@@todo Johan are we sure that we want to promote such dummy methods? In the following whenClassChanged: is much more interesting.
 
 
 !! Managing three widgets and their interactions
@@ -157,12 +164,13 @@ ProtocolViewer >> initializeWidgets
 	events label: 'api-events'.
 		
 	self focusOrder add: models; add: api; add: events.
-
+]]]
+[[[
 ProtocolViewer >> title
 	^ 'Protocol viewer'
 ]]]
 
-To describe the interactions between the different widgets we create the ==initializePresenter== method. It specifies that when a class is selected, the selections in the method lists are reset and both method lists are populated. Additionally, when a method is selected in one method list, the selection in the other list is reset.
+To describe the interactions between the different widgets we define the ==initializePresenter== method. It specifies that when a class is selected, the selections in the method lists are reset and both method lists are populated. Additionally, when a method is selected in one method list, the selection in the other list is reset.
 
 [[[
 ProtocolViewer >> initializePresenter
@@ -179,7 +187,9 @@ ProtocolViewer >> initializePresenter
 		method ifNotNil: [ events resetSelection ] ].
 	events whenSelectedItemChanged: [ :method |
 		method ifNotNil: [ api resetSelection ] ].
+]]]
 
+[[[
 ProtocolViewer >> methodsIn: class for: protocol
 	^ (class methodsInProtocol: protocol) sorted:
 	  		 [ :a :b | a selector < b selector ].
@@ -204,10 +214,12 @@ Similar to the second user interface, when this UI is reused it will probably ne
 [[[
 ProtocolViewer >> whenClassChanged: aBlock
 	models whenSelectedItemChanged: aBlock
-
+]]]
+[[[
 ProtocolViewer >> whenEventChanged: aBlock
 	events whenSelectedItemChanged: aBlock
-
+]]]
+[[[
 ProtocolViewer >> whenAPIChanged: aBlock
 	api whenSelectedItemChanged: aBlock
 ]]]
@@ -226,7 +238,8 @@ ComposableModel subclass: #ProtocolBrowser
 	instanceVariableNames: 'text viewer'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
-
+]]]
+[[[
 ProtocolBrowser >> initializeWidgets
 	text := self instantiate: TextModel.
 	viewer := self instantiate: ProtocolViewer.
@@ -236,7 +249,8 @@ ProtocolBrowser >> initializeWidgets
 	self focusOrder 
 		add: viewer;
 		add: text.
-
+]]]
+[[[	
 ProtocolBrowser >> title
 	^'Spec Protocol Browser'
 ]]]
