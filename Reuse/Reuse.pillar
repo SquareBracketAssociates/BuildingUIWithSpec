@@ -165,6 +165,7 @@ ProtocolViewer >> initializeWidgets
 		
 	self focusOrder add: models; add: api; add: events.
 ]]]
+
 [[[
 ProtocolViewer >> title
 	^ 'Protocol viewer'
@@ -184,7 +185,7 @@ ProtocolViewer >> initializePresenter
 				events items: (self methodsIn: class for: 'api-events') ] ].
 	
 	api whenSelectedItemChanged: [ :method |
-		method ifNotNil: [ events resetSelection ] ].
+ 		method ifNotNil: [ events resetSelection ] ].
 	events whenSelectedItemChanged: [ :method |
 		method ifNotNil: [ api resetSelection ] ].
 ]]]
@@ -224,7 +225,7 @@ ProtocolViewer >> whenAPIChanged: aBlock
 	api whenSelectedItemChanged: aBlock
 ]]]
 
-
+Note that such methods are better than the basic delegating because they define the customization API of the widget. 
 
 !! Changing the layout of a reused widget
 @sec_protocolbrowser
