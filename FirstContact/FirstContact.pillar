@@ -97,7 +97,7 @@ CustomerSatisfaction >> initializePresenter
 	buttonBad action: [ screen label: buttonBad label ].
 ]]]
 
-We use the message ==action:== to specify the action that is performed when the buttons are clicked. In this case, we change the content of what is shown on the screen, to provide feedback that the choice has been registered. Note that the message ==action:== is part of the button API. In other situations, you will specify that when a given event occurs, another message should be send to a widget subpart. 
+We use the message ==action:== to specify the action that is performed when the buttons are clicked. In this case, we change the content of what is shown on the screen, to provide feedback that the choice has been registered. Note that the message ==action:== is part of the button API. In other situations, you will specify that when a given event occurs, another message should be sent to a widget subpart. 
 
 @@note To summarize: the configuration of a widget `on its own' goes in ==initializeWidgets== and the configuration of a widget `in cooperation with others' goes in ==initializePresenter==.
 
