@@ -1,18 +1,30 @@
 { "title" : "Layout Construction"}
 @cha_layout_construction
 
-@@todo JF editorial pass
+@@todo JF editorial pass + conclusion
 
-@@todo JF complete intro
+Layout of widgets in a window or a containing widget when this widget is being reused is a nontrivial problem.
+This is because there are many factors at play in determining where a widget is being placed in the container (be it a window or another widget).
+The straightforward solution is to place widgets at absolute coordinates of the enclosing container, but this breaks when the container is resized: widgets do not grow or shrink together with the container.
+However, if the window is never resized this is not really an issue either, and absolute positioning allows for pixel-perfect placing of every widget.
 
-In  this chapter, we use an example class that has two buttons, a list and a text field, the code of which is below:
+Because of these multiple usage scenarios, multiple ways for widgets to be laid out need to be provided, and Spec provides various, in the ==SpecLayout== class, in the ==commands== and ==commands-advanced== protocols.
+Up till now, we have only seen the use of rows and columns, and the adding of a single widget to the container.
+By default, a row, column, or a single widget will take up all available space in its container, 
+
+@@todo JF missing some explanation of adding multiple widgets = multiple add's
+@@todo JF missing some more explanation of always trying to take up all available space?
+
+In  this chapter, we discuss in depth two main strategies for laying out widgets in this chapter: first the various options for specifying rows and columns, and second the diverse ways in which widgets can be laid out freely.
+To do this, we use an example class that has two buttons, a list and a text field, the non-layout code of which is below:
 
 [[[
 ComposableModel subclass: #LayoutExample
 	instanceVariableNames: 'list button button2 text'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
-
+]]]
+[[[
 LayoutExample >> initializeWidgets
 	button := self newButton.
 	button2 := self newButton.
@@ -22,42 +34,6 @@ LayoutExample >> initializeWidgets
 	button label: 'i am a button'.
 	button label: 'me too!'.
 ]]]
-
-!! Only One Widget
-
-@@todo JF This text need thorough reworking.
-@@todo JF missing some explanation of always trying to take up all available space
-
-The simpliest example of such a method is laying out just one widget. Below we present such a layout.
-
-It returns a layout in which just one widget is added: the widget contained in ==theList== instance variable.
-
-[[[^ SpecLayout composed
-		add: #theList;
-		yourself
-]]]
-
-The symbol ==theList== refers to an instance side method returning a widget.
-This is because instance variables are private, so the layout class needs to use an accessor to obtain it when building the UI.
-
-@@note By default, a widget will take all the space available in its container.
-
-All the methods for adding sub widgets can be found in the ''commands'' and ''commands-advanced'' protocols of ""SpecLayout"".
-
-
-Also, these methods are ''not'' restricted to laying out sub widgets.
-
-It can also refer to sub widgets contained in sub widgets, i.e. when
-reusing an existing UI, specify a new layout for the sub widgets that
-comprise this UI.
-
-To do this, instead of giving a symbol, an array with 2 (or more) symbols must
-be given.
-
-The first symbol identifies the UI being reused and the second the sub
-widget within this UI whose new layout position is being specified.
-
-We have seen an example of this reuse in *@sec_protocolbrowser*.
 
 
 !! Row and column layouts
@@ -132,7 +108,8 @@ LayoutExample >> oneRowConcise
 			add: #list;
 			add: #button;
 			yourself.
-
+]]]
+[[[
 LayoutExample >> oneColumnConcise
 	^ SpecColumnLayout composed
 			add: #list;
@@ -303,10 +280,23 @@ nestingTB
 
 +Screen shot of a use of proportional rows and columns.>file://figures/ProportionalRowsCols.png|width=50|label=fig_ProportionalRowsCols+
 
+@@todo JF and of course we used newRow:origin:corner: in First Contact
+
 !! Layouts without rows or columns
 
+Rows and columns are of course not the only way in which a user interface can be laid out.
+Spec also allows widgets to be placed more freely.
+This can be done either using absolute positions of the enclosing container or using relative positioning, which takes into account window resizing.
+We show here how these different placement options can be used.
 
 !!! Absolute widget positions
+
+A first manner in which widgets can be laid out, is by giving them absolute positions in their enclosing container.
+To do this, the  ==SpecLayout== method ==add:top:bottom:left:right:== is used.
+It takes four extra arguments, each representing a distance as a number of pixels.
+The number of pixels should be positive, as it indicates a distance from the given edge towards the opposite edge.
+
+For example, below we perform a layout of a button at 10 pixels from the top, 200 pixels from the bottom, 10 from the left and 10 from the right, and the result is shown in Figure *@fig_AbsoluteButton*.
 
 [[[
 LayoutExample >> oneButtonAbsolute
@@ -323,6 +313,13 @@ LayoutExample >> oneButtonAbsolute
 
 !!! Relative widget positions
 
+Relative widget positions cause the widget to be resized according to how its container is resized.
+The method ==add: origin: corner:== of ==SpecLayout== specifies such relative layout of a widget, percentage-wise from the origin point to the corner point.
+These two points represent respectively the top left corner and the bottom right corner of the widget.
+Since the arguments express a percentage of the container, they must be between 0@0 and 1@1.
+
+For example, below we place one button that is half the container size in the center of the container, which can be seen in Figure *@fig_CenteredButton*.
+
 [[[
 LayoutExample >> oneButtonSmaller
 	^ SpecLayout composed
@@ -330,78 +327,43 @@ LayoutExample >> oneButtonSmaller
 		yourself
 ]]]
 
-+Screen shot of an always centered Button>file://figures/CentreredButton.png|width=50|label=fig_CentreredButton+
++Screen shot of an always centered Button>file://figures/CentreredButton.png|width=50|label=fig_CenteredButton+
 
+
+Alternatively, the method ==add:top:bottom:left:right:== can also be used with percentage arguments, i.e., between 0 and 1, to produce a relative layout with percentages computed from the opposite edge.
+For example, the code below produces exactly the same result as the code above.
+We however discourage this use of the ==add:top:bottom:left:right:== method, as there may be confusion with positions of 0 or 1 pixels (is it a relative or an absolute position?) and it does not support the use of offsets, which we discuss next.
+
+[[[
+LayoutExample >> oneButtonSmallerAlternative
+	^ SpecLayout composed
+		add: #button top: 0.25 bottom: 0.25 left: 0.25 right: 0.25;
+		yourself
+]]]
 
 !!! Relatives with offsets
 
+Relative positions of widgets have the advantage that they resize widgets as their container grows and shrinks, but have the disadvantage that widgets are always placed right next to each other or next to the container border.
+Placing a widget at, e.g., five percent of a container border, can make the border of the correct thickness for a specific window size but then too big or too small when the window is resized.
+Actually, what is needed is for a way in which we can place widgets relatively, but specify absolute offsets in addition, so that the gaps between widgets will always be the same.
+This is possible with the ==add: origin: corner: offsetOrigin: offsetCorner:== method of ==SpecLayout==.
+The ==origin: corner:== arguments are the same as in the ==add: origin: corner:==method  and both offset arguments take a point as argument.
+These points express the number of pixels from the corresponding corner, in the classical computer graphics coordinate system where the origin is in the top left corner.
+Consequently, the ==x== or ==y== component can be negative representing an offset towards the left, respectively the top.
 
+For example, the code below lays out two buttons on top of each other.
+Each of them takes half the space of the window, minus the window border of 10 pixels and a the space between them of 10 pixels. 
 
 [[[
 LayoutExample >> twoButtonsRelativeOffset
 	^ SpecLayout composed
-		add: #button origin: (0 @ 0) corner: (1 @ 0.5) offsetOrigin: (10 @ 10) offsetCorner: (-10 @ -5) ;
-		add: #button2 origin: (0 @ 0.5 ) corner: (1 @ 1) offsetOrigin: (10 @ 5) offsetCorner: (-10 @ -10);
+		add: #button origin: (0 @ 0) corner: (1 @ 0.5)
+				 offsetOrigin: (10 @ 10) offsetCorner: (-10 @ -5) ;
+		add: #button2 origin: (0 @ 0.5 ) corner: (1 @ 1)
+				 offsetOrigin: (10 @ 5) offsetCorner: (-10 @ -10);
 		yourself
 ]]]
 
-!! ORPHAN
+!! Conclusions
 
-To do so, the proportional position of the four sides of a widget can be specified, as shown in the example *@ex_layout_proportional*. For each edge, the proportion indicates at what percentage of the overall container the edge should be placed.
-
-Zero percent is the container edge, 100 percent is the opposite container edge.
-For example, for the top edge, the percentage is counted from the top down: 0 is the top edge, and 1 is the bottom edge.
-
-[[[
-^ SpecLayout composed
-	add: #theButton top: 0.25 bottom: 0.25 left: 0.25 right: 0.25;
-	yourself
-]]]
-
-
-
-!! Absolute offsets
-
-@@todo Missing an example
-Also, the argument can be an integer if the offset has to be a fixed number of pixels.
-The number of pixels should be positive, as it indicates a distance from the corresponding edge, going to the opposite edge.
-
-!! Proportional with offsets
-@sec_layout_expert
-
-!!! origin: corner:
-
-The previous examples should cover most of the cases of layout of widgets.
-For the remaining cases there is a last way to specify a widget by specifying its position, in case everything else fails.
-
-The method ==add: origin: corner: == of ==SpecLayout== specifies the layout of a widget, percentage-wise from the origin point to the corner point.
-
-These two points represent respectively the top left corner and the bottom right corner of the widget. The arguments express a percentage of the container, so these __must__ be between ''0@0'' and ''1@1'' .
-
-
-!!! Addition offsetOrigin: offsetCorner: 
-
-In addition to origin and corner , two offsets can be also be specified, using the method ==add: origin: corner: offsetOrigin: offsetCorner: ==.
-
-The offsets specify the number of pixels that the origin and the corner should be moved.
-
-Contrary to the previous way to define layouts, while using ==add: origin: corner:  offsetOrigin: offsetCorner: == the offset can be negative.
-The offset expresses the number of pixels from the corresponding corner, in the classical computer graphics coordinate system where the origin is in the top left corner.
-Note that this approach is similar to the ProportionalLayout of ""Morphic"".
-
-
-The example below shows how to add a widget looking like a toolbar.
-Here we reuse theButton for simplicity, we specify that it take all the window width but only 30 pixels in height.
-
-[[[
-^ SpecLayout composed
-				add: #theButton
-					origin: 0 @ 0
-					corner: 1 @ 0
-					offsetOrigin: 0 @ 0
-					offsetCorner: 0 @ 30;
-				yourself
-]]]
-
-+Render of a Toolbar made with the Expert Mode>file://figures/ExpertModeToolbar.png|width=50|label=fig_ExpertModeToolbar+
 
