@@ -59,7 +59,7 @@ The resulting UI is shown in Figure *@fig_WidgetClassList*.
 
 +Screen shot of the WidgetClassList.>file://figures/WidgetClassList.png|width=50|label=fig_WidgetClassList+
 
-Since this UI will later be used together with other widgets to provide a more complete user interface, some actions will need to occur when a list item is clicked. However, we cannot know beforehand what all these possible actions will be everywhere that it will be reused. The best solution therefore is to place this responsibility on the reuser of the widget. Every time this UI is reused as a widget, it will be configured by the reuser. To allow this, we add a configuration method namd ==wheSelectedItemChanged:==, in the ==api== protocol:
+Since this UI will later be used together with other widgets to provide a more complete user interface, some actions will need to occur when a list item is clicked. However, we cannot know beforehand what all these possible actions will be everywhere that it will be reused. The best solution therefore is to place this responsibility on the reuser of the widget. Every time this UI is reused as a widget, it will be configured by the reuser. To allow this, we add a configuration method namd ==whenSelectedItemChanged:==, in the ==api== protocol:
 
 [[[
 WidgetClassList >> whenSelectedItemChanged: aBlock
@@ -68,9 +68,7 @@ WidgetClassList >> whenSelectedItemChanged: aBlock
 
 Now, whoever reuses this widget can parameterize it with a block that will be executed whenever the selected item is changed. 
 
-@@note The only rule for reuse of Spec widgets is that all configuration methods of your UI should be contained in a ==api== protocol. This is to make it easier for reusers of this widget to discover how it can be parameterized.
-
-@@todo are we sure that we want API and that we want to force to define such method.
+@@note The only rule for reuse of Spec widgets is that all public configuration methods of your UI should be contained in a ==api== protocol. This is to make it easier for reusers of this widget to discover how it can be parameterized. We will discuss the topic of a public configuration API in Section *@sec_public_API* at the end of this chapter.
 
 
 !! Combining two basic widgets into a reusable UI
@@ -100,7 +98,7 @@ ProtocolMethodList >> title
 	^ 'Protocol widget'
 ]]]
 
-The layout code builds a column with the fixed-height label on top and the list taking all the space that remains. (See Chapter  *@cha_layouts_construction* for more layout information).
+The layout code builds a column with the fixed-height label on top and the list taking all the space that remains. (See Chapter  *@cha_layout_construction* for more on layouts.)
 
 [[[
 ProtocolMethodList class >> defaultSpec
@@ -133,10 +131,7 @@ ProtocolMethodList >> whenSelectedItemChanged: aBlock
 	methods whenSelectedItemChanged: aBlock
 ]]]
 
-Note that such methods are a bit useless since the clients can use the accessors to access sub-elements. 
-
-@@todo Johan are we sure that we want to promote such dummy methods? In the following whenClassChanged: is much more interesting.
-
+@@note An alternative to adding these methods is simply to do nothing: since both the methods and the label are accesible (through their accessors), a reuser of this widget may simply obtain them and configure them directly. These two alternatives reflect a design decision that we will discuss in Section *@sec_public_API*.
 
 !! Managing three widgets and their interactions
 @sec_protocolviewer
@@ -225,7 +220,8 @@ ProtocolViewer >> whenAPIChanged: aBlock
 	api whenSelectedItemChanged: aBlock
 ]]]
 
-Note that such methods are better than the basic delegating because they define the customization API of the widget. 
+@@note Compared to the public configuration API methods we have seen before, these methods add semantic information to the configuration API. They state that they configure what to do when a class, ==api== or ==api-events== list item has been changed. This arguably communicates the customization API more clearly than just having the subwidgets accessible.
+
 
 !! Changing the layout of a reused widget
 @sec_protocolbrowser
@@ -293,8 +289,31 @@ ProtocolBrowser class >> defaultSpec
 
 This concludes the last example of this chapter, and the result can be seen in the first figure of this chapter, Figure *@fig_protocol_browser*.
 
+!! Considerations about a public configuration API
+@sec_public_API
+
+In this chapter we have seen several definitions of methods in the public configuration API of the widget being built.
+The implementation of our configuration methods here simply delegated to internal widgets, but a configuration can of course be more complex than that, depending on the internal logic of the UI. 
+
+For methods that simply delegate to the internal widgets, the question is whether it makes sense to define these as methods in the ==api== protocols at all.
+This fundamentally is a design decision to be made by the programmer.
+Not having such methods makes the implementation of the widget more lightweight but comes at a cost of a less clear intent and of breaking encapsulation.
+
+For the former cost, we have seen an example in the protocol method list of Section *@sec_protocollist*.
+The presence of the three methods defined there communicates to the user that we care about what to do when a class, ==api== or ==api-events== list item has been changed. 
+The same fundamentally also holds for the other examples in this chapter: each method in an ==api== protocol communicates an intent to the reuser: this is how we expect that this widget will be configured. 
+Without such declared methods, it is less clear to the reuser what can to be done to be able to effectively reuse this widget.
+
+For the latter cost, expecting reusers of the widget to directly send messages to internal objects (in instance variables) means breaking encapsulation.
+As a consequence, we are no longer free to change the internals of the UI, e.g., by renaming the instance variables to a better name or changing the kind of widget used.
+Such changes may break reusers of the widget and hence severely limits how we can evolve this widget in the future.
+In the end, it is safer to define a public API and ensure in future versions of the widget that the functionality of this API remains the same.
+
+So in the end it is important to consider future reusers of your UI and future evolution of your UI.
+You need to make a tradeoff of writing extra methods versus possibly making reuse of the UI harder as well as possibly making future evolution of the UI harder.
+
 !! Conclusion
 
-In this chapter we have discussed a key point of Spec: the ability to seamlessly reuse existing UIs as widgets. This ability comes with no significant cost to the creator of a UI. The only thing that needs to be taken into account is how a UI can (or should) be customized, and these customization methods should be placed in a ==api== protocol for discoverability.
+In this chapter we have discussed a key point of Spec: the ability to seamlessly reuse existing UIs as widgets. This ability comes with no significant cost to the creator of a UI. The only thing that needs to be taken into account is how a UI can (or should) be customized, and public customization methods should be placed in a ==api== protocol.
 
 The reuse of complex widgets at no significant cost was a key design goal of Spec because it is an important productivity boost for the writing process of UIs. The boost firstly comes from being able to reuse existing nontrivial widgets, and secondly because it allows you to structure your UI in coherent and more easily manageable sub-parts with clear interfaces. We therefore encourage you to think of your UI as a composition of such sub-parts and construct it modularly, to yield greater productivity.
