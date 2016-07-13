@@ -93,6 +93,7 @@ ProtocolMethodList >> initializeWidgets
 	label label: 'Protocol'.
 	self focusOrder add: methods.
 ]]]
+
 [[[
 ProtocolMethodList >> title
 	^ 'Protocol widget'
@@ -131,7 +132,7 @@ ProtocolMethodList >> whenSelectedItemChanged: aBlock
 	methods whenSelectedItemChanged: aBlock
 ]]]
 
-@@note An alternative to adding these methods is simply to do nothing: since both the methods and the label are accesible (through their accessors), a reuser of this widget may simply obtain them and configure them directly. These two alternatives reflect a design decision that we will discuss in Section *@sec_public_API*.
+@@note An alternative to adding these methods is simply to do nothing: since both the methods and the label are accessible (through their accessors), a reuser of this widget may simply obtain them and configure them directly. These two alternatives reflect a design decision that we will discuss in Section *@sec_public_API*.
 
 !! Managing three widgets and their interactions
 @sec_protocolviewer
