@@ -43,19 +43,16 @@ In general the ==initializeWidgets== method should follow the pattern:
 The last step is not mandatory but ''highly'' recommended.
 Indeed, without this final step keyboard navigation will not work reliably.
 
-@@note Specifying this method is mandatory, as without it the UI would have no widgets.
+@@note Specifying the method ==initializeWidgets== is mandatory, as without it the UI would have no widgets.
 
 
 !!! Widget instantiation
 
 The instantiation of the model for a widget can be done in two ways: through the use of a creation method or through the use of the ==instantiate:== method.
 
-Considering the first option, the framework provides unary messages for the creation of all basic widgets.
-The format of these messages is ==new[Widget]==, for example ==newButton== creates a button widget, and ==newList== creates a list widget.
-The complete list of available widget creation methods can be found in the class ==ComposableModel== in the protocol ==widgets==.
+- Considering the first option, the framework provides unary messages for the creation of all basic widgets. The format of these messages is ==new[Widget]==, for example ==newButton== creates a button widget, and ==newList== creates a list widget. The complete list of available widget creation methods can be found in the class ==ComposableModel== in the protocol ==widgets==.
 
-The second option is more general: to reuse a  ==ComposableModel== subclass (other than the ones handled by the first option) the widget needs to be instantiated using the ==instantiate:== method.
-For example, to reuse a ==MessageBrowser==  widget, the code is ==self instantiate: MessageBrowser.==
+- The second option is more general: to reuse a ==ComposableModel== subclass (other than the ones handled by the first option) the widget needs to be instantiated using the ==instantiate:== method. For example, to reuse a ==MessageBrowser==  widget, the code is ==self instantiate: MessageBrowser.==
 
 
 !! The ''layout'' method
