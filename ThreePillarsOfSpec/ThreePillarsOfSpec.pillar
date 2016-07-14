@@ -1,15 +1,21 @@
 { "title" : "The fundamentals of Spec"}
 @cha_fundamentals_of_spec
 
+In this chapter we revisit the key aspects of Spec and put in perspective the important 
+customization points of its building process. 
+
+!! User interface building: a composition
+
 A key aspect of Spec is that all user interfaces are constructed through the reuse and composition of existing user interfaces.
-To allow this, defining a user interface consists of defining the ""model"" of the user interface, and ""not"" the user interface elements that will be shown on screen.
+To allow this, defining a user interface consists of defining the ''model'' of the user interface, and ''not'' the user interface elements that will be shown on screen.
 These UI elements are instantiated by Spec, taking into account the underlying UI framework.
 
 In the end, it is the composition of the model and the UI elements that makes up the resulting user interface that is shown.
-This also explains the name of the root component of Spec: since all UIs are constructed through ""composition"" of other UI's, and it is sufficient to define the ""model"" to define the UI, the root class of all UIs is named ==ComposableModel==.
+This also explains the name of the root component of Spec: since all UIs are constructed through ''composition'' of other UI's, and it is sufficient to define the ''model'' to define the UI, the root class of all UIs is named ==ComposableModel==.
 Consequently, to define a new user interface, a subclass of ==ComposableModel== needs to be created.
 
-Considering the construction and orchestration of the different widgets in a user interface, Spec is inspired by the Model-View-Presenter pattern.
+Considering the construction and orchestration of the different widgets in a user interface, Spec is inspired by the Model-View-Presenter pattern. In Spec, the model is actually a presenter in the MVP triad. Note that future versions of Spec may rename the ==ComposableModel== into ==ComposablePresenter== to convey such situation.
+
 Fundamentally, it is built around three concerns that materialize themselves as the following three methods in ==ComposableModel==:
 - ==initializeWidgets== treats the widgets themselves
 - ==initializePresenter== treats the interactions between widgets
