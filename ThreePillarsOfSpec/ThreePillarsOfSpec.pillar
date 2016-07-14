@@ -27,12 +27,12 @@ In this chapter we describe the finer points of each method and how these three 
 !! The ''initializeWidgets'' method
 @sec_initializeWidgets
 
-This method instantiates, saves in instance variables, and partially configures the different widgets that will be part of the UI.
+The method ==initializeWidgets== instantiates, saves in instance variables, and partially configures the different widgets that will be part of the UI.
 Instantiation of the models will cause the instantiation and initialization of the different lower-level user interface components, constructing the UI that is shown to the user.
 A first part of the configuration of each widget is specified here as well, which is why this method is called ==initializeWidgets==.
 This focus in this method is to specify what the widgets will look like and what their self-contained behavior is.
 The behavior to update model state, e.g., when pressing a ==Save== button, is described in this method as well.
-It is explicitly ""not"" the responsibility of this method to define the interactions ""between"" the widgets.
+It is explicitly ''not'' the responsibility of this method to define the interactions ''between'' the widgets.
 
 In general the ==initializeWidgets== method should follow the pattern:
 
@@ -40,7 +40,7 @@ In general the ==initializeWidgets== method should follow the pattern:
 - widget configuration specification
 - specification of focus order
 
-The last step is not mandatory but ""highly"" recommended.
+The last step is not mandatory but ''highly'' recommended.
 Indeed, without this final step keyboard navigation will not work reliably.
 
 @@note Specifying this method is mandatory, as without it the UI would have no widgets.
@@ -77,7 +77,9 @@ ComposableModel subclass: #TwoButtons
 	instanceVariableNames: 'button1 button2'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
+]]]
 
+[[[
 TwoButtons >> initializeWidgets
 	button1 := self newButton.
 	button2 := self newButton.
@@ -87,8 +89,10 @@ TwoButtons >> initializeWidgets
 
 	self focusOrder
 		add: button1;
-		add: button2.
-
+		add: button2
+]]]		
+		
+[[[
 TwoButtons class >> buttonRow
 	<spec: #default>
 	^SpecRowLayout composed
