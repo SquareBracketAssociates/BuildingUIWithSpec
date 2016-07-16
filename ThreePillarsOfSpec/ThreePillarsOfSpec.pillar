@@ -58,16 +58,20 @@ The instantiation of the model for a widget can be done in two ways: through the
 !! The ''layout'' method
 @sec_layoutmethod
 
-This method specifies the layout of the different widgets in the UI.
+@@note may be the title should be Expressing UI Layouts and the first sentence should be. Widget layout is expressed defining methods that specify how the different widgets composing a UI are placed. As we will such methods can have different name but should be tagged to the recognized by the system.
+
+The method ==layout== specifies the layout of the different widgets in the UI.
 It also specifies how a widget reacts when the window is resized.
 The layout method is placed at the class side because it typically returns a value that is the same for all the instances.
 Put differently, typically all the instances of the same user interface have the same layout and hence this can be considered as being a class-side accessor for a class variable.
 
-@@note Specifying this method is mandatory, as without it the UI would show no widgets to the user.
+@@note Specifying the method ==layout== is mandatory, as without it the UI would show no widgets to the user.
+
+@@todo johan this is strange because we say that the layout method is mandatory but none of the example explicitly defines one. Even the lookup does not look for the layout method. So we should rephrase this. I did not check the image to check what to write but to me. May be we should say layout methods (methods defining spec layout objects) not sure that it is working? May be this is the first sentence that is misleading.
 
 !!! Having multiple layouts for a widget
 
-For the same UI multiple layouts can be described, and when the UI is built the use of a specific layout can be indicated. To do this, instead of calling ==openWithSpec== (as we have done until now), use the ==openWithSpec:== message with the name of the layout method as argument. For example, consider the following artificial example of a two button UI that has two different layout methods:
+For the same UI, multiple layouts can be described, and when the UI is built the use of a specific layout can be indicated. To do this, instead of calling ==openWithSpec== (as we have done until now), use the ==openWithSpec:== message with the name of the layout method as argument. For example, consider the following artificial example of a two button UI that has two different layout methods:
 
 [[[
 ComposableModel subclass: #TwoButtons
@@ -95,14 +99,20 @@ TwoButtons class >> buttonRow
 	^SpecRowLayout composed
 		add: #button1; add: #button2;
 		yourself
-
+]]]
+[[[
 TwoButtons class >> buttonCol
 	^SpecColumnLayout composed
 		add: #button1; add: #button2;
 		yourself
 ]]]
 
-This UI can be opened in multiple ways: ==TwoButtons new openWithSpec: #buttonRow== places the buttons in a row and ==TwoButtons new openWithSpec: #buttonCol== places them in a column. Note that the ==buttonRow== layout method has a ==<spec: #default>== pragma. As a result, the ==buttonRow== layout will be used when executing ==TwoButtons new openWithSpec==, as we explain next.
+This UI can be opened in multiple ways: 
+
+- ==TwoButtons new openWithSpec: #buttonRow== places the buttons in a row.
+- ==TwoButtons new openWithSpec: #buttonCol== places them in a column. 
+
+Note that the ==buttonRow== layout method has a ==<spec: #default>== pragma. As a result, the ==buttonRow== layout will be used when executing ==TwoButtons new openWithSpec==, as we explain next.
 
 The ==openWithSpec== method uses the following lookup mechanism to obtain the layout method:
 # Search on class side, throughout the whole class hierarchy, for a method with the pragma ==<spec: #default>==.
@@ -129,16 +139,22 @@ ComposableModel subclass: #TBAndListH
 	instanceVariableNames: 'buttons list'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
+]]]
 
+[[[
 TBAndListH >> initializeWidgets
 	buttons := self instantiate: TwoButtons.
 	list := self newList.
 	list items: (1 to: 10).
 	self focusOrder add: buttons; add: list.
+]]]
 
+[[[
 TBAndListH >> title
 	^'SuperWidget'
+]]]
 
+[[[
 TBAndListH class >> defaultSpec
 	^ SpecRowLayout composed
 			add: #buttons; add: #list;
@@ -154,13 +170,14 @@ Alternatively, we can create ==TBAndListV== class as a subclass of ==TBAndListH=
 +Screen shot of the UI with buttons placed vertically>file://figures/SuperWidget.png|width=50|label=fig_SuperWidget+
 
 
-
 [[[
 TBAndListH subclass: #TBAndListV
 	instanceVariableNames: ''
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
+]]]
 
+[[[
 TBAndListV class >> defaultSpec
 	^ SpecRowLayout composed
 			add: #buttons withSpec: #buttonCol; add: #list;
@@ -171,16 +188,16 @@ TBAndListV class >> defaultSpec
 !! The ''initializePresenter'' method
 @sec_initializePresenter
 
-This method defines the interactions between the different widgets.
+The method ==initializePresenter== defines the interactions between the different widgets.
 By connecting the behaviors of the different widgets it specifies the overall presentation, i.e., how the overall UI responds to interactions by the user.
 Usually this method consists of specifications of actions to perform when a certain event is received by a widget.
 The whole interaction flow of the UI then emerges from the propagation of those events.
 
-@@note ==initializePresenter== is the only optional method for a Spec UI.
+@@note The method ==initializePresenter== is the only optional method for a Spec UI.
 
-In  Spec, the different UI models are contained in value holders, and the event mechanism relies on the announcements of these value holders to manage the interactions between widgets.
-Value holders provide a single method ==whenChangedDo:== that is used to register a block to perform on change.
-In addition to this primitive  ==whenChangedDo:== method, the basic widgets provide more specific hooks, e.g., when an item in a list is selected or deselected.
+In Spec, the different UI models are contained in value holders, and the event mechanism relies on the announcements of these value holders to manage the interactions between widgets.
+Value holders provide the method ==whenChangedDo:== that is used to register a block to perform on change and the method ==whenChangedSend: aSelector to: aReceiver== to send a meessage to a given object.
+In addition to these primitives methods, the basic widgets provide more specific hooks, e.g., when an item in a list is selected or deselected.
 
 
 !! Conclusion
