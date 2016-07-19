@@ -57,8 +57,6 @@ LayoutExample >> oneRow
 		yourself
 ]]]
 
-@@todo johan what is #thelist and #theButton? should it not be list and button? I updated the code.
-
 This code is a layout method that builds a row of widgets using the ==newRow:== message.
 The argument of the message is a one-argument block, and the block argument will contain an instance of a ==SpecRowLayout==.
 The widgets are then added to this layout object, which aligns them all in a row.
@@ -314,7 +312,7 @@ LayoutExample >> oneButtonSmaller
 
 Alternatively, the method ==add:top:bottom:left:right:== can also be used with percentage arguments, i.e., between 0 and 1, to produce a relative layout with percentages computed from the opposite edge.
 For example, the code below produces exactly the same result as the code above.
-We however discourage this use of the ==add:top:bottom:left:right:== method, as there may be confusion with positions of 0 or 1 pixels (is it a relative or an absolute position?) and it does not support the use of offsets, which we discuss next.
+We however discourage this use of the ==add:top:bottom:left:right:== method, as there may be confusion with positions of 0 or 1 pixels (Johan? is it a relative or an absolute position?) and it does not support the use of offsets, which we discuss next.
 
 [[[
 LayoutExample >> oneButtonSmallerAlternative
