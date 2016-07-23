@@ -1,7 +1,7 @@
 { "title" : "Layout Construction"}
 @cha_layout_construction
 
-Placing and describing the behavior of widgets on resize of their container is an important yet complex issue. In this chapter we present the different ways to express layouts with Spec. We describe how layouts of reused widgets can be composed to create the layout of the composite widget. 
+Placing and describing the behavior of widgets on resizing of their container is an important yet complex issue. In this chapter we present the different ways to express layouts with Spec.
 
 !! About layouts
 Layout of widgets in a window or in their reusing UI is a nontrivial problem.
@@ -222,7 +222,7 @@ LayoutExample >> columnOf50
 
 Alternatively, inside of a column layout and a row layout, ==add:height:==, respectively ==add:width:==, can also be used to state the height, respectively the width, of that specific widget.
 
-@@note It is considered a bad practice to hardcode the size of widgets in pixels, as changes (e.g., font size) can invalidate this number. To alleviate this, ==ComposableModel class== provides accessors for practical sizes in its ==defaults== protocol.
+@@note It is considered a bad practice to hardcode the size of widgets in pixels, as some changes (e.g., in font size) can invalidate this number. To alleviate this, ==ComposableModel class== provides accessors for practical sizes in its ==defaults== protocol.
 
 An example of the use of accessors that compute height is ==toolbarHeight==, which we used in the protocol method browser, shown in Figure *@fig_protocollist*. This accessor depends on the font size and is also useful for sizing button rows.
 
@@ -312,7 +312,7 @@ LayoutExample >> oneButtonSmaller
 
 Alternatively, the method ==add:top:bottom:left:right:== can also be used with percentage arguments, i.e., between 0 and 1, to produce a relative layout with percentages computed from the opposite edge.
 For example, the code below produces exactly the same result as the code above.
-We however discourage this use of the ==add:top:bottom:left:right:== method, as there may be confusion with positions of 0 or 1 pixels (Johan? is it a relative or an absolute position?) and it does not support the use of offsets, which we discuss next.
+We however discourage this use of the ==add:top:bottom:left:right:== method for two reasons. Firstly there may be confusion between relative and absolute: should you interpret a value of 0 or 1 as a percentage or as a number of pixels? Secondly it does not support the use of offsets, which we discuss next.
 
 [[[
 LayoutExample >> oneButtonSmallerAlternative
@@ -322,7 +322,7 @@ LayoutExample >> oneButtonSmallerAlternative
 ]]]
 
 
-!!! Relatives with offsets
+!!! Relative with offsets
 
 Widget relative positions have the advantage that they resize widgets as their container grows and shrinks, but have the disadvantage that widgets are always placed right next to each other or next to the container border.
 Placing a widget at, e.g., five percent of a container border, can make the border of the correct thickness for a specific window size but then too big or too small when the window is resized.
@@ -359,7 +359,9 @@ CustomerSatisfaction class >> defaultSpec
 		newRow: [ :row | 
 				row add: #buttonHappy; add: #buttonNeutral; add: #buttonBad ]
 			origin: 0 @ 0 corner: 1 @ 0.7;
-		newRow: [ :row | row add: #screen ] origin: 0 @ 0.7 corner: 1 @ 1;
+		newRow: [ :row |
+				row add: #screen ]
+			origin: 0 @ 0.7 corner: 1 @ 1;
 		yourself
 ]]]
 
