@@ -1,4 +1,4 @@
-[![Build Status](https://ci.inria.fr/pharo-contribution/buildStatus/icon?job=BuildingUIWithSpec)](https://ci.inria.fr/pharo-contribution/view/Books/job/BuildingUIWithSpec/) Built artefacts can be downloaded from the [CI server](https://ci.inria.fr/pharo-contribution/view/Books/job/BuildingUIWithSpec/lastSuccessfulBuild/artifact/).
+[![Build Status](https://ci.inria.fr/pharo-contribution/buildStatus/icon?job=BuildingUIWithSpec)](https://ci.inria.fr/pharo-contribution/view/Books/job/BuildingUIWithSpec/) Built artefacts can be downloaded from the [CI server](https://ci.inria.fr/pharo-contribution/view/Books/job/BuildingUIWithSpec/lastSuccessfulBuild/artifact/book-result/).
 
 To install 
 
