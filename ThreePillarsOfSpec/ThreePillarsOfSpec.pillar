@@ -1,8 +1,8 @@
 { "title" : "The fundamentals of Spec"}
 @cha_fundamentals_of_spec
 
-In this chapter we revisit the key aspects of Spec and put in perspective the important 
-customization points of its building process. 
+In this chapter we revisit the key aspects of Spec and put the important 
+customization points of its building process in perspective. 
 
 !! User interface building: a composition
 
@@ -14,7 +14,7 @@ In the end, it is the composition of the model and the UI elements that makes up
 This also explains the name of the root component of Spec: since all UIs are constructed through ''composition'' of other UI's, and it is sufficient to define the ''model'' to define the UI, the root class of all UIs is named ==ComposableModel==.
 Consequently, to define a new user interface, a subclass of ==ComposableModel== needs to be created.
 
-Considering the construction and orchestration of the different widgets in a user interface, Spec is inspired by the Model-View-Presenter pattern. In Spec, the model is actually a presenter in the MVP triad. Note that future versions of Spec may rename the ==ComposableModel== into ==ComposablePresenter== to convey such situation.
+Considering the construction and orchestration of the different widgets in a user interface, Spec is inspired by the Model-View-Presenter pattern. The model that is defined in Spec corresponds to a presenter in the MVP triad. Note that because of this, future versions of Spec may rename the ==ComposableModel== into ==ComposablePresenter== for naming consistency.
 
 Fundamentally, it is built around three concerns that materialize themselves as the following three methods in ==ComposableModel==:
 - ==initializeWidgets== treats the widgets themselves
@@ -55,19 +55,18 @@ The instantiation of the model for a widget can be done in two ways: through the
 - The second option is more general: to reuse a ==ComposableModel== subclass (other than the ones handled by the first option) the widget needs to be instantiated using the ==instantiate:== method. For example, to reuse a ==MessageBrowser==  widget, the code is ==self instantiate: MessageBrowser.==
 
 
-!! The ''layout'' method
+!! Defining UI Layouts 
 @sec_layoutmethod
 
-@@note may be the title should be Expressing UI Layouts and the first sentence should be. Widget layout is expressed defining methods that specify how the different widgets composing a UI are placed. As we will such methods can have different name but should be tagged to the recognized by the system.
+Widget layout is defined by specifying methods that state how the different widgets that compose a UI are placed.
+In addition, it also specifies how a widget reacts when the window is resized.
+As we will see later, these methods can have different names and are subject to a specific lookup process.
 
-The method ==layout== specifies the layout of the different widgets in the UI.
-It also specifies how a widget reacts when the window is resized.
-The layout method is placed at the class side because it typically returns a value that is the same for all the instances.
+A layout method is placed at the class side because it typically returns a value that is the same for all the instances.
 Put differently, typically all the instances of the same user interface have the same layout and hence this can be considered as being a class-side accessor for a class variable.
 
-@@note Specifying the method ==layout== is mandatory, as without it the UI would show no widgets to the user.
+@@note Specifying a layout method is mandatory, as without it the UI would show no widgets to the user.
 
-@@todo johan this is strange because we say that the layout method is mandatory but none of the example explicitly defines one. Even the lookup does not look for the layout method. So we should rephrase this. I did not check the image to check what to write but to me. May be we should say layout methods (methods defining spec layout objects) not sure that it is working? May be this is the first sentence that is misleading.
 
 !!! Having multiple layouts for a widget
 
@@ -197,11 +196,11 @@ The whole interaction flow of the UI then emerges from the propagation of those 
 
 In Spec, the different UI models are contained in value holders, and the event mechanism relies on the announcements of these value holders to manage the interactions between widgets.
 Value holders provide the method ==whenChangedDo:== that is used to register a block to perform on change and the method ==whenChangedSend: aSelector to: aReceiver== to send a meessage to a given object.
-In addition to these primitives methods, the basic widgets provide more specific hooks, e.g., when an item in a list is selected or deselected.
+In addition to these primitive methods, the basic widgets provide more specific hooks, e.g., when an item in a list is selected.
 
 
 !! Conclusion
 
-In this chapter we have given a more detailed description of how the three fundamental methods of Spec: ==initializeWidgets==, ==defaultSpec== and ==initializePresenter== are each responsible for a different aspect of the user interface building process. Notably, we also discussed in detail the ability to use different layout methods and how the lookup of layout methods is performed.
+In this chapter we have given a more detailed description of how the three fundamental methods of Spec: ==initializeWidgets==, ==defaultSpec== and ==initializePresenter== are each responsible for a different aspect of the user interface building process. We also discussed in detail the ability to use different layout methods and how the lookup of layout methods is performed.
 
 @@note Although reuse is fundamental in Spec, we did not explicitly treat it in this chapter. Instead we refer to the previous chapter for more information.
