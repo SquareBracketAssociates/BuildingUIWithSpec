@@ -34,9 +34,9 @@ initDir:
 
 book: sbabook ./book-result/SpecBooklet.pdf
 
-chapters: $(PDFCHAPTERS)
+chapters: sbabook $(PDFCHAPTERS)
 
-htmlChapters: $(HTMLCHAPTERS)
+htmlChapters: sbabook $(HTMLCHAPTERS)
 
 .SECONDARY:
 
