@@ -1,4 +1,8 @@
-{ "title" : "Managing windows"}
+{
+	"metadata" : {
+		"title" : "Managing windows"
+	}
+}
 @cha_managing_windows
 
 @@todo JF REWRITE
@@ -81,7 +85,7 @@ In *@sec_textInputFieldModel*, acessor of the window is use.
 
 To set the about text of a window, either override the ==aboutText==
 method of the corresponding
-==ComposableModel== so that it returns the new about text, or send the 
+==ComposableModel== so that it returns the new about text, or send the
 instance the ==aboutText:== message before opening, for example like
 below.
 
@@ -98,7 +102,7 @@ below.
 
 To set the initial size of a window when it opens, either override the ==extent==
 method of the corresponding
-==ComposableModel== so that it returns a Point, or send the 
+==ComposableModel== so that it returns a Point, or send the
 instance the ==extent:== message before opening, for example like
 this:
 
@@ -145,7 +149,7 @@ depending on what button is clicked.
 		 container minus label: 'Smaller!'.
 		 container plus action: [ container window extent: 500@500].
 		 container minus action: [ container window extent: 200@200].
-		 container layout: 
+		 container layout:
 		 		   	(SpecColumnLayout composed
 								add: #plus; add: #minus; yourself).
 		container openWithSpec

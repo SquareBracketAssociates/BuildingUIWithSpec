@@ -1,4 +1,8 @@
-{ "title" : "Advanced Widgets"}
+{
+	"metadata" : {
+		"title" : "Advanced Widgets"
+	}
+}
 @cha_advanced_widgets
 
 @@todo JF REWRITE almost completely
@@ -47,12 +51,12 @@ DynamicalPopup >> initializeWidgets
 	self
 		layout:
 			(SpecLayout composed
-				newRow: [ :row | 
+				newRow: [ :row |
 					row
 						add: #label origin: 0 @ 0 corner: 0.3 @ 1;
 						add: #textInput origin: 0.3 @ 0 corner: 1 @ 1 ];
 				yourself).
-	
+
 	"specification of order of focus"
 	self focusOrder add: self textInput
 ]]]
@@ -272,21 +276,21 @@ And to control the following methods its behaviour, it should be defined only on
 [[[
 LittleToolbar >> configMainMenu
 	menu
-		addGroup: [ :group1 | 
+		addGroup: [ :group1 |
 			group1
-				addItem: [ :item | 
+				addItem: [ :item |
 					item
 						name: 'File';
 						subMenu: self createSubMenu ].
 			group1
-				addItem: [ :item | 
+				addItem: [ :item |
 					item
 						description: 'Open file';
 						icon: (Smalltalk ui icons iconNamed: #openIcon);
 						action: [ self inform: 'Open File' ] ] ];
-		addGroup: [ :group2 | 
+		addGroup: [ :group2 |
 			group2
-				addItem: [ :item | 
+				addItem: [ :item |
 					item
 						description: 'Add menu item';
 						icon: (Smalltalk ui icons iconNamed: #add);
@@ -298,16 +302,16 @@ LittleToolbar >> configMainMenu
 [[[
 LittleToolbar >> createSubMenu
 	^ MenuModel new
-		addGroup: [ :group | 
+		addGroup: [ :group |
 			group
-				addItem: [ :item | 
+				addItem: [ :item |
 					item
 						name: 'Save';
 						icon: (Smalltalk ui icons iconNamed: #smallSaveIcon);
 						shortcut: $s meta;
 						action: [ self inform: 'Save' ] ].
 			group
-				addItem: [ :item | 
+				addItem: [ :item |
 					item
 						name: 'Print';
 						shortcut: $p meta;
@@ -322,7 +326,7 @@ LittleToolbar >> createSubMenu
 [[[
 LittleToolbar >> dynamicalAdding: aGroup
 	aGroup
-		addItem: [ :item | 
+		addItem: [ :item |
 			item
 				name: 'Dynamic';
 				icon: (Smalltalk ui icons iconNamed: #delete);
@@ -341,4 +345,3 @@ The figure *@fig_LittleToolbar* show the result after two clicks on the button t
 @sec_TabModel
 
 @@todo JF write me
-

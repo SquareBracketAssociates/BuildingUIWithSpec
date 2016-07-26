@@ -1,8 +1,12 @@
-{ "title" : "The fundamentals of Spec"}
+{
+	"metadata" : {
+		"title" : "The fundamentals of Spec"
+	}
+}
 @cha_fundamentals_of_spec
 
-In this chapter we revisit the key aspects of Spec and put the important 
-customization points of its building process in perspective. 
+In this chapter we revisit the key aspects of Spec and put the important
+customization points of its building process in perspective.
 
 !! User interface building: a composition
 
@@ -55,7 +59,7 @@ The instantiation of the model for a widget can be done in two ways: through the
 - The second option is more general: to reuse a ==ComposableModel== subclass (other than the ones handled by the first option) the widget needs to be instantiated using the ==instantiate:== method. For example, to reuse a ==MessageBrowser==  widget, the code is ==self instantiate: MessageBrowser.==
 
 
-!! Defining UI Layouts 
+!! Defining UI Layouts
 @sec_layoutmethod
 
 Widget layout is defined by specifying methods that state how the different widgets that compose a UI are placed.
@@ -90,8 +94,8 @@ TwoButtons >> initializeWidgets
 	self focusOrder
 		add: button1;
 		add: button2
-]]]		
-		
+]]]
+
 [[[
 TwoButtons class >> buttonRow
 	<spec: #default>
@@ -106,10 +110,10 @@ TwoButtons class >> buttonCol
 		yourself
 ]]]
 
-This UI can be opened in multiple ways: 
+This UI can be opened in multiple ways:
 
 - ==TwoButtons new openWithSpec: #buttonRow== places the buttons in a row.
-- ==TwoButtons new openWithSpec: #buttonCol== places them in a column. 
+- ==TwoButtons new openWithSpec: #buttonCol== places them in a column.
 
 Note that the ==buttonRow== layout method has a ==<spec: #default>== pragma. As a result, the ==buttonRow== layout will be used when executing ==TwoButtons new openWithSpec==, as we explain next.
 

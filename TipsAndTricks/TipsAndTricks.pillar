@@ -1,11 +1,15 @@
-{ "title" : "Tips and Tricks"}
+{
+	"metadata" : {
+		"title" : "Tips and Tricks"
+	}
+}
 @cha_tips_and_tricks
 
 @@todo JF write some sections, check last section for more refs, do an editorial pass
 
 This chapter collects many small examples of features that may be of
 use when building user interfaces with Spec. For the sake of brevity,
-many examples use dynamic Spec (see chapter XXX), but these 
+many examples use dynamic Spec (see chapter XXX), but these
 of course also work with normal Spec.
 
 
@@ -20,7 +24,7 @@ e.g. a scrollable list of buttons that reveal information about the classes in t
 ListModel new
 	items:
 		('Files' asPackage classes
-			collect: [ :class | 
+			collect: [ :class |
 				ButtonModel new
 					icon: class systemIcon;
 					label: class name;
@@ -63,16 +67,16 @@ This code literally runs the tests sequences over the calculator GUI’s key but
 [[[
 setUp
   calculator := HP35CalculatorUIModel new.
-  calculator openWithSpec 
+  calculator openWithSpec
 
 tearDown
   calculator window close
 
 runSequence: script
-  script pairsDo: [ :key :result | 
+  script pairsDo: [ :key :result |
     (calculator perform: key) performAction.
-    self 
-      assert: calculator display text 
+    self
+      assert: calculator display text
       equals: result asString asUppercase ]
 ]]]
 
@@ -95,7 +99,7 @@ rendered in red, and use the Balloon font in Italic.
 		container red whenBuiltDo: [:ann|
 				  ann widget color: (Color red);
 				  	  font: BalloonMorph balloonFont emphasis: 2].
-		 container layout: 
+		 container layout:
 		 		   	(SpecLayout composed add: #red; yourself).
 		container openWithSpec
 ]]]
@@ -107,7 +111,7 @@ rendered in red, and use the Balloon font in Italic.
 There are multiple ways in which a table-like widget can be shown to the user. The most straightforward way is the ==MultiColumnListModel==, for example as below:
 
 [[[
-MultiColumnListModel new 
+MultiColumnListModel new
 	items: #(
 		('Origin' 'Destination' 'Start Time' 'Stop Time')
 		('Santiago' 'Paris' '15:30' '11:15')
@@ -124,7 +128,7 @@ Alternatively, a ==TreeModel== can be used, which allows for more fancy formatti
 r := FileLocator vmDirectory.
     m := TreeModel new.
     m roots: r allFiles.
-    m rootNodeHolder: [ :item | 
+    m rootNodeHolder: [ :item |
         TreeNodeModel new
             content: item;
             icon: Smalltalk ui icons smallLeftFlushIcon
@@ -132,7 +136,7 @@ r := FileLocator vmDirectory.
     title: r fullName.
     col1 := TreeColumnModel new
         displayBlock: [ :node | node content basename ];
-        headerLabel:'Name'.        
+        headerLabel:'Name'.
     col2 := TreeColumnModel new
         displayBlock: [ :node | node content creationTime ];
         headerLabel:'Time'.
@@ -145,7 +149,7 @@ r := FileLocator vmDirectory.
 
 !! Non-Editable Multi-Line Text
 
-The ==TextInputFieldModel== can be configured such that the text it contains is not editable, by disabling it: 
+The ==TextInputFieldModel== can be configured such that the text it contains is not editable, by disabling it:
 
 [[[
 TextInputFieldModel new
@@ -163,13 +167,13 @@ Adding items to a collection held in a list does not update the widget. To do th
 		count :=0.
 		container := DynamicComposableModel new.
 		container instantiateModels:  #(#list ListModel #plus ButtonModel).
-		container plus label: '+1'. 
+		container plus label: '+1'.
 		container plus action: [ | items |
 			count := count + 1.
 			items := container list getList asOrderedCollection.
 			items add: count asString.
 			container list items: items ].
-		container layout: 
+		container layout:
 		 		   	(SpecRowLayout composed
 						add: #list ; add: #plus ; yourself).
 		container openWithSpec
@@ -180,7 +184,7 @@ Adding items to a collection held in a list does not update the widget. To do th
 
 ==ComposableModel== provides a variable '''focusOrder''' and its accessors to managed the path followed by the focus. If it lets nil the default Object is set.
 
-[[[label=ex_focusOrder_acessor|caption=The getter ComposableModel focusOrder|language=Smalltalk 
+[[[label=ex_focusOrder_acessor|caption=The getter ComposableModel focusOrder|language=Smalltalk
 ComposableModel>>focusOrder
 	^ focusOrder ifNil: [ focusOrder := SpecFocusOrder new ]
 ]]]
@@ -193,7 +197,7 @@ SpecFocusOrder manages models in an OrderedCollection (presenters) and provides 
 
 @@todo check if for: aModel is mandatory
 
-[[[label=ex_focusOrder_giveFocusToNextFrom|caption=The method SpecFocusOrder giveFocusToNextFrom|language=Smalltalk 
+[[[label=ex_focusOrder_giveFocusToNextFrom|caption=The method SpecFocusOrder giveFocusToNextFrom|language=Smalltalk
 SpecFocusOrder>>giveFocusToNextFrom: aPresenter for: aModel
 	| focus |
 	focus := self presenters.
@@ -210,7 +214,7 @@ SpecFocusOrder>>giveFocusToNextFrom: aPresenter for: aModel
 			next takeKeyboardFocus.
 			true ]
 		ifNotNil: [ aModel owner giveFocusToNextFrom: aModel.
-			true ]	
+			true ]
 ]]]
 
 That method looks for the next model to give the focus through these steps:
@@ -232,4 +236,3 @@ That method looks for the next model to give the focus through these steps:
 - ==AbstractWidgetModel== subclasses sometimes provide examples in their class side, the most part of them are in the package Spec-core in the protocol Widget
 
 @@todo fill locations of others examples / revisit it
-

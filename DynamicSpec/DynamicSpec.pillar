@@ -1,12 +1,16 @@
-{ "title" : "Dynamic Spec"}
+{
+	"metadata" : {
+		"title" : "Dynamic Spec"
+	}
+}
 @cha_dynamic_spec
 
 @@todo JF REWRITE
 
 !! ProtocolBrowser dynamic Version
 
-Having an user interface with a well known number of sub widgets and a static layout is not always sufficient. 
-A user interface is often more than just that, for example here are two situations where more is needed: 
+Having an user interface with a well known number of sub widgets and a static layout is not always sufficient.
+A user interface is often more than just that, for example here are two situations where more is needed:
 First, when the layout of the user interface needs to be changed at runtime to match the execution context of the software.
 Second, sub widgets are added or removed at runtime and therefore the programmer needs to be able to parametrize those new sub widgets on the fly.
 
@@ -32,7 +36,7 @@ The message ==needRebuild: false== needs to be sent to any of those sub widgets.
 
 For example, if a model comprising a ''button'' and a ''list'' just wants to rearrange the position of these UI elements, there is no need to rebuild them. As shown in the example *@ex_needRebuild*
 
-[[[label=ex_needRebuild|caption=How to need rebuild sub widgets|language=Smalltalk 
+[[[label=ex_needRebuild|caption=How to need rebuild sub widgets|language=Smalltalk
 rebuildWithNewLayout
 	| newLayout |
 
@@ -60,7 +64,7 @@ This allows for a widget to be accessed by sending a message whose selector is t
 
 By example, if a widget named ==button== is created, then this widget can be accessed by calling ==self button== as shown in the example *@ex_dynamic_creation*.
 
-[[[label=ex_dynamic_creation|caption=Dynamic creation of a widget|language=Smalltalk 
+[[[label=ex_dynamic_creation|caption=Dynamic creation of a widget|language=Smalltalk
 	self instantiateModels: #( button ButtonModel ).
 	self button label: 'Click me'.
 ]]]
@@ -105,14 +109,14 @@ The final result looks like the Figure *@fig_browser*.
 	dynamicProtocolViewer assign: dynamicWidgetClassList to: #classes.
 	dynamicProtocolViewer instantiateModels: #(#methods #ListModel).
 	dynamicWidgetClassList list
-		whenSelectedItemChanged: [ :item | 
+		whenSelectedItemChanged: [ :item |
 			item
 				ifNil: [ dynamicProtocolViewer methods items: #() ]
 				ifNotNil: [ dynamicProtocolViewer methods items: (item selectorsInProtocol: 'api') sorted ] ].
 	dynamicProtocolViewer
 		layout:
 			(SpecLayout composed
-				newRow: [ :r | 
+				newRow: [ :r |
 					r
 						add: #classes;
 						add: #methods ];
@@ -122,14 +126,14 @@ The final result looks like the Figure *@fig_browser*.
 	dynamicProtoclBrowser assign: dynamicProtocolViewer to: #top.
 	dynamicProtoclBrowser instantiateModels: #(#text #TextModel).
 	dynamicProtocolViewer methods
-		whenSelectedItemChanged: [ :selector | 
+		whenSelectedItemChanged: [ :selector |
 			selector
 				ifNil: [ dynamicProtoclBrowser text text: '' ]
 				ifNotNil: [ dynamicProtoclBrowser text text: (dynamicWidgetClassList list selectedItem >> selector) sourceCode ] ].
 	dynamicProtoclBrowser
 		layout:
 			(SpecLayout composed
-				newColumn: [ :c | 
+				newColumn: [ :c |
 					c
 						add: #top;
 						add: #text ];
@@ -139,4 +143,3 @@ The final result looks like the Figure *@fig_browser*.
 ]]]
 
 +Prototype of Protocol Browser>file://figures/Dyn_Protocol_Browser.png|width=50|label=fig_browser+
-

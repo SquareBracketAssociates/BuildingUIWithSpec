@@ -1,5 +1,6 @@
 %!TEX TS-program = lualatex
 % -*- mode: LaTeX; -*-
+% -*- mode: latex; -*- mustache tags: {{=« »=}} «! the '&' below prevents HTML escaping. »
 \documentclass[10pt,twoside,english]{support/latex/sbabook/sbabook}
 \let\wholebook=\relax
 
@@ -116,17 +117,7 @@
 
 \mainmatter
 
-\input{Intro/Intro}
-\input{FirstContact/FirstContact}
-\input{Reuse/Reuse}
-\input{ThreePillarsOfSpec/ThreePillarsOfSpec}
-\input{LayoutsContruction/LayoutsContruction}
-\input{ManagingWindow/ManagingWindow}
-\input{AdvancedWidgets/AdvancedWidgets}
-\input{DynamicSpec/DynamicSpec}
-\input{TipsAndTricks/TipsAndTricks}
-\input{SpecInternals/SpecInternals}
-
+«& content»
 
 % lulu requires an empty page at the end. That's why I'm using
 % \backmatter here.

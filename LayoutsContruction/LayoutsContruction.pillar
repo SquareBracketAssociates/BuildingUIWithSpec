@@ -1,4 +1,8 @@
-{ "title" : "Layout Construction"}
+{
+	"metadata" : {
+		"title" : "Layout Construction"
+	}
+}
 @cha_layout_construction
 
 Placing and describing the behavior of widgets on resizing of their container is an important yet complex issue. In this chapter we present the different ways to express layouts with Spec.
@@ -20,7 +24,7 @@ We discuss in depth two broad strategies for laying out widgets: first the vario
 Each of them has their advantages and disadvantages depending on the kind of UI that is being constructed so it is best to know all of them well enough to be able to make the tradeoff.
 
 
-!!! A working example 
+!!! A working example
 To illustrate these layouts, we use an example class that has two buttons, a list and a text field, the non-layout code of which is below:
 
 [[[
@@ -113,7 +117,7 @@ LayoutExample >> oneColumnConcise
 
 !! Combining rows and columns
 
-Rows and columns can be combined to build more complex layouts, by sending both the ==newRow:== and ==newColumn:== messages in different combinations. 
+Rows and columns can be combined to build more complex layouts, by sending both the ==newRow:== and ==newColumn:== messages in different combinations.
 We show some examples here to illustrate the possibilities.
 
 The first example shows how we can have two rows of widgets: we create a column and twice call ==newRow:==. The result is shown in Figure *@fig_TwoRows*.
@@ -197,7 +201,7 @@ LayoutExample >> oneColumnWithSplitter
 
 !!! Size in pixels
 
-Programmatically it is possible to explicitly specify the absolute size of a row or column in pixels by using the ==newRow:height:== and ==newColumn:width:== methods. 
+Programmatically it is possible to explicitly specify the absolute size of a row or column in pixels by using the ==newRow:height:== and ==newColumn:width:== methods.
 This is useful, for example, if a row of buttons is to be placed above or below a text field where it can avoid an ugly layout with huge buttons as seen previously in Figure *@fig_TwoRows*.
 
 We show two simple examples of the use of absolute size below, the first leading to the UI of Figure *@fig_Row30pixels* and the second to the UI of Figure *@fig_Column50pixels*.
@@ -333,7 +337,7 @@ These points express the number of pixels from the corresponding corner, in the 
 Consequently, the ==x== or ==y== component can be negative representing an offset towards the left, respectively the top.
 
 For example, the code below lays out two buttons on top of each other.
-Each of them takes half the space of the window, minus the window border of 10 pixels and a the space between them of 10 pixels. 
+Each of them takes half the space of the window, minus the window border of 10 pixels and a the space between them of 10 pixels.
 
 [[[
 LayoutExample >> twoButtonsRelativeOffset
@@ -356,7 +360,7 @@ The layout code for this example is below, and the result can be seen in Figure 
 [[[
 CustomerSatisfaction class >> defaultSpec
 	^ SpecLayout composed
-		newRow: [ :row | 
+		newRow: [ :row |
 				row add: #buttonHappy; add: #buttonNeutral; add: #buttonBad ]
 			origin: 0 @ 0 corner: 1 @ 0.7;
 		newRow: [ :row |
