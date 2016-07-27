@@ -7,3 +7,4 @@ pharo-ui
 pharo-vm/
 pillar
 pillarPostExport.sh
+mustache

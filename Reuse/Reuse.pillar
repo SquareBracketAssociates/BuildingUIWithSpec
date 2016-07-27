@@ -1,11 +1,15 @@
-{ "title" : "Reusing and composing elements"}
+{
+	"metadata" : {
+		"title" : "Reusing and composing elements"
+	}
+}
 @cha_reuse
 
 A key design goal of Spec is to enable the seamless reuse of user interfaces as widgets for the user interface you are building. The reason for this is that it results in a significant productivity boost when creating user interfaces.
 
 This focus on reuse was actually already visible in the previous chapter, where we have seen that basic widgets can be used as if they were a complete user interface. In this section we focus on the reuse and composition of widgets, showing that it basically comes for free. The only requirement when building a UI is to consider how the user interface should be parameterized when it is being reused, and there is only one concrete rule that needs to be followed in that respect.
 
-In this chapter, you will learn how we can build a new UI by reusing already defined elements. 
+In this chapter, you will learn how we can build a new UI by reusing already defined elements.
 
 !! First requirements
 
@@ -19,7 +23,7 @@ To show how Spec enables the composition and reuse of user interfaces, in this c
 # The ""ProtocolBrowser"" : reuses a ==ProtocolViewer==, changes its layout and adds a ==TextModel== to see the source code of the methods.
 
 
-!! Creating a basic UI to be reused as a widget 
+!! Creating a basic UI to be reused as a widget
 @sec_WidgetClassList
 
 The first custom UI we build should display a list of all subclasses of
@@ -66,7 +70,7 @@ WidgetClassList >> whenSelectedItemChanged: aBlock
 	list whenSelectedItemChanged: aBlock
 ]]]
 
-Now, whoever reuses this widget can parameterize it with a block that will be executed whenever the selected item is changed. 
+Now, whoever reuses this widget can parameterize it with a block that will be executed whenever the selected item is changed.
 
 @@note The only rule for reuse of Spec widgets is that all public configuration methods of your UI should be contained in a ==api== protocol. This is to make it easier for reusers of this widget to discover how it can be parameterized. We will discuss the topic of a public configuration API in Section *@sec_public_API* at the end of this chapter.
 
@@ -155,10 +159,10 @@ ProtocolViewer >> initializeWidgets
 	models := self instantiate: WidgetClassList.
 	api := self instantiate: ProtocolMethodList.
 	events := self instantiate: ProtocolMethodList.
-	
+
 	api label: 'api'.
 	events label: 'api-events'.
-		
+
 	self focusOrder add: models; add: api; add: events.
 ]]]
 
@@ -176,10 +180,10 @@ ProtocolViewer >> initializePresenter
 		events resetSelection.
 		class
 			ifNil: [ api items: #(). events items: #() ]
-			ifNotNil: [ 
+			ifNotNil: [
 				api items: (self methodsIn: class for: 'api').
 				events items: (self methodsIn: class for: 'api-events') ] ].
-	
+
 	api whenSelectedItemChanged: [ :method |
  		method ifNotNil: [ events resetSelection ] ].
 	events whenSelectedItemChanged: [ :method |
@@ -244,11 +248,11 @@ ProtocolBrowser >> initializeWidgets
 	text
 		aboutToStyle: true;
 		isCodeCompletionAllowed: true.
-	self focusOrder 
+	self focusOrder
 		add: viewer;
 		add: text.
 ]]]
-[[[	
+[[[
 ProtocolBrowser >> title
 	^'Spec Protocol Browser'
 ]]]
@@ -262,12 +266,12 @@ The ==initalizePresenter== method is used to make the text zone react to a selec
 [[[
 ProtocolBrowser >> initializePresenter
 	viewer whenClassChanged: [ :class | text behavior: class ].
-	viewer whenAPIChanged: [ :item | 
-		item 
+	viewer whenAPIChanged: [ :item |
+		item
 			ifNil: [ text text: '' ]
 			ifNotNil: [ text text: item sourceCode ] ].
-	viewer whenEventChanged: [ :item | 
-		item 
+	viewer whenEventChanged: [ :item |
+		item
 			ifNil: [ text text: '' ]
 			ifNotNil: [ text text: item sourceCode ] ]
 ]]]
@@ -277,9 +281,9 @@ The last piece of the puzzle is the layout of the different widgets that we are 
 [[[
 ProtocolBrowser class >> defaultSpec
 	^ SpecLayout composed newColumn: [:col |
-			col newRow: [ :row | 
+			col newRow: [ :row |
 				row add: #(viewer models);
-					 	newColumn: [ :col2 | 
+					 	newColumn: [ :col2 |
 							col2 add: #(viewer api);
 								   add: #(viewer events) ] ];
 					  add: #text];
@@ -294,15 +298,15 @@ This concludes the last example of this chapter, and the result can be seen in t
 @sec_public_API
 
 In this chapter we have seen several definitions of methods in the public configuration API of the widget being built.
-The implementation of our configuration methods here simply delegated to internal widgets, but a configuration can of course be more complex than that, depending on the internal logic of the UI. 
+The implementation of our configuration methods here simply delegated to internal widgets, but a configuration can of course be more complex than that, depending on the internal logic of the UI.
 
 For methods that simply delegate to the internal widgets, the question is whether it makes sense to define these as methods in the ==api== protocols at all.
 This fundamentally is a design decision to be made by the programmer.
 Not having such methods makes the implementation of the widget more lightweight but comes at a cost of a less clear intent and of breaking encapsulation.
 
 For the former cost, we have seen an example in the protocol method list of Section *@sec_protocollist*.
-The presence of the three methods defined there communicates to the user that we care about what to do when a class, ==api== or ==api-events== list item has been changed. 
-The same fundamentally also holds for the other examples in this chapter: each method in an ==api== protocol communicates an intent to the reuser: this is how we expect that this widget will be configured. 
+The presence of the three methods defined there communicates to the user that we care about what to do when a class, ==api== or ==api-events== list item has been changed.
+The same fundamentally also holds for the other examples in this chapter: each method in an ==api== protocol communicates an intent to the reuser: this is how we expect that this widget will be configured.
 Without such declared methods, it is less clear to the reuser what can to be done to be able to effectively reuse this widget.
 
 For the latter cost, expecting reusers of the widget to directly send messages to internal objects (in instance variables) means breaking encapsulation.
