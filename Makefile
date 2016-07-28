@@ -51,7 +51,7 @@ $(OUTPUTDIRECTORY)/%.pillar: $(OUTPUTDIRECTORY)/%.pillar.json
 	./mustache --data=$< --template=${PILLARTEMPLATE} > $@
 
 $(OUTPUTDIRECTORY)/SpecBooklet.tex.json: SpecBooklet.pillar copySupport
-	./pillar export --to="latex:sbabook" --outputFile=$* $<
+	./pillar export --to="latex:sbabook" --outputFile=SpecBooklet $<
 
 $(OUTPUTDIRECTORY)/%.tex.json: %.pillar copySupport
 	./pillar export --to="latex:sbabook" --outputFile=$* $<
