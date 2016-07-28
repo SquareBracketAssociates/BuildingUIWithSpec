@@ -45,16 +45,16 @@ sbabook:
 
 #Tex compilation
 $(OUTPUTDIRECTORY)/%.pillar.json: %.pillar copySupport
-	./pillar export --to="Pillar by chapter" --path="${<}" $<
+	./pillar export --to="Pillar by chapter" --outputFile=$* $<
 
 $(OUTPUTDIRECTORY)/%.pillar: $(OUTPUTDIRECTORY)/%.pillar.json
 	./mustache --data=$< --template=${PILLARTEMPLATE} > $@
 
 $(OUTPUTDIRECTORY)/SpecBooklet.tex.json: SpecBooklet.pillar copySupport
-	./pillar export --to="latex:sbabook" --path="${<}" $<
+	./pillar export --to="latex:sbabook" --outputFile=$* $<
 
 $(OUTPUTDIRECTORY)/%.tex.json: %.pillar copySupport
-	./pillar export --to="latex:sbabook" --path="${<}" $<
+	./pillar export --to="latex:sbabook" --outputFile=$* $<
 
 $(OUTPUTDIRECTORY)/SpecBooklet.tex: $(OUTPUTDIRECTORY)/SpecBooklet.tex.json
 	./mustache --data=$< --template=${BOOKLATEXTEMPLATE} > $@
@@ -68,7 +68,7 @@ $(OUTPUTDIRECTORY)/%.pdf: $(OUTPUTDIRECTORY)/%.tex
 
 #HTML compilation
 $(OUTPUTDIRECTORY)/%.html.json: %.pillar copySupport
-	./pillar export --to="html" --path="${<}" $<
+	./pillar export --to="html" --outputFile=$* $<
 
 $(OUTPUTDIRECTORY)/%.html: $(OUTPUTDIRECTORY)/%.html.json
 	./mustache --data=$< --template=${HTMLTEMPLATE} > $@
