@@ -7,9 +7,31 @@
 
 @@todo JF REWRITE
 
-@@todo JF we need to present an existing CM to customize as the example here. We can use customerSatisfaction of the first section.
 
 @@todo JF give more informations about modal (setModal: aWindow).
+
+!!! A working example
+
+To illustrate the window configuration options that are available, we use a simple example class that has two buttons placed side by side:
+
+[[[
+ComposableModel subclass: #WindowExample
+	instanceVariableNames: 'button1 button2'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+]]]
+[[[
+WindowExample >> initializeWidgets
+	button1 := self newButton.
+	button2 := self newButton.
+	button1 label: '+'.
+	button2 label: '-'.
+]]]
+[[[
+WindowExample class >>defaultSpec
+	^SpecRowLayout composed
+            add: #button1; add: #button2; yourself.
+]]]
 
 !! Open the Window
 
@@ -116,41 +138,31 @@ this:
 
 !! Make a fixed size window, without any window control widgets
 
-@@todo write some nice text here
+Sometimes it makes sense to have a window that has no control widgets at all, or to make it impossible to resize it. Currently these actions cannot be performed on the ==ComposableModel== of that window, but the underlying widget library may allow it. Below we show how to get the ==Morphic== window of our example and instruct it to be unresizable and remove all control widgets:
 
 [[[
-	| win |
-	win := TextInputFieldModel new openWithSpec window.
-	win beUnresizeable;
+	| model |
+	model := WindowExample new openWithSpec.
+	model window beUnresizeable;
 		removeCollapseBox;
 		removeExpandBox;
 		removeCloseBox;
 		removeMenuBox
 ]]]
 
-@@note This window is still closable using the halo menus.
+@@note This window is still closable using the halo menus or by calling ==close== on the ==ComposableModel== instance (==model== in the example above).
 
 !! Dynamically Change the Size of a Window
 
-@@todo JF change this example so that it does not use dynamic spec
-
-Windows can be dynamically resized by sending the corresponding
-==WindowModel== the ==extent:== message. To get a handle on the
-==WidowModel== of a ==ComposableModel== instance, send it the
-==window== message (after it has been opened with
-==openWithSpec==). For example, below a window that resizes itself
-depending on what button is clicked.
+Windows can be dynamically resized by sending the corresponding ==WindowModel== the ==extent:== message. To get a handle on the ==WidowModel== of a ==ComposableModel== instance, send it the ==window== message (after it has been opened with ==openWithSpec==). For example, we can change the ==initializeWidgets== method of our example so that the window resizes itself depending on what button is clicked.
 
 [[[
-		 |container|
-		 container := DynamicComposableModel new.
-		 container instantiateModels:  #(#plus ButtonModel #minus ButtonModel).
-		 container plus label: 'Bigger!'.
-		 container minus label: 'Smaller!'.
-		 container plus action: [ container window extent: 500@500].
-		 container minus action: [ container window extent: 200@200].
-		 container layout:
-		 		   	(SpecColumnLayout composed
-								add: #plus; add: #minus; yourself).
-		container openWithSpec
+WindowExample >> initializeWidgets
+	button1 := self newButton.
+	button2 := self newButton.
+	button1 label: '+'.
+	button2 label: '-'.
+	button1 action: [ self window extent: 500@200].
+	button2 action: [ self window extent: 200@100].
 ]]]
+
