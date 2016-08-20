@@ -12,25 +12,25 @@
 
 !!! A working example
 
-To illustrate the window configuration options that are available, we use a simple example class that has two buttons placed side by side:
+To illustrate the window configuration options that are available, we use a simple ==WindowExample== class that has two buttons placed side by side. These buttons do not have any behavior associated yet, this will be added in an example at the end of the chapter.
 
 [[[
 ComposableModel subclass: #WindowExample
-	instanceVariableNames: 'button1 button2'
-	classVariableNames: ''
-	package: 'Spec-BuildUIWithSpec'
+   instanceVariableNames: 'button1 button2'
+   classVariableNames: ''
+   package: 'Spec-BuildUIWithSpec'
 ]]]
 [[[
 WindowExample >> initializeWidgets
-	button1 := self newButton.
-	button2 := self newButton.
-	button1 label: '+'.
-	button2 label: '-'.
+   button1 := self newButton.
+   button2 := self newButton.
+   button1 label: '+'.
+   button2 label: '-'.
 ]]]
 [[[
 WindowExample class >>defaultSpec
-	^SpecRowLayout composed
-            add: #button1; add: #button2; yourself.
+   ^ SpecRowLayout composed
+         add: #button1; add: #button2; yourself.
 ]]]
 
 !! Open the Window
@@ -101,68 +101,72 @@ In *@sec_textInputFieldModel*, acessor of the window is use.
 
 @@note JF ALL BELOW IS CUT-PASTE FROM TIPS AND TRICKS
 
-@@note JF what is the story of initialExtent versus extent redefine? The latter does not allow for reuse of the CM since it hardcodes the size? Note text from Stef: "initialExtent should be put into (do not forget to say that this is only for window"
+
 
 !! Setting the About text of a Window
 
-To set the about text of a window, either override the ==aboutText==
-method of the corresponding
-==ComposableModel== so that it returns the new about text, or send the
-instance the ==aboutText:== message before opening, for example like
-below.
+To set the about text of a window, either override the ==aboutText== method of the corresponding
+==ComposableModel== so that it returns the new about text, or send the instance the ==aboutText:== message before opening, for example like below.
 
 [[[
-	| inputField |
-	inputField := TextInputFieldModel new.
-	inputField
-		aboutText: 'This is an empty text Field'.
-	inputField openWithSpec
+| we |
+ we := WindowExample new.
+ we aboutText: 'But what do the buttons do?'.
+ we openWithSpec
 ]]]
 
 
-!! Setting the Initial size of a Window When it Opens
+!! Window Size and Decoration
+
+We now focus on sizing a window before and after opening it, and then talk about removing the different control widgets that decorate the window.
+
+!!! Setting Initial Size and Changing Size
 
 To set the initial size of a window when it opens, either override the ==extent==
-method of the corresponding
-==ComposableModel== so that it returns a Point, or send the
-instance the ==extent:== message before opening, for example like
-this:
+method of the corresponding ==ComposableModel== so that it returns a Point, or send the
+instance the ==extent:== message before opening, for example like this:
 
 [[[
-	| inputField |
-	inputField := TextInputFieldModel new.
-	inputField
-		extent: 500@600.
-	inputField openWithSpec
+| we |
+ we := WindowExample new.
+ we extent: 300@80.
+ we openWithSpec
 ]]]
 
-!! Make a fixed size window, without any window control widgets
-
-Sometimes it makes sense to have a window that has no control widgets at all, or to make it impossible to resize it. Currently these actions cannot be performed on the ==ComposableModel== of that window, but the underlying widget library may allow it. Below we show how to get the ==Morphic== window of our example and instruct it to be unresizable and remove all control widgets:
-
-[[[
-	| model |
-	model := WindowExample new openWithSpec.
-	model window beUnresizeable;
-		removeCollapseBox;
-		removeExpandBox;
-		removeCloseBox;
-		removeMenuBox
-]]]
-
-@@note This window is still closable using the halo menus or by calling ==close== on the ==ComposableModel== instance (==model== in the example above).
-
-!! Dynamically Change the Size of a Window
-
-Windows can be dynamically resized by sending the corresponding ==WindowModel== the ==extent:== message. To get a handle on the ==WidowModel== of a ==ComposableModel== instance, send it the ==window== message (after it has been opened with ==openWithSpec==). For example, we can change the ==initializeWidgets== method of our example so that the window resizes itself depending on what button is clicked.
+After a window is opened, it can also be resized by sending the ==extent:== message. However, this message needs to be sent to the ==WindowModel== that corresponds to the opened ==ComposableModel==. To get a handle on the ==WidowModel==, send the ==window== message (after the UI has been opened with ==openWithSpec==). For example, we can change the ==initializeWidgets== method of our example so that the window resizes itself depending on what button is clicked.
 
 [[[
 WindowExample >> initializeWidgets
-	button1 := self newButton.
-	button2 := self newButton.
-	button1 label: '+'.
-	button2 label: '-'.
-	button1 action: [ self window extent: 500@200].
-	button2 action: [ self window extent: 200@100].
+  button1 := self newButton.
+  button2 := self newButton.
+  button1 label: '+'.
+  button2 label: '-'.
+  button1 action: [ self window extent: 500@200].
+  button2 action: [ self window extent: 200@100].
 ]]]
 
+!!! Fixed Size
+
+The size of a window can be made fixed, so that the user cannot resize it by dragging the sides or corners. To configure this we however need to talk to the underlying widget library (==Morphic== in Pharo 5).  We get the ==Morphic== window of our example and instruct it to be unresizable as follows: 
+
+[[[
+| model |
+ model := WindowExample new openWithSpec.
+ model window beUnresizeable
+]]]
+
+!!! Removing Window Decoration
+
+Sometimes it makes sense to have a window without decoration, i.e. without control widgets. Currently this configuration cannot be performed on the ==ComposableModel== of that window, but the underlying widget library may allow it. Below we show how to get the ==Morphic== window of our example and instruct it to remove the different control widgets:
+
+[[[
+| model |
+ model := WindowExample new openWithSpec.
+ model window
+    removeCollapseBox;
+    removeExpandBox;
+    removeCloseBox;
+    removeMenuBox
+]]]
+
+@@note This window is still closable using the halo menus or by calling ==close== on the ==ComposableModel== instance (==model== in the example above).
