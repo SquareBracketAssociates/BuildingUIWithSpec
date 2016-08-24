@@ -8,8 +8,6 @@
 @@todo JF REWRITE
 
 
-@@todo JF give more informations about modal (setModal: aWindow).
-
 !!! A working example
 
 To illustrate the window configuration options that are available, we use a simple ==WindowExample== class that has two buttons placed side by side. These buttons do not have any behavior associated yet, this will be added in an example at the end of the chapter.
@@ -33,48 +31,10 @@ WindowExample class >>defaultSpec
          add: #button1; add: #button2; yourself.
 ]]]
 
-!! Open the Window
-
-@@todo JF This should clarify the situation of opening a normal window vs opening a dialog box vs opening a modal dialog box + what's up with DialogModel.
-
-==ComposableModel== provides methods to open a window containing a widget.
-==openWithSpec== is the most basic.
-Here, it will use the layout provide by the method containing the pragma "<spec: #default>" and should give the figure *@fig_Customers_Basic*.
-Further information about the layout lookup are given in the Chapter *@cha_deeper_into_spec*
-
-[[[language=Smalltalk
-CustomerStatisfaction new openWithSpec
-]]]
-
-+Render of CustomerStatisfaction>file://figures/Customers_Basic.png|width=50|label=fig_Customers_Basic+
-
-Another method of ==ComposableModel==, ==openDialogWithSpec==, open the model in a dialog window, the following code should give the figure *@fig_Customers_Dialog*.
-
-[[[language=Smalltalk
-CustomerStatisfaction new openDialogWithSpec
-]]]
-
-+Render of CustomerStatisfaction in a Dialog Window>file://figures/Customers_Dialog.png|width=50|label=fig_Customers_Dialog+
-
 
 
 !! Methods provided by ComposableModel
 
-!!! The Title
-
-By default, the title of a new window of a ==ComposableModel== is '''Untitled window'''.
-
-Overide the ==title== method in the subclass change the title of the window, like the call at the ==title:== method.
-
-[[[caption=Code of CustomerStatisfaction class >> title|language=Smalltalk|
-CustomerStatisfaction >> title
-	^ 'Customers satisfaction'
-]]]
-
-
-!!! The initial size
-
-Similarly at the setting of the title, overide the ==initialExtent== method set the initial size of the window. ==ComposableModel== provide the message ==extent:== to do that, but it must be called before the method to instanciate the window.
 
 @@todo may explain the following methods of ==ComposableModel==:
 - hasWindow
@@ -83,44 +43,58 @@ Similarly at the setting of the title, overide the ==initialExtent== method set 
 - askOkToClose:
 
 
+!!Opening a window or a dialog box
 
-!! The Window
+!!!Opening and closing a window
 
-==ComposableModel== provide the accessor ==window== to access at the instance of the created window.
-- ==openWithSpec== create an instance of WindowModel
-- ==openDialogWithSpec== create an instance of DialogWindowModel (a subclass of WindowModel)
+== WindowExample new openWithSpec == ==openWithSpec:== and ==openWithSpecLayout:==  creates an instance of ==WindowModel==
 
+!!!Opening a dialog box and its configuration options
 
-@@todo may explain the API methods of windows
-- okAction:
+Spec provides for an easy way to open a UI as a simple dialog box with ''Ok'' and ''Cancel'' buttons (that has no icons for resizing, closing or the window menu). To do this, send the message ==openDialogWithSpec== as below:
 
-The default toolbar of the ==DialogWindowModel== has an ''Ok'' button and a ''Cancel'' button.
-In *@sec_textInputFieldModel*, acessor of the window is use.
+[[[
+| we diag |
+ we := WindowExample new. 
+ diag := we openDialogWithSpec.
+]]]
 
+The result of this (e.g. assigned to the ==diag== variable above) is an instance of the  ==DialogWindowModel== class (a subclass of ==WindowModel==).  ==openDialogWithSpec== has the same variants as ==openWindowWithSpec== that take a specific layout as argument.
 
+The ==DialogWindowModel== instance can also be configured in multiple ways. To execute code when the user clicks on a button, send it the ==okAction:== or ==cancelAction:== message with a zero-argument block. If the block returns ==false== the window will not be closed (if it returns anything else it will be closed). This allows for validation of the contents of the dialog box, only allowing it to be closed if validation succeeds. Complimentarily, the ''OK'' button can be grayed out by sending the ==okButtonEnabled: false== message, and enabled again with a ==true== argument.
 
-@@note JF ALL BELOW IS CUT-PASTE FROM TIPS AND TRICKS
+Also, after a dialog box has been closed the message ==cancelled== will return ==true== if the box was closed by clicking on the ''Cancel'' button.
 
+!! Making the window modal or acting on window close
 
+A modal window is a window that takes control of the entire Pharo user interface, making it impossible for the user to select another window while it is open. This is especially useful for dialog boxes, but may also be needed for other kinds of windows.
 
-!! Setting the About text of a Window
-
-To set the about text of a window, either override the ==aboutText== method of the corresponding
-==ComposableModel== so that it returns the new about text, or send the instance the ==aboutText:== message before opening, for example like below.
+Spec allows any window to be made modal by sending the message ==modalRelativeTo: World== to the ==WindowModel== that corresponds to the opened ==ComposableModel==. To get a handle on the ==WidowModel==, send the ==window== message (after the UI has been opened with ==openWithSpec==). 
 
 [[[
 | we |
- we := WindowExample new.
- we aboutText: 'But what do the buttons do?'.
- we openWithSpec
+ we := WindowExample new. 
+ we openWithSpec.
+ we window modalRelativeTo: World
+]]]
+
+@@note The argument of ==modalRelativeTo:== should always be the root of the currently shown widget hierarchy: ==World==. 
+
+It is also possible to perform an action whenever a window is closed, by sending the ==whenClosedDo:== message to the UI's ==WindowModel==. For example, below we specify a goodbye message to deliver when our example UI is closed.
+
+[[[
+| we |
+ we := WindowExample new. 
+ we openWithSpec.
+ we window whenClosedDo: [ UIManager default inform: 'Bye bye!' ].
 ]]]
 
 
-!! Window Size and Decoration
+!! Window size and decoration
 
 We now focus on sizing a window before and after opening it, and then talk about removing the different control widgets that decorate the window.
 
-!!! Setting Initial Size and Changing Size
+!!! Setting initial size and changing size
 
 To set the initial size of a window when it opens, either override the ==extent==
 method of the corresponding ==ComposableModel== so that it returns a Point, or send the
@@ -133,7 +107,7 @@ instance the ==extent:== message before opening, for example like this:
  we openWithSpec
 ]]]
 
-After a window is opened, it can also be resized by sending the ==extent:== message. However, this message needs to be sent to the ==WindowModel== that corresponds to the opened ==ComposableModel==. To get a handle on the ==WidowModel==, send the ==window== message (after the UI has been opened with ==openWithSpec==). For example, we can change the ==initializeWidgets== method of our example so that the window resizes itself depending on what button is clicked.
+After a window is opened, it can also be resized by sending the ==extent:== message to the window of the UI. For example, we can change the ==initializeWidgets== method of our example so that the window resizes itself depending on what button is clicked.
 
 [[[
 WindowExample >> initializeWidgets
@@ -145,28 +119,64 @@ WindowExample >> initializeWidgets
   button2 action: [ self window extent: 200@100].
 ]]]
 
-!!! Fixed Size
+!!! Fixed size
 
-The size of a window can be made fixed, so that the user cannot resize it by dragging the sides or corners. To configure this we however need to talk to the underlying widget library (==Morphic== in Pharo 5).  We get the ==Morphic== window of our example and instruct it to be unresizable as follows: 
+The size of a window can be made fixed, so that the user cannot resize it by dragging the sides or corners. To configure this we however need to talk to the underlying widget library (==Morphic== in Pharo 5).  We get the ==Morphic== window of our example (via its ==WindowModel==) and instruct it to be unresizable as follows: 
 
 [[[
-| model |
- model := WindowExample new openWithSpec.
- model window beUnresizeable
+| wewin |
+ wewin := WindowExample new openWithSpec.
+ wewin window beUnresizeable
 ]]]
 
-!!! Removing Window Decoration
+!!! Removing window decoration
 
 Sometimes it makes sense to have a window without decoration, i.e. without control widgets. Currently this configuration cannot be performed on the ==ComposableModel== of that window, but the underlying widget library may allow it. Below we show how to get the ==Morphic== window of our example and instruct it to remove the different control widgets:
 
 [[[
-| model |
- model := WindowExample new openWithSpec.
- model window
+| wewin |
+ wewin := WindowExample new openWithSpec.
+ wewin window
     removeCollapseBox;
     removeExpandBox;
     removeCloseBox;
     removeMenuBox
 ]]]
 
-@@note This window is still closable using the halo menus or by calling ==close== on the ==ComposableModel== instance (==model== in the example above).
+@@note This window is still closable using the halo menus or by calling ==close== on the ==WindowModel== instance (==wewin== in the example above).
+
+
+!! Window title and about text
+
+You can provide some textual information about the widow by providing a title and a text for the window's about dialog, as we show here.
+
+!!! Setting and changing the title
+
+By default, the title of a new window is '''Untitled window'''. This can be changed by overriding the ==title== method (of ==ComposableModel==) and returning a string that will be used as a title. For example, we can title our example user interface as follows:
+
+[[[
+WindowExample >> title
+   ^ 'Click to grow or shrink.'
+]]]
+
+In addition, you can set the title of any UI after it has been opened (even if it specifies a ==title== method) by sending the ==title:== message with the new title as argument to the window of the UI. An example is below:
+
+[[[
+| we |
+ we := WindowExample new. 
+ we openWithSpec.
+ we window title: 'I am different!'
+]]]
+
+
+!!! Setting the about text
+
+To set the about text of a window, either override the ==aboutText== method of the corresponding
+==ComposableModel== so that it returns the new about text, or send the instance the ==aboutText:== message before opening, for example like below.
+
+[[[
+| we |
+ we := WindowExample new.
+ we aboutText: 'Click + to grow, - to shrink.'.
+ we openWithSpec
+]]]
