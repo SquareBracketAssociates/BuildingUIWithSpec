@@ -118,7 +118,7 @@ CustomerSatisfaction class >> defaultSpec
 		yourself
 ]]]
 
-In this layout, we add two rows to the UI, one with the buttons and one with the screen of text. Defining widget layout is a complex process with many different possible requirements, hence in this chapter we do not talk in detail about layout specification. Instead for more information we refer to Chapter *@cha_layouts_construction*.
+In this layout, we add two rows to the UI, one with the buttons and one with the screen of text. Defining widget layout is a complex process with many different possible requirements, hence in this chapter we do not talk in detail about layout specification. Instead for more information we refer to Chapter *@cha_layout_construction*.
 
 @@note The argument of the ==add:== messages are the symbols for the accessors. This is because the Spec interpreter will call these methods to retrieve the widgets when performing the layout.
 

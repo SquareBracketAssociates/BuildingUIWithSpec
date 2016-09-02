@@ -7,6 +7,9 @@
 
 @@todo JF write some sections, check last section for more refs, do an editorial pass
 
+
+@@todo JF add TickingWindowModel  (defaultWindowModelClass ^ TickingWindowModel) and then implement ==step== method
+
 This chapter collects many small examples of features that may be of
 use when building user interfaces with Spec. For the sake of brevity,
 many examples use dynamic Spec (see chapter XXX), but these
