@@ -5,12 +5,14 @@
 }
 @cha_managing_windows
 
-@@todo JF REWRITE
 
+In this book so far we have talked about reuse of ==ComposableModel==s, discussed the fundamental functioning of Spec and presented how to layout the widgets of a user interface. Yet what is still missing for a working user interface is showing all these widgets inside of a window. In our examples until now we have only shown a few of the features of Spec for managing windows, basically restricting ourself to opening a window.
+
+In this chapter we provide a more complete overview of how Spec allows for the managing of windows. We show opening and closing, the built-in dialog box facility, sizing of windows and all kinds of window decoration.
 
 !!! A working example
 
-To illustrate the window configuration options that are available, we use a simple ==WindowExample== class that has two buttons placed side by side. These buttons do not have any behavior associated yet, this will be added in an example at the end of the chapter.
+To illustrate the window configuration options that are available, we use a simple ==WindowExample== class that has two buttons placed side by side. These buttons do not have any behavior associated yet, this will be added in an example further down this chapter.
 
 [[[
 ComposableModel subclass: #WindowExample
@@ -32,22 +34,25 @@ WindowExample class >>defaultSpec
 ]]]
 
 
-
-!! Methods provided by ComposableModel
-
-
-@@todo may explain the following methods of ==ComposableModel==:
-- hasWindow
-- isDisplayed
-- windowIcon: (spirita: i have try it without see any change)
-- askOkToClose:
-
-
 !!Opening a window or a dialog box
 
-!!!Opening and closing a window
+A user interface can be opened as a normal window, or opened as a dialog box, i.e. without decoration and with ''Ok'' and ''Cancel'' buttons. We show here how this is done, including the configuration options specific to dialog boxes. (See also Section *@sec_win_size_decoration* for more information about window decoration.)
 
-== WindowExample new openWithSpec == ==openWithSpec:== and ==openWithSpecLayout:==  creates an instance of ==WindowModel==
+!!!Opening a window
+
+As we have shown in previous sections, to open a user interface you need to instantiate the ==ComposableModel== for that interface and send it the ==openWithSpec== message. This creates an instance of ==WindowModel== containing the user interface and shows it in a window on screen.
+
+We have also seen the ==openWithSpec:== method, notably in Chapter *@cha_layout_construction*, that takes the name of a layout message as argument. Instead of using the default layout (whose lookup is described in Section *@sec_layoutmethod*), the opened UI will use the layout returned by that method. A second variant is ==openWithSpecLayout:== that takes a ==SpecLayout== instance (or an instance of its subclasses).
+
+For example, below we show the three ways we can open a window for our ==WindowExample==. It will open three identical windows.
+
+[[[
+| we |
+ we := WindowExample new.
+ we openWithSpec.
+ we openWithSpec: #defaultSpec.
+ we openWithSpecLayout: we defaultSpec.
+]]]
 
 !!!Opening a dialog box and its configuration options
 
@@ -59,13 +64,17 @@ Spec provides for an easy way to open a UI as a simple dialog box with ''Ok'' an
  diag := we openDialogWithSpec.
 ]]]
 
-The result of this (e.g. assigned to the ==diag== variable above) is an instance of the  ==DialogWindowModel== class (a subclass of ==WindowModel==).  ==openDialogWithSpec== has the same variants as ==openWindowWithSpec== that take a specific layout as argument.
+The result of this (e.g. assigned to the ==diag== variable above) is an instance of the  ==DialogWindowModel== class (a subclass of ==WindowModel==). For convenience,  ==openDialogWithSpec== has the same variants as ==openWindowWithSpec== that take a specific layout as argument, either as a message name or as a ==SpecLayout== instance.
 
-The ==DialogWindowModel== instance can also be configured in multiple ways. To execute code when the user clicks on a button, send it the ==okAction:== or ==cancelAction:== message with a zero-argument block. If the block returns ==false== the window will not be closed (if it returns anything else it will be closed). This allows for validation of the contents of the dialog box, only allowing it to be closed if validation succeeds. Complimentarily, the ''OK'' button can be grayed out by sending the ==okButtonEnabled: false== message, and enabled again with a ==true== argument.
+The ==DialogWindowModel== instance (==diag== in the example above) can also be configured in multiple ways. To execute code when the user clicks on a button, send it the ==okAction:== or ==cancelAction:== message with a zero-argument block. If the block returns ==false== the window will not be closed (if it returns anything else it will be closed). This closing logic allows for the validation of the contents of the dialog box, only allowing it to be closed if validation succeeds. Complimentarily, the ''OK'' button can be grayed out by sending the ==okButtonEnabled: false== message, and enabled again with a ==true== argument.
 
-Also, after a dialog box has been closed the message ==cancelled== will return ==true== if the box was closed by clicking on the ''Cancel'' button.
+Also, the message ==cancelled== will return ==true== if the box was closed by clicking on the ''Cancel'' button.
 
-!! Making the window modal or acting on window close
+!! Modal windows and the closing of windows
+
+Windows are not alone on the screen, and they probably will not live forever. Here we talk about gaining full control of the entire user interface, and how to hook into the window closing logic.
+
+!!! Modal windows
 
 A modal window is a window that takes control of the entire Pharo user interface, making it impossible for the user to select another window while it is open. This is especially useful for dialog boxes, but may also be needed for other kinds of windows.
 
@@ -80,6 +89,32 @@ Spec allows any window to be made modal by sending the message ==modalRelativeTo
 
 @@note The argument of ==modalRelativeTo:== should always be the root of the currently shown widget hierarchy: ==World==. 
 
+!!! Preventing window close
+
+Spec provides for the possibility to check if a window can effectively be closed when the user clicks on the close box. To use it, this feature must first be turned on, by sending ==askOkToClose: true== to the ==ComposableModel==. This can be done for example by changing our ==WindowExample== as follows:
+
+[[[
+WindowExample >> initializeWidgets
+   button1 := self newButton.
+   button2 := self newButton.
+   button1 label: '+'.
+   button2 label: '-'.
+   self askOkToClose: true.
+]]]
+
+The behavior of the close button however is still not changed, closing a window is still possible. This is because we have not defined the implementation of what to check on window close. This is most easily done by overriding the ==okToChange== method of ==ComposableModel==, for example as below:
+
+[[[
+WindowExample >> okToChange
+   ^false
+]]]
+
+Because this method returns ==false==, clicking on the close button of an open ==WindowExample== window will not have any effect. We have effectively created an unclosable window! To be able to close this window, we should change the implementation of the above method to return ==true== (or simply remove it).
+
+Of course the example ==okToChange== method above is extremely simplistic and not very useful. It instead should define application-dependent logic of what to check on window close. Note that there are many examples of ==okToChange== methods in the system that can be used as inspiration.
+
+!!! Acting on window close
+
 It is also possible to perform an action whenever a window is closed, by sending the ==whenClosedDo:== message to the UI's ==WindowModel==. For example, below we specify a goodbye message to deliver when our example UI is closed.
 
 [[[
@@ -91,6 +126,7 @@ It is also possible to perform an action whenever a window is closed, by sending
 
 
 !! Window size and decoration
+@sec_win_size_decoration
 
 We now focus on sizing a window before and after opening it, and then talk about removing the different control widgets that decorate the window.
 
@@ -107,7 +143,7 @@ instance the ==extent:== message before opening, for example like this:
  we openWithSpec
 ]]]
 
-After a window is opened, it can also be resized by sending the ==extent:== message to the window of the UI. For example, we can change the ==initializeWidgets== method of our example so that the window resizes itself depending on what button is clicked.
+After a window is opened, it can also be resized by sending the ==extent:== message to the window of the UI. For example, we can change our examples' ==initializeWidgets== method so that the window resizes itself depending on what button is clicked.
 
 [[[
 WindowExample >> initializeWidgets
@@ -146,7 +182,7 @@ Sometimes it makes sense to have a window without decoration, i.e. without contr
 @@note This window is still closable using the halo menus or by calling ==close== on the ==WindowModel== instance (==wewin== in the example above).
 
 
-!! Window title and about text
+!! The final details: title, icon and about text
 
 You can provide some textual information about the widow by providing a title and a text for the window's about dialog, as we show here.
 
@@ -168,6 +204,30 @@ In addition, you can set the title of any UI after it has been opened (even if i
  we window title: 'I am different!'
 ]]]
 
+!!! Setting the icon
+
+At the bottom of the main Pharo window there is a window taskbar, allowing the user to switch between windows by clicking on the buttons that represent each window. These buttons also have an icon that is ment to represent the windows' kind. This icon can also be configured through Spec, in two different ways.
+
+Firstly, sending the ==windowIcon:== message to the ==ComposableModel== allows an icon to be set per window, as below. Note that it does not matter if the message is sent before or after the window is opened.
+
+[[[
+| wm1 wm2 |
+ wm1 := WindowExample new.
+ wm1 openWithSpec.
+ wm1 windowIcon: #thumbsDown asIcon.
+ wm2 := WindowExample new.
+ wm2 windowIcon: #thumbsUp asIcon.
+ wm2 openWithSpec.
+]]]
+
+Secondly, the icon can be changed by overriding the ==windowIcon== message, as below.
+
+[[[
+WindowExample >> windowIcon
+   ^ #thumbsUp asIcon
+]]]
+
+@@note Changing the ==windowIcon== method will affect all open windows, as the taskbar is periodically refreshed. This refreshing is also why ==windowIcon:== can be sent before or after the window has been opened.
 
 !!! Setting the about text
 
@@ -180,3 +240,8 @@ To set the about text of a window, either override the ==aboutText== method of t
  we aboutText: 'Click + to grow, - to shrink.'.
  we openWithSpec
 ]]]
+
+
+!! Conclusion
+
+In this chapter we treated the features of Spec that have to do with windows. We first talked about opening and closing windows as well as how to open a window as a dialog box. This was followed by configuring the window size and its decorating widgets. We ended this chapter with the small yet important details of the window: its title, icon and about text. 
