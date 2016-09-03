@@ -214,9 +214,9 @@ Firstly, sending the ==windowIcon:== message to the ==ComposableModel== allows a
 | wm1 wm2 |
  wm1 := WindowExample new.
  wm1 openWithSpec.
- wm1 windowIcon: #thumbsDown asIcon.
+ wm1 windowIcon: (wm1 iconNamed: #thumbsDown).
  wm2 := WindowExample new.
- wm2 windowIcon: #thumbsUp asIcon.
+ wm2 windowIcon: (wm2 iconNamed: #thumbsUp).
  wm2 openWithSpec.
 ]]]
 
@@ -224,7 +224,7 @@ Secondly, the icon can be changed by overriding the ==windowIcon== message, as b
 
 [[[
 WindowExample >> windowIcon
-   ^ #thumbsUp asIcon
+   ^ self iconNamed: #thumbsUp
 ]]]
 
 @@note Changing the ==windowIcon== method will affect all open windows, as the taskbar is periodically refreshed. This refreshing is also why ==windowIcon:== can be sent before or after the window has been opened.
