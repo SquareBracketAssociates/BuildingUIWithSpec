@@ -7,6 +7,235 @@
 
 @@todo JF REWRITE
 
+@@todo JF saying nothing about the ==needFullRebuild:== method.
+
+!! Dynamically changing an already opened UI
+
+[[[
+ComposableModel subclass: #DynamicViewer
+	instanceVariableNames: 'list view button state'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+]]]
+
+[[[
+DynamicViewer >> extent
+	^ 400@350
+]]]
+
+[[[
+DynamicViewer >> items: aCollection.
+	list items: aCollection
+]]]
+
+[[[
+DynamicViewer >> initializeWidgets
+	list := self newList.
+	list displayBlock: [ :item | item printString contractTo: 15 ].
+	
+	button := self newButton.
+	button label: 'Change!'.
+	state := $v.
+		
+	view := self defaultView.
+]]]
+
+[[[
+DynamicViewer >> defaultView
+	| cm |
+	cm := self newLabel.
+	cm label: 'Select something from the list please.'.
+	^cm
+]]]
+
+
+[[[
+DynamicViewer class >> verticalSpec
+	<spec: #default>
+	^ SpecColumnLayout composed
+		newRow: [ :r |
+			r newColumn: [:c | c add: #list] left: 0 right: 0.7.
+			r newColumn: [:c | c add: #view] left: 0.32 right: 0];
+		newRow: [ :r | r add: #button ] height: self toolbarHeight;
+      yourself.
+]]]
+
+[[[
+DynamicViewer class >> horizontalSpec
+	^ SpecColumnLayout composed
+      newRow: [:r | r add: #list] top: 0 bottom: 0.7;
+		newRow: [:r | r add: #view] top: 0.32 bottom: 0.02;
+		newRow: [:r | r add: #button] height: self toolbarHeight;
+      yourself.
+]]]
+
+[[[
+DynamicViewer >> initializePresenter
+	button action: [
+		state := (state = $v)	ifTrue: [ $h ] ifFalse: [ $v ].
+		self needRebuild: false.
+		self buildWithSpecLayout: self currentSpec.
+		].
+]]]
+
+[[[
+DynamicViewer >> currentSpec.
+	^ state = $v
+		ifTrue: [ self class verticalSpec ]
+		ifFalse: [ self class horizontalSpec ]
+]]]
+
+[[[
+DynamicViewer >> initializePresenter
+	button action: [
+		state := (state = $v)	ifTrue: [ $h ] ifFalse: [ $v ].
+		self needRebuild: false.
+		self buildWithSpecLayout: self currentSpec.
+		].
+
+	list whenSelectedItemChanged: [ :new |
+			view := self widgetFor: new.
+			self needRebuild: false.
+			self buildWithSpecLayout: self currentSpec.
+		].
+]]]
+
+[[[
+DynamicViewer >> widgetFor: aDatum
+	| cm |
+	aDatum isNil ifTrue: [ ^self defaultView ].
+	aDatum isForm ifTrue: [ 
+		cm := self newImage.
+		cm image: aDatum.
+		^cm ].
+	aDatum isArray ifTrue: [ 
+		cm := self newList.
+		cm items: aDatum.
+		^cm].
+	
+	"default case"
+	cm := self newText.
+	cm text: aDatum asString.
+	^cm
+]]]
+
+@@note The code for ==widgetFor:== does not follow good OO practices. In the context of this chapter we choose to write ugly code like this to make the example more self-contained. However, any student of ours caught writing code like this will be invited to our office for a long conversation.
+
+
+[[[
+| viewer |
+ viewer := DynamicViewer new.
+ viewer items: {
+	42 .
+	'Everberg' . 
+	#thumbsUp asIcon . 
+	#(SGO CDG ZYR BRU) . 
+	(OrderedCollection withAllSubclasses collect:[: cls | cls comment]) asArray}.
+ viewer openWithSpec.
+]]]
+
+!! Dynamically populating a UI with widgets
+
+[[[
+DynamicComposableModel subclass: #DynamicArrayViewer
+	instanceVariableNames: 'collection label'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+]]]
+
+[[[
+DynamicArrayViewer >> initializeWidgets
+	
+	label := self newLabel.
+	label label: 'An array with ',collection size asString, ' elements:'.
+		
+	1 to: collection size do: [ :count | | model |
+		model := self newText.
+		model text: (collection at: count) asString.
+		self assign: model to: ('txt_',count asString) asSymbol .
+		 ]
+]]]
+
+@@note JF talk in a note about the accessors so you can also do stuff in initializePresenter
+
+[[[
+DynamicArrayViewer >> layout
+	"either set the layout with an accessor or override layout getter"
+	| col |
+	col := SpecColumnLayout composed.
+	col add: #label.
+	1 to: collection size do: [:count|
+		col add: ('txt_',count asString) asSymbol ].
+	
+	^col 
+]]]
+
+[[[
+DynamicArrayViewer class >> on: aCollection
+	| inst |
+	inst := self basicNew.
+	inst collection: aCollection.
+	inst initialize.
+	^inst.
+]]]
+
+[[[
+(DynamicArrayViewer on: (OrderedCollection withAllSubclasses collect:[: cls | cls comment])) openWithSpec.
+]]]
+
+
+!! Hacking together a UI in the Playground
+
+[[[
+	| ui num |
+	
+	num := 0.
+	ui := DynamicComposableModel new.
+	ui title: 'I am dynamic'.
+	ui extent: 250@70.
+]]]
+
+[[[	
+	ui instantiateModels: #( 
+		text LabelModel
+		plus ButtonModel
+		minus ButtonModel ).
+]]]
+
+[[[
+	ui text label: num asString.
+	
+	ui minus 
+		label: '-';
+		state: false;
+		action: 	[ 
+			num := num -1.
+			ui text label: num asString ].
+
+	ui plus 
+		label: '+';
+		state: false;
+		action: 	[ 
+			num := num +1.
+			ui text label: num asString ].
+]]]
+[[[
+	ui layout := (SpecLayout composed
+		newColumn: [ :c |
+			c
+				add: #text height: 25;
+				newRow: [ :r | r add: #minus ; addSplitter; add: #plus ] height: 25 ];
+		yourself).
+				
+	ui openWithSpec.
+]]]
+
+@@note This example is adapted from code present in the Pharo 5 image: ==DynamicSpecExample >> openOnInteger== by Torsten Bergmann.
+
+@@note When doing this you are ignoring all the code writing and management facilities that Pharo has to offer (e.g. the browser) and not cleanly separating the different responsibilities of the code of the UI. In other words, this is truly an ugly way to hack together a user interface.
+
+@@note JF Everything below this line is old stuff that should dissapear
+
 !! ProtocolBrowser dynamic Version
 
 Having an user interface with a well known number of sub widgets and a static layout is not always sufficient.
