@@ -268,11 +268,9 @@ ProtocolBrowser >> initializePresenter
 	viewer whenClassChanged: [ :class | text behavior: class ].
 	viewer whenAPIChanged: [ :item |
 		item
-			ifNil: [ text text: '' ]
 			ifNotNil: [ text text: item sourceCode ] ].
 	viewer whenEventChanged: [ :item |
 		item
-			ifNil: [ text text: '' ]
 			ifNotNil: [ text text: item sourceCode ] ]
 ]]]
 
