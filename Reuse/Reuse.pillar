@@ -82,7 +82,7 @@ The UI we build now will show a list of all methods of a given protocol, and it 
 
 [[[
 ComposableModel subclass: #ProtocolMethodList
-	instanceVariableNames: 'label methods
+	instanceVariableNames: 'label methods'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
 ]]]

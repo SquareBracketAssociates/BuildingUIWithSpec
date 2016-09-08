@@ -7,7 +7,7 @@
 
 To start this booklet we use a couple of examples to explain the use of Spec. We will first construct a small but complete user interface, and then show some more examples of how existing widgets can be configured. This will already allow you to build basic user interfaces.
 
-After completing this chapter you should at least read the following chapter about reuse of Spec widgets, which is the key reason behind the power of Spec. With these two chapters read you should be able to construct Spec user interfaces as intended. You could can use the rest of this booklet just as reference material, but nonetheless we recommend you to at least give a brief look at the other chapters as well.
+After completing this chapter you should at least read the following chapter about reuse of Spec widgets, which is the key reason behind the power of Spec. With these two chapters read you should be able to construct Spec user interfaces as intended. You could use the rest of this booklet just as reference material, but nonetheless we recommend you to at least give a brief look at the other chapters as well.
 
 !! A customer satisfaction UI
 @sec_customer_satisfaction
