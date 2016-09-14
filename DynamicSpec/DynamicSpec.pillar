@@ -5,9 +5,11 @@
 }
 @cha_dynamic_spec
 
-@@todo JF REWRITE
-
 @@todo JF saying nothing about the ==needFullRebuild:== method.
+
+Up until now we have seen user interfaces that are static: Once the UI is opened, the widgets are never changed and the layout of the UI is never changed. Also, when writing the code we know exactly which widgets, and how many of them, to use. There are however cases where user interfaces need to be more dynamic, for example adding and removing widgets depending on user input, which requires a re-layout of (part of) the user interface, or showing multiple custom widgets, the number of which depends on the underlying data being shown. Spec also provides support for these situations thanks to its dynamic features.
+
+In this chapter we show three dynamic features of Spec. Firstly we present how to dynamically change a UI that is already open. Secondly we give an example of how to defer to UI opening time the choice of widgets to show (instead of hardcoding this when writing the UI). Thirdly we script a complete UI from within one (big) block of code. 
 
 !! Dynamically changing an already opened UI
 
@@ -186,6 +188,12 @@ DynamicArrayViewer class >> on: aCollection
 
 !! Hacking together a UI in the Playground
 
+Thanks to the ==DynamicComposableModel==, Spec also allows for a more scripting-like development style, where the entire UI is defined in one giant piece of code, typically built incrementally. This may be useful, e.g. for `quick and dirty' prototyping where you want to omit the creation of a class for the UI as well as the definition of multiple methods. In this section we show how we can hack together a simple UI, scripting style, from within the Playground.
+
+The UI we build here is a simple example showing a number and two buttons, one to increment the number and one to decrement it. This example is adapted from code present in the Pharo 5 image: ==DynamicSpecExample >> openOnInteger== by Torsten Bergmann, for which we give our thanks.
+
+We start our example code by instantiating a ==DynamicComposableModel== and setting the title and size of the window for our UI by using the ==title:== and ==extent:== methods (see Chapter *@cha_managing_windows*). Note that the local variable ==num== will hold the number shown in the UI.
+
 [[[
 	| ui num |
 	
@@ -195,12 +203,18 @@ DynamicArrayViewer class >> on: aCollection
 	ui extent: 250@70.
 ]]]
 
+We then add the widgets to the UI, using the ==instantiateModels:== method. This method takes as argument a collection of pairs. The first element of the pair is the name of the widget, i.e. the name of the instance variable if this would be a normal, static, UI. The second element of the pair is a subclass of ==ComposableModel==, determining the type of the widget.
+
 [[[	
 	ui instantiateModels: #( 
 		text LabelModel
 		plus ButtonModel
 		minus ButtonModel ).
 ]]]
+
+Hence this UI will hold a ==text== widget, which is a ==LabelModel== instance, as well as two ==ButtonModel== widgets, in ==plus== and ==minus==, respectively. Fundamentally, the code above is the only change with respect to normal UI development. The rest of UI coding happens almost identically as before.
+
+With the widgets defined and instantiated, we can now configure them, as we would do in a normal ==initializeWidgets== or ==initializePresenter== method:
 
 [[[
 	ui text label: num asString.
@@ -219,6 +233,9 @@ DynamicArrayViewer class >> on: aCollection
 			num := num +1.
 			ui text label: num asString ].
 ]]]
+
+The last thing we need to do is to give the UI a layout. This is done by calling the ==layout:== method, giving it an instance of a ==SpecLayout== that specifies the layout. The UI can then be opened and is fully functional.
+
 [[[
 	ui layout := (SpecLayout composed
 		newColumn: [ :c |
@@ -230,11 +247,9 @@ DynamicArrayViewer class >> on: aCollection
 	ui openWithSpec.
 ]]]
 
-@@note This example is adapted from code present in the Pharo 5 image: ==DynamicSpecExample >> openOnInteger== by Torsten Bergmann.
+@@note When doing this you are ignoring all the code writing and management facilities that Pharo has to offer (e.g. the browser) and not cleanly separating the different responsibilities of the code of the UI. In other words, this is truly a quick and dirty way to hack together a user interface that should really not make it to production.
 
-@@note When doing this you are ignoring all the code writing and management facilities that Pharo has to offer (e.g. the browser) and not cleanly separating the different responsibilities of the code of the UI. In other words, this is truly an ugly way to hack together a user interface.
-
-@@note JF Everything below this line is old stuff that should dissapear
+@@note JF Everything below this line is old stuff that should disappear
 
 !! ProtocolBrowser dynamic Version
 
