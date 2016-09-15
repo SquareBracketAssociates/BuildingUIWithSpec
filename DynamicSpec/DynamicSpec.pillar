@@ -5,13 +5,24 @@
 }
 @cha_dynamic_spec
 
-@@todo JF saying nothing about the ==needFullRebuild:== method.
+Up until now we have seen user interfaces that are static: Once the UI is opened, the widgets are never changed and the layout of the UI is never changed. Also, when writing the code of the UI we know exactly which (and how many) widgets to use. There are however cases where user interfaces need to be more dynamic. For example, a file dialog can have a preview area for the currently selected file: when the file is text, its contents is shown in a text field, when it is an image, the image is shown, and so on. Another case is visualizing collections of data where we cannot determine at development time how data items will be shown. For example in a genealogy application clicking on a parent reveals information on all of the children, each child being presented using a complex, editable, widget. 
 
-Up until now we have seen user interfaces that are static: Once the UI is opened, the widgets are never changed and the layout of the UI is never changed. Also, when writing the code we know exactly which widgets, and how many of them, to use. There are however cases where user interfaces need to be more dynamic, for example adding and removing widgets depending on user input, which requires a re-layout of (part of) the user interface, or showing multiple custom widgets, the number of which depends on the underlying data being shown. Spec also provides support for these situations thanks to its dynamic features.
-
-In this chapter we show three dynamic features of Spec. Firstly we present how to dynamically change a UI that is already open. Secondly we give an example of how to defer to UI opening time the choice of widgets to show (instead of hardcoding this when writing the UI). Thirdly we script a complete UI from within one (big) block of code. 
+Spec also provides support for these kinds of user interfaces thanks to its dynamic features, and we show them in this chapter. Firstly we present how to dynamically change a UI that is already open. Secondly we give an example of how to defer to UI opening time the choice of widgets to show, instead of hardcoding this when writing the UI. Thirdly we script a complete UI from within one (big) piece of code. 
 
 !! Dynamically changing an already opened UI
+
+The first dynamic feature of Spec that we show is changing the layout and contents of an UI that is already open. This is done by using the ==needRebuild:== and ==buildWithSpecLayout:== methods. The first method is used to signal that the complete UI does ''not'' need to be rebuilt from scratch. The second triggers a rebuild of the UI, which is then limited to laying out the widgets as specified in the ==SpecLayout== given as argument.
+
+!!! A running example
+
+To show the use of these two methods, we create an example user interface that is a multi-data viewer: on the left it shows a list of different kinds of data, and on the right it contains a `view' widget that shows this data in the most appropriate manner. The multi-data viewer can also change its layout from this horizontal form to a vertical form where the list of data is on top and the view widget at the bottom. This change is done by clicking on a button. We show the multi-data viewer when just opened in Figure *@fig_DynHorizontal* and in vertical mode with an item selected in *@fig_DynVertical*.
+
++Screen shot of the multi-data viewer when just opened.>file://figures/DynHorizontal.png|width=60|label=fig_DynHorizontal+
+
+
++Screen shot of the multi-data viewer in vertical layout, with a Form selected.>file://figures/DynVertical.png|width=60|label=fig_DynVertical+
+
+We need to set up the UI before we can talk about changing it after it is opened. We start with the class definition, window size and title definition, and functionality for setting the contents of the list:
 
 [[[
 ComposableModel subclass: #DynamicViewer
@@ -19,26 +30,28 @@ ComposableModel subclass: #DynamicViewer
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
 ]]]
-
 [[[
 DynamicViewer >> extent
 	^ 400@350
 ]]]
-
+[[[
+DynamicViewer >> title
+	^ 'Dynamic Multi-Data Viewer'
+]]]
 [[[
 DynamicViewer >> items: aCollection.
 	list items: aCollection
 ]]]
 
+Similarly, the ==initializeWidgets== method is simple. The list shows the ==printString==, contracted to 15 characters. We record that the UI is using a horizontal layout by setting ==state== to the ==$h== character, and we set the view to the default, which is a label (as seen in Figure *@fig_DynHorizontal*). 
+
 [[[
 DynamicViewer >> initializeWidgets
 	list := self newList.
 	list displayBlock: [ :item | item printString contractTo: 15 ].
-	
 	button := self newButton.
 	button label: 'Change!'.
-	state := $v.
-		
+	state := $h.
 	view := self defaultView.
 ]]]
 
@@ -50,9 +63,10 @@ DynamicViewer >> defaultView
 	^cm
 ]]]
 
+The layout of the window is given by the ==horizontalSpec== method below. Again, there are no surprises here.  This is the default layout thanks to the ==<spec: #default>== pragma, see Chapter *@cha_layout_construction* for more information. 
 
 [[[
-DynamicViewer class >> verticalSpec
+DynamicViewer class >> horizontalSpec
 	<spec: #default>
 	^ SpecColumnLayout composed
 		newRow: [ :r |
@@ -62,23 +76,35 @@ DynamicViewer class >> verticalSpec
       yourself.
 ]]]
 
+We can now already open this UI and give it a list of items to show. For example, the code below produces the UI as shown in Figure *@fig_DynHorizontal*. 
+
 [[[
-DynamicViewer class >> horizontalSpec
-	^ SpecColumnLayout composed
-      newRow: [:r | r add: #list] top: 0 bottom: 0.7;
-		newRow: [:r | r add: #view] top: 0.32 bottom: 0.02;
-		newRow: [:r | r add: #button] height: self toolbarHeight;
-      yourself.
+| viewer |
+ viewer := DynamicViewer new.
+ viewer openWithSpec.
+ viewer items: {
+	42 .
+	'Everberg' . 
+	#thumbsUp asIcon . 
+	#(SGO CDG ZYR BRU) . 
+	(OrderedCollection withAllSubclasses
+	  collect:[: cls | cls comment]) asArray}.
 ]]]
+
+!!! Changing the layout of the UI
+
+Clicking on the 'Change!' button however does not do anything yet. For this we need to define the action block of the button, which we do in ==initializePresenter==, as below. In this action block we first switch the state between ==$h== and ==$v== as appropriate. Second, we signal that the complete UI does ''not'' need to be rebuilt from scratch, with the ==self needRebuild: false.== line. Thanks to this, the next rebuild of the UI will be limited to only performing layout operations. Third and last, the layout change is then triggered by the ==buildWithSpecLayout:== message. It takes a ==SpecLayout== as argument, and it will change the layout of the UI to the specified layout. 
 
 [[[
 DynamicViewer >> initializePresenter
 	button action: [
-		state := (state = $v)	ifTrue: [ $h ] ifFalse: [ $v ].
+		state := (state = $v) ifTrue: [ $h ] ifFalse: [ $v ].
 		self needRebuild: false.
 		self buildWithSpecLayout: self currentSpec.
 		].
 ]]]
+
+The new layout for the UI is returned by the ==currentSpec== method shown below. It simply delegates to the ==horizontalSpec== or ==verticalSpec== methods, depending on the value saved in ==state==. 
 
 [[[
 DynamicViewer >> currentSpec.
@@ -86,6 +112,23 @@ DynamicViewer >> currentSpec.
 		ifTrue: [ self class verticalSpec ]
 		ifFalse: [ self class horizontalSpec ]
 ]]]
+
+[[[
+DynamicViewer class >> verticalSpec
+	^ SpecColumnLayout composed
+      newRow: [:r | r add: #list] top: 0 bottom: 0.7;
+      newRow: [:r | r add: #view] top: 0.32 bottom: 0.02;
+      newRow: [:r | r add: #button] height: self toolbarHeight;
+      yourself.
+]]]
+
+The above is all that we need to do to be able to switch the layout of the viewer from horizontal to vertical mode. At its core lie the two calls ==self needRebuild: false.== and ==self buildWithSpecLayout: <XXX>==. All the rest is really just machinery used to define the value of ==<XXX>==.
+
+!!! Replacing a widget with another one
+
+Fundamentally, replacing a widget with another one is just a special case of changing the layout of the UI. The layout used is ''actually the same'', it just so happens that one widget instance was first replaced for another.
+
+To show this, we implement the code that visualizes the selected item of the list by showing it in the ==view== widget. This is done by adding new code to ==initializePresenter==, as below. The list selection change block performs the same layout operations as the button action block discussed above. The difference lies in the assignment of a new widget to the ==view== instance variable. This then allows the UI to, e.g. show the ==Form== as in Figure *@fig_DynHorizontal*. 
 
 [[[
 DynamicViewer >> initializePresenter
@@ -101,6 +144,8 @@ DynamicViewer >> initializePresenter
 			self buildWithSpecLayout: self currentSpec.
 		].
 ]]]
+
+The responsibility of the ==widgetFor:== method is to return an instance of the correct widget, showing the selected item. For the sake of keeping this example small, we provide below some decidedly non-OO code that fundamentally implements a big ==switch== statement over the type of the selected item. A clean OO implementation would use double-dispatch, and is left as an exercise to you, dear reader.
 
 [[[
 DynamicViewer >> widgetFor: aDatum
@@ -121,22 +166,42 @@ DynamicViewer >> widgetFor: aDatum
 	^cm
 ]]]
 
-@@note The code for ==widgetFor:== does not follow good OO practices. In the context of this chapter we choose to write ugly code like this to make the example more self-contained. However, any student of ours caught writing code like this will be invited to our office for a long conversation.
+@@note The code for ==widgetFor:== does not follow good OO practices. In the context of this chapter we choose to write this ugly code to make the example more self-contained. Any student of ours caught writing code like this will be invited to our respective offices for a long conversation.
+
+
+!! Dynamically populating a UI with widgets
+
+It is not always possible to determine beforehand how many widgets will be shown in a UI, and instead this needs to be decided when the UI is opened. Spec also provides support for this. Dynamic population is done by subclassing ==DynamicComposableModel== (instead of ==ComposableModel==), using its ==assign:to:== method to dynamically create virtual instance variables for the different widgets and by defining an instance-side layout. 
+
+!!! Adapting the multi-data viewer
+
+To show this, we build an extension to the dynamic multi-data viewer of the previous section. It shows the contents of an array differently than simply in a list view, seen for example in Figure *@fig_MultiDataArray*. We create a new ==DynamicArrayViewer== widget for this detailed view, and hence first change the implementation of ==DynamicViewer >> widgetFor:== to return such a widget:
+
++Screen shot of the extended multi-data viewer showing the contents of an array.>file://figures/MultiDataArray.png|width=60|label=fig_MultiDataArray+
 
 
 [[[
-| viewer |
- viewer := DynamicViewer new.
- viewer items: {
-	42 .
-	'Everberg' . 
-	#thumbsUp asIcon . 
-	#(SGO CDG ZYR BRU) . 
-	(OrderedCollection withAllSubclasses collect:[: cls | cls comment]) asArray}.
- viewer openWithSpec.
+DynamicViewer >> widgetFor: aDatum
+| cm |
+	aDatum isNil ifTrue: [ ^self defaultView ].
+	aDatum isForm ifTrue: [ 
+		cm := self newImage.
+		cm image: aDatum.
+		^cm ].
+	aDatum isArray ifTrue: [ 
+		cm := DynamicArrayViewer on: aDatum.
+		cm owner: self.  " needed because we do not use 'instantiate:' "
+		^cm].
+	
+	"default case"
+	cm := self newText.
+	cm text: aDatum asString.
+	^cm
 ]]]
 
-!! Dynamically populating a UI with widgets
+!!! Implementing the widget for showing array contents
+
+We now implement the widget that will show the detailed contents of an array. It is a subclass of ==DynamicComposableModel==, with an instance variable ==collection== that holds the array and ==label== that holds the label at the top.
 
 [[[
 DynamicComposableModel subclass: #DynamicArrayViewer
@@ -144,6 +209,21 @@ DynamicComposableModel subclass: #DynamicArrayViewer
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
 ]]]
+
+The ==collection== instance variable is initialized when the widget is instantiated using the ==on:== message, as shown below. This variable must be initialized before the ==initialize== method is called because in ==initializeWidgets== we need it to determine the items that will be shown.
+
+[[[
+DynamicArrayViewer class >> on: aCollection
+	| inst |
+	inst := self basicNew.
+	inst collection: aCollection.
+	inst initialize.
+	^inst.
+]]]
+
+The ==initializeWidgets== method iterates over the collection and instantiates a ==TextModel== for each of its items. This is then added to the UI using the ==assign:to:== method, as shown below.
+
+==assign:to:== takes an instance of a ==ComposableModel== and a symbol that will be used to refer to that instance. Spec virtually creates a variable together with its (virtual) accessor methods. For example, the code below will cause the generation of accessors ==txt_1==, ==txt_2==, etc. as well as ==txt_1:==, ==txt_2:==, etc.
 
 [[[
 DynamicArrayViewer >> initializeWidgets
@@ -158,11 +238,14 @@ DynamicArrayViewer >> initializeWidgets
 		 ]
 ]]]
 
-@@note JF talk in a note about the accessors so you can also do stuff in initializePresenter
+@@note The generation of these virtual accessors allows the widgets to be referred to in the rest of the code through an accessor, as if it was a normal variable. 
+
+Now the only thing left to do is to define a layout for the widgets of this UI. In addition to the class-side layout features of ==ComposableModel==, ==DynamicComposableModel== also allows a layout to be specified at instance side. This can be done either by overriding the ==layout== method to return the required ==SpecLayout== instance, or using the ==layout:== accessor to set the layout. These two options are similar to what is possible with window title and size, as discussed in Chapter *@cha_managing_windows*.
+
+In our example, we need to define a layout at instance side since the number of widgets differs per instance. We choose to override the ==layout== method, as shown below. This code creates a column and adds all widgets that were created in ==initializeWidgets==. We can see that the dynamically created widgets are referred to by their name ==txt_1==, ==txt_2==, etc. , reconstructed by iterating over the collection. This is a sub-optimal implementation and we will show an alternative implementation at the end of this chapter.
 
 [[[
 DynamicArrayViewer >> layout
-	"either set the layout with an accessor or override layout getter"
 	| col |
 	col := SpecColumnLayout composed.
 	col add: #label.
@@ -172,23 +255,45 @@ DynamicArrayViewer >> layout
 	^col 
 ]]]
 
-[[[
-DynamicArrayViewer class >> on: aCollection
-	| inst |
-	inst := self basicNew.
-	inst collection: aCollection.
-	inst initialize.
-	^inst.
-]]]
+This is all that is required to dynamically populate a UI. Note that this UI can also be opened stand-alone as it is a subclass of ==ComposableModel==. For example, the snippet of code below will open it with the same contents as in Figure *@fig_MultiDataArray*.
 
 [[[
-(DynamicArrayViewer on: (OrderedCollection withAllSubclasses collect:[: cls | cls comment])) openWithSpec.
+(DynamicArrayViewer on:
+       (OrderedCollection withAllSubclasses
+           collect:[: cls | cls comment]))
+   openWithSpec.
 ]]]
 
+
+!!! An alternative implementation of initializeWidgets
+
+Above we have seen that ==initializeWidgets== and ==layout== do double work when creating the names of the virtual variables of the widgets. We can avoid this if instead of overriding the ==layout== method, we use the ==layout:== accessor inside of ==initializeWidgets== as follows:
+
+[[[
+DynamicArrayViewer >> initializeWidgets
+	| col |
+	col := SpecColumnLayout composed.
+
+	label := self newLabel.
+	label label: 'An array with ',collection size asString, ' elements:'.
+	col add: #label.	
+		
+	1 to: collection size do: [ :count | | model nam |
+		model := self newText.
+		model text: (collection at: count) asString.
+		nam := ('txt_',count asString) asSymbol.
+		self assign: model to: nam.
+		col add: nam. 
+		 ]
+
+	self layout: col.
+]]]
+
+This implementation builds the layout at the same time as the widgets are built. It adds a reference in the layout to each widget just after it is created. At the end of the method, the layout for the UI is set using the ==layout:== method, removing the need to override ==layout== as in the previous implementation.
 
 !! Hacking together a UI in the Playground
 
-Thanks to the ==DynamicComposableModel==, Spec also allows for a more scripting-like development style, where the entire UI is defined in one giant piece of code, typically built incrementally. This may be useful, e.g. for `quick and dirty' prototyping where you want to omit the creation of a class for the UI as well as the definition of multiple methods. In this section we show how we can hack together a simple UI, scripting style, from within the Playground.
+Thanks to ==DynamicComposableModel==, Spec also allows for a more scripting-like development style, where the entire UI is defined in one giant piece of code, typically built incrementally. This may be useful, e.g. for `quick and dirty' prototyping where you want to omit the creation of a class for the UI as well as the definition of multiple methods. In this section we show how we can hack together a simple UI, scripting style, from within the Playground.
 
 The UI we build here is a simple example showing a number and two buttons, one to increment the number and one to decrement it. This example is adapted from code present in the Pharo 5 image: ==DynamicSpecExample >> openOnInteger== by Torsten Bergmann, for which we give our thanks.
 
@@ -203,7 +308,7 @@ We start our example code by instantiating a ==DynamicComposableModel== and sett
 	ui extent: 250@70.
 ]]]
 
-We then add the widgets to the UI, using the ==instantiateModels:== method. This method takes as argument a collection of pairs. The first element of the pair is the name of the widget, i.e. the name of the instance variable if this would be a normal, static, UI. The second element of the pair is a subclass of ==ComposableModel==, determining the type of the widget.
+We then add the widgets to the UI, using the ==instantiateModels:== method. This method takes as argument a collection of pairs. The first element of the pair is the name of the widget, i.e. the name of the instance variable if this would be a normal, static, UI. The second element of the pair is a subclass of ==ComposableModel==, determining the type of the widget. 
 
 [[[	
 	ui instantiateModels: #( 
@@ -212,7 +317,7 @@ We then add the widgets to the UI, using the ==instantiateModels:== method. This
 		minus ButtonModel ).
 ]]]
 
-Hence this UI will hold a ==text== widget, which is a ==LabelModel== instance, as well as two ==ButtonModel== widgets, in ==plus== and ==minus==, respectively. Fundamentally, the code above is the only change with respect to normal UI development. The rest of UI coding happens almost identically as before.
+Hence this UI will hold a ==text== widget, which is a ==LabelModel== instance, as well as two ==ButtonModel== widgets, in ==plus== and ==minus==, respectively. Fundamentally, the code above is the only change with respect to what we have seen before. This is because, as in the ==assign:to:== method shown in the previous section, Spec also automatically generates the (virtual) accessors for the widgets, making it possible to just use accessors in the remainder of the code.
 
 With the widgets defined and instantiated, we can now configure them, as we would do in a normal ==initializeWidgets== or ==initializePresenter== method:
 
@@ -249,141 +354,6 @@ The last thing we need to do is to give the UI a layout. This is done by calling
 
 @@note When doing this you are ignoring all the code writing and management facilities that Pharo has to offer (e.g. the browser) and not cleanly separating the different responsibilities of the code of the UI. In other words, this is truly a quick and dirty way to hack together a user interface that should really not make it to production.
 
-@@note JF Everything below this line is old stuff that should disappear
+!! Conclusion
 
-!! ProtocolBrowser dynamic Version
-
-Having an user interface with a well known number of sub widgets and a static layout is not always sufficient.
-A user interface is often more than just that, for example here are two situations where more is needed:
-First, when the layout of the user interface needs to be changed at runtime to match the execution context of the software.
-Second, sub widgets are added or removed at runtime and therefore the programmer needs to be able to parametrize those new sub widgets on the fly.
-
-''Spec'' also provides support for such dynamic user interfaces.
-In this section we show how to use ''Spec'' in these situations.
-
-First, we talk about making dynamic modifications of the layout of widgets, and second we discuss the dynamic adding and removing of subwidgets.
-Third and last we show how the dynamic features can be used to quickly prototype a user interface.
-
-
-
-!!! Dynamic modification of the layout
-
-Changing the layout of widgets at runtime is straightforward, as we will see here.
-
-Such changes basically consist of three steps:
-- First, create the new layout.
-- Second, the ==needRebuild== flag is set to ==false== to prohibit the creation of a new UI element (and reuse the existing one).
-- Third, the rebuilding of the user interface is performed.
-
-One widget can also keep the UI elements of its sub widgets which do not need to be rebuilt.
-The message ==needRebuild: false== needs to be sent to any of those sub widgets.
-
-For example, if a model comprising a ''button'' and a ''list'' just wants to rearrange the position of these UI elements, there is no need to rebuild them. As shown in the example *@ex_needRebuild*
-
-[[[label=ex_needRebuild|caption=How to need rebuild sub widgets|language=Smalltalk
-rebuildWithNewLayout
-	| newLayout |
-
-	newLayout := self newLayoutCreatedDynamically.
-	self needRebuild: false.
-	theButton needRebuild: false.
-	theList needRebuild: false.
-	self buildWithSpecLayout: newLayout.
-]]]
-
-
-
-!!! Dynamic adding and removal of subwidgets
-
-If a user interface needs a varying number of subwidgets, the amount of which cannot be established at compilation time, then another approach is needed.
-In this scenario, ==DynamicComposableModel== is the model that needs to be subclassed, as this class provides support for the required kind of dynamic behavior.
-
-Amongst others, this class adds the method ==assign:to:==, which takes a model instance as a first argument, and a unique symbol as a second argument.
-This method is used to assign an already instantiated model as sub widget, instead of the method ==instantiateModels:== that takes a class name as argument and instantiates a new model.
-
-When using ==DynamicComposableModel==, the instantiation of the sub widgets is a bit different from normal use.
-In the ==instantiateWidgets== method, instead of instantiating each widget separately, ==instantiateModels:== should be used to instantiate them.
-This method takes as argument an array of pairs, where each pair is composed of the unique name of the widget as key, and the name of the widget class as value.
-This allows for a widget to be accessed by sending a message whose selector is the widget name to the model.
-
-By example, if a widget named ==button== is created, then this widget can be accessed by calling ==self button== as shown in the example *@ex_dynamic_creation*.
-
-[[[label=ex_dynamic_creation|caption=Dynamic creation of a widget|language=Smalltalk
-	self instantiateModels: #( button ButtonModel ).
-	self button label: 'Click me'.
-]]]
-
-!!! Examples: Prototyping a UI
-
-Thanks to the capability of ''Spec'' to dynamically instantiate widgets, it is also possible to prototype a user interface from within any workspace.
-The following examples show how ''Spec'' can be used to quickly prototype a user interace.
-
-The first example explains how to design by prototyping a user interface.
-The second example introduces the composition of dynamic models.
-
-
-The result can be seen in Figure *@fig_popup*.
-
-
-!!!! Composing dynamic models
-
-This exemple shows in three parts how to buid a simple code browser.
-
-First a simple list widget is created displaying all the subclasses of AstractWidgetModel.
-
-Then the list widget is reused to build a viewer widget displaying the protocol methods of the selected class.
-
-Finally the last widget is defined with the previously created viewer.
-In addition, a text zone is added to show the selected methods source code.
-
-The final result looks like the Figure *@fig_browser*.
-
-[[[
-| dynamicWidgetClassList dynamicProtocolViewer dynamicProtoclBrowser |
-	dynamicWidgetClassList := DynamicComposableModel new.
-	dynamicWidgetClassList instantiateModels: #(#list #ListModel).
-	dynamicWidgetClassList list items: (AbstractWidgetModel allSubclasses sorted: [ :a :b | a name < b name ]).
-	dynamicWidgetClassList
-		layout:
-			(SpecLayout composed
-				add: #list;
-				yourself).
-	dynamicWidgetClassList openWithSpec.
-	dynamicProtocolViewer := DynamicComposableModel new.
-	dynamicProtocolViewer assign: dynamicWidgetClassList to: #classes.
-	dynamicProtocolViewer instantiateModels: #(#methods #ListModel).
-	dynamicWidgetClassList list
-		whenSelectedItemChanged: [ :item |
-			item
-				ifNil: [ dynamicProtocolViewer methods items: #() ]
-				ifNotNil: [ dynamicProtocolViewer methods items: (item selectorsInProtocol: 'api') sorted ] ].
-	dynamicProtocolViewer
-		layout:
-			(SpecLayout composed
-				newRow: [ :r |
-					r
-						add: #classes;
-						add: #methods ];
-				yourself).
-	dynamicProtocolViewer openWithSpec.
-	dynamicProtoclBrowser := DynamicComposableModel new.
-	dynamicProtoclBrowser assign: dynamicProtocolViewer to: #top.
-	dynamicProtoclBrowser instantiateModels: #(#text #TextModel).
-	dynamicProtocolViewer methods
-		whenSelectedItemChanged: [ :selector |
-			selector
-				ifNil: [ dynamicProtoclBrowser text text: '' ]
-				ifNotNil: [ dynamicProtoclBrowser text text: (dynamicWidgetClassList list selectedItem >> selector) sourceCode ] ].
-	dynamicProtoclBrowser
-		layout:
-			(SpecLayout composed
-				newColumn: [ :c |
-					c
-						add: #top;
-						add: #text ];
-				yourself).
-	dynamicProtoclBrowser openWithSpec.
-	dynamicProtoclBrowser title: 'Protocol browser'
-]]]
-
-+Prototype of Protocol Browser>file://figures/Dyn_Protocol_Browser.png|width=50|label=fig_browser+
+In this chapter we have discussed the features of Spec that allow for more dynamic user interfaces: changing the layout and the content on-the fly, as well as determining the UIs' widgets at opening time. We ended with a last dynamic feature: allowing the complete construction of a UI in one big block of code, scripting style. 
