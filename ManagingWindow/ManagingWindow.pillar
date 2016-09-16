@@ -70,6 +70,18 @@ The ==DialogWindowModel== instance (==diag== in the example above) can also be c
 
 Also, the message ==cancelled== will return ==true== if the box was closed by clicking on the ''Cancel'' button.
 
+!!! Taking over the entire screen
+
+Lastly, it is also possible to open a UI such that it takes over the entire Pharo screen. There are no other windows, the UI is full screen without any resizing or closing boxes, nor a title bar. The Pharo window is your UI's window.
+
+To take over the entire Pharo screen, send the message ==openWorldWithSpec==:
+
+[[[
+WindowExample new openWorldWithSpec.
+]]]
+
+@@note Via the halos the UI can still be closed, but any other windows that were open before will have disappeared.
+
 !! Modal windows and the closing of windows
 
 Windows are not alone on the screen, and they probably will not live forever. Here we talk about gaining full control of the entire user interface, and how to hook into the window closing logic.
