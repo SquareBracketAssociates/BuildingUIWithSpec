@@ -11,16 +11,19 @@ Spec also provides support for these kinds of user interfaces thanks to its dyna
 
 !! Dynamically changing an already opened UI
 
-The first dynamic feature of Spec that we show is changing the layout and contents of an UI that is already open. This is done by using the ==needRebuild:== and ==buildWithSpecLayout:== methods. The first method is used to signal that the complete UI does ''not'' need to be rebuilt from scratch. The second triggers a rebuild of the UI, which is then limited to laying out the widgets as specified in the ==SpecLayout== given as argument.
+The first dynamic feature of Spec that we show is changing the layout and contents of an UI that is already open. This is done by using the ==needRebuild:== and ==buildWithSpecLayout:== methods. 
+
+- ==needRebuild:==  This method is used to signal that the complete UI does ''not'' need to be rebuilt from scratch. 
+- ==buildWithSpecLayout:== The method triggers a rebuild of the UI, which is then limited to laying out the widgets as specified in the ==SpecLayout== instance given as argument.
 
 !!! A running example
 
-To show the use of these two methods, we create an example user interface that is a multi-data viewer: on the left it shows a list of different kinds of data, and on the right it contains a `view' widget that shows this data in the most appropriate manner. The multi-data viewer can also change its layout from this horizontal form to a vertical form where the list of data is on top and the view widget at the bottom. This change is done by clicking on a button. We show the multi-data viewer when just opened in Figure *@fig_DynHorizontal* and in vertical mode with an item selected in *@fig_DynVertical*.
+To show the use of these two methods, we create an example user interface that is a multi-data viewer: on the left it shows a list of different kinds of data, and on the right it contains a `view' widget that shows this data in the most appropriate manner. The multi-data viewer can also change its layout from this horizontal form to a vertical form where the list of data is on top and the view widget at the bottom. This change is done by clicking on a button. We show the multi-data viewer when just opened in Figure *@fig_DynHorizontal* and in vertical mode with an item selected in Figure *@fig_DynVertical*.
 
-+Screen shot of the multi-data viewer when just opened.>file://figures/DynHorizontal.png|width=60|label=fig_DynHorizontal+
++The multi-data viewer when just opened.>file://figures/DynHorizontal.png|width=60|label=fig_DynHorizontal+
 
 
-+Screen shot of the multi-data viewer in vertical layout, with a Form selected.>file://figures/DynVertical.png|width=60|label=fig_DynVertical+
++The multi-data viewer in vertical layout, with a Form selected.>file://figures/DynVertical.png|width=60|label=fig_DynVertical+
 
 We need to set up the UI before we can talk about changing it after it is opened. We start with the class definition, window size and title definition, and functionality for setting the contents of the list:
 
@@ -39,7 +42,7 @@ DynamicViewer >> title
 	^ 'Dynamic Multi-Data Viewer'
 ]]]
 [[[
-DynamicViewer >> items: aCollection.
+DynamicViewer >> items: aCollection
 	list items: aCollection
 ]]]
 
@@ -80,9 +83,9 @@ We can now already open this UI and give it a list of items to show. For example
 
 [[[
 | viewer |
- viewer := DynamicViewer new.
- viewer openWithSpec.
- viewer items: {
+viewer := DynamicViewer new.
+viewer openWithSpec.
+viewer items: {
 	42 .
 	'Everberg' . 
 	#thumbsUp asIcon . 
@@ -91,7 +94,7 @@ We can now already open this UI and give it a list of items to show. For example
 	  collect:[: cls | cls comment]) asArray}.
 ]]]
 
-!!! Changing the layout of the UI
+!!! Changing the UI layout
 
 Clicking on the 'Change!' button however does not do anything yet. For this we need to define the action block of the button, which we do in ==initializePresenter==, as below. In this action block we first switch the state between ==$h== and ==$v== as appropriate. Second, we signal that the complete UI does ''not'' need to be rebuilt from scratch, with the ==self needRebuild: false.== line. Thanks to this, the next rebuild of the UI will be limited to only performing layout operations. Third and last, the layout change is then triggered by the ==buildWithSpecLayout:== message. It takes a ==SpecLayout== as argument, and it will change the layout of the UI to the specified layout. 
 
@@ -122,7 +125,7 @@ DynamicViewer class >> verticalSpec
       yourself.
 ]]]
 
-The above is all that we need to do to be able to switch the layout of the viewer from horizontal to vertical mode. At its core lie the two calls ==self needRebuild: false.== and ==self buildWithSpecLayout: <XXX>==. All the rest is really just machinery used to define the value of ==<XXX>==.
+The above is all that we need to do to be able to switch the layout of the viewer from horizontal to vertical mode. At its core lie the two calls: ==self needRebuild: false== and ==self buildWithSpecLayout: <XXX>==. All the rest is really just machinery used to define the value of ==<XXX>==.
 
 !!! Replacing a widget with another one
 
@@ -145,20 +148,20 @@ DynamicViewer >> initializePresenter
 		].
 ]]]
 
-The responsibility of the ==widgetFor:== method is to return an instance of the correct widget, showing the selected item. For the sake of keeping this example small, we provide below some decidedly non-OO code that fundamentally implements a big ==switch== statement over the type of the selected item. A clean OO implementation would use double-dispatch, and is left as an exercise to you, dear reader.
+The responsibility of the ==widgetFor:== method is to return an instance of the correct widget, showing the selected item. For the sake of keeping this example small, we provide below some decidedly non-OO code that fundamentally implements a big switch statement over the type of the selected item. A clean OO implementation would use double-dispatch, and is left as an exercise to you, dear reader.
 
 [[[
 DynamicViewer >> widgetFor: aDatum
 	| cm |
-	aDatum isNil ifTrue: [ ^self defaultView ].
+	aDatum isNil ifTrue: [ ^ self defaultView ].
 	aDatum isForm ifTrue: [ 
 		cm := self newImage.
 		cm image: aDatum.
-		^cm ].
+		^ cm ].
 	aDatum isArray ifTrue: [ 
 		cm := self newList.
 		cm items: aDatum.
-		^cm].
+		^ cm ].
 	
 	"default case"
 	cm := self newText.
@@ -177,26 +180,26 @@ It is not always possible to determine beforehand how many widgets will be shown
 
 To show this, we build an extension to the dynamic multi-data viewer of the previous section. It shows the contents of an array differently than simply in a list view, seen for example in Figure *@fig_MultiDataArray*. We create a new ==DynamicArrayViewer== widget for this detailed view, and hence first change the implementation of ==DynamicViewer >> widgetFor:== to return such a widget:
 
-+Screen shot of the extended multi-data viewer showing the contents of an array.>file://figures/MultiDataArray.png|width=60|label=fig_MultiDataArray+
++The extended multi-data viewer showing the contents of an array.>file://figures/MultiDataArray.png|width=60|label=fig_MultiDataArray+
 
 
 [[[
 DynamicViewer >> widgetFor: aDatum
-| cm |
-	aDatum isNil ifTrue: [ ^self defaultView ].
+	| cm |
+	aDatum isNil ifTrue: [ ^ self defaultView ].
 	aDatum isForm ifTrue: [ 
 		cm := self newImage.
 		cm image: aDatum.
-		^cm ].
+		^ cm ].
 	aDatum isArray ifTrue: [ 
 		cm := DynamicArrayViewer on: aDatum.
 		cm owner: self.  " needed because we do not use 'instantiate:' "
-		^cm].
+		^ cm].
 	
 	"default case"
 	cm := self newText.
 	cm text: aDatum asString.
-	^cm
+	^ cm
 ]]]
 
 !!! Implementing the widget for showing array contents
@@ -229,13 +232,12 @@ The ==initializeWidgets== method iterates over the collection and instantiates a
 DynamicArrayViewer >> initializeWidgets
 	
 	label := self newLabel.
-	label label: 'An array with ',collection size asString, ' elements:'.
+	label label: 'An array with ', collection size asString , ' elements:'.
 		
 	1 to: collection size do: [ :count | | model |
 		model := self newText.
 		model text: (collection at: count) asString.
-		self assign: model to: ('txt_',count asString) asSymbol .
-		 ]
+		self assign: model to: ('txt_',count asString) asSymbol ]
 ]]]
 
 @@note The generation of these virtual accessors allows the widgets to be referred to in the rest of the code through an accessor, as if it was a normal variable. 
@@ -251,8 +253,7 @@ DynamicArrayViewer >> layout
 	col add: #label.
 	1 to: collection size do: [:count|
 		col add: ('txt_',count asString) asSymbol ].
-	
-	^col 
+	^ col 
 ]]]
 
 This is all that is required to dynamically populate a UI. Note that this UI can also be opened stand-alone as it is a subclass of ==ComposableModel==. For example, the snippet of code below will open it with the same contents as in Figure *@fig_MultiDataArray*.
@@ -275,7 +276,7 @@ DynamicArrayViewer >> initializeWidgets
 	col := SpecColumnLayout composed.
 
 	label := self newLabel.
-	label label: 'An array with ',collection size asString, ' elements:'.
+	label label: 'An array with ', collection size asString , ' elements:'.
 	col add: #label.	
 		
 	1 to: collection size do: [ :count | | model nam |
@@ -283,8 +284,7 @@ DynamicArrayViewer >> initializeWidgets
 		model text: (collection at: count) asString.
 		nam := ('txt_',count asString) asSymbol.
 		self assign: model to: nam.
-		col add: nam. 
-		 ]
+		col add: nam ]
 
 	self layout: col.
 ]]]
@@ -308,7 +308,7 @@ We start our example code by instantiating a ==DynamicComposableModel== and sett
 	ui extent: 250@70.
 ]]]
 
-We then add the widgets to the UI, using the ==instantiateModels:== method. This method takes as argument a collection of pairs. The first element of the pair is the name of the widget, i.e. the name of the instance variable if this would be a normal, static, UI. The second element of the pair is a subclass of ==ComposableModel==, determining the type of the widget. 
+We then add the widgets to the UI, using the ==instantiateModels:== method. This method takes as argument a collection of pairs. The first element of the pair is the name of the widget, i.e., the name of the instance variable if this would be a normal, static, UI. The second element of the pair is a subclass of ==ComposableModel==, determining the type of the widget. 
 
 [[[	
 	ui instantiateModels: #( 
@@ -352,7 +352,7 @@ The last thing we need to do is to give the UI a layout. This is done by calling
 	ui openWithSpec.
 ]]]
 
-@@note When doing this you are ignoring all the code writing and management facilities that Pharo has to offer (e.g. the browser) and not cleanly separating the different responsibilities of the code of the UI. In other words, this is truly a quick and dirty way to hack together a user interface that should really not make it to production.
+@@note When doing this you are ignoring all the code writing and management facilities that Pharo has to offer (e.g., the browser) and not cleanly separating the different responsibilities of the code of the UI. You also hamper future extension via subclassing. In other words, this is truly a quick and dirty way to hack together a user interface that should really not make it to production.
 
 !! Conclusion
 
