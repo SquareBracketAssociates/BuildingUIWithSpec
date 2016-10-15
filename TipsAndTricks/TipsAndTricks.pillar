@@ -11,7 +11,12 @@ some examples use dynamic Spec (see chapter *@cha_dynamic_spec*), but these
 of course also work without using the dynamic features of Spec.
 Most of the examples are short snippets of code that should be auto-explicative.
 
-!! Include a Morph in a Spec UI
+!! Integrating the different UI frameworks
+
+In this section we show different ways in which the multiple UI
+frameworks present in Pharo can play together with Spec. 
+
+!!! Include a Morph in a Spec UI
 
 Any morph can be included as a widget in a Spec UI. To do this, send
 the Morph instance the ==asSpecAdapter== message, it will return a
@@ -47,7 +52,7 @@ SpecCalendar >> title
 ]]]
 
 
-!! Include a Glamour UI in a Spec UI
+!!! Include a Glamour UI in a Spec UI
 
 
 User interfaces written in Glamour can also be embedded in a Spec UI thanks to a bridge class ==GlamourPresentationModel==. This is a ==ComposableModel== subclass that wraps Glamour user interfaces such as the Playground or the Inspector.
@@ -82,7 +87,7 @@ The GT Playground is a bit unusual in the data that it opens on, this data must 
 ]]]
 
 
-!! Make a Spec presentation for the GT Inspector
+!!! Make a Spec presentation for the GT Inspector
 
 The inverse of the previous tip can also be realized, in a way: It is possible to write code for a GT Inspector tab such that the tab shows a Spec UI. To do this the ==display:== block of the tab should evaluate to a ==ComposableModel== instance that has been set up completely by sending it the ==buildWithSpec== message.
 
@@ -115,36 +120,15 @@ Object >> gtInspectorRecursive: composite
 	 	 	 cm]
 ]]]
 
-!! Customizing the appearance of a widget
 
-If Spec does not allow you to customize the appearance of a widget,
-but the underlying widget library does, you can send messages to the
-widget just after it has been built. For this, configure the widget
-with the ==whenBuiltDo:== message. The argument is a block that takes
-one argument, which will be an instance of a ==WidgetBuilt== announcement.
+!! Lists, trees and tables
 
-For example, the code below assumes the use of Morphic and results in the label being
-rendered in red, and using the Balloon font in Italic.
+In this section we group all tips that treat lists, trees and tables.
 
-[[[
-|container|
-  container := DynamicComposableModel new.
-  container instantiateModels:  #(#red LabelModel).
-  container red label: 'I am red'.
-  container red whenBuiltDo: [:ann|
-	  ann widget color: (Color red);
-         font: BalloonMorph balloonFont emphasis: 2].
-  container layout: (SpecLayout composed add: #red; yourself).
-  container openWithSpec
-]]]
-
-@@note Warning: By doing the above you are tightly coupling your UI to the underlying widget library. As a result, your UI may break if there are changes in this library, or if Spec uses another library for its underlying widgets.
-
-
-!! A scrollable list of widgets
+!!! A scrollable list of widgets
 
 ==ListModel== can show more than just text, it can also visualize any
-kind of widget. To do this, in the ==displayBlock:== send the widgets the ==buildWithSpec== message. This allows to create, e.g. a scrollable list of buttons that reveal information about the classes in the ''Files'' package:
+kind of widget. To do this, in the ==displayBlock:== send the widgets the ==buildWithSpec== message. This allows to create, e.g. a scrollable list of buttons that show the comments of the classes in the ''Files'' package, as shown in Figure *@fig_scrollable_buttons*.
 
 [[[
 ListModel new
@@ -157,10 +141,52 @@ ListModel new
 	openWithSpec
 ]]]
 
-+The Scrollable List of Widgets>file://figures/scrollable_buttons.png|width=30|label=fig_scrollable_buttons+
++The Scrollable List of Widgets>file://figures/scrollable_buttons.png|width=50|label=fig_scrollable_buttons+
 
 
-!! Show a table-like view
+!!! List items do not update automatically
+
+Adding items to a collection held in a list does ''not'' update the widget. A refresh only happens when the items of the list are set using the ==items:== message. Note that setting the items also sorts them if a sort block is specified.
+
+[[[
+|container count|
+ count :=0.
+ container := DynamicComposableModel new.
+ container instantiateModels:  #(#list ListModel #plus ButtonModel).
+ container plus label: '+1'.
+ container plus action: [ | items |
+   count := count + 1.
+   items := container list getList asOrderedCollection.
+   items add: count asString.
+   container list items: items ].
+ container layout:
+   (SpecRowLayout composed add: #list ; add: #plus ; yourself).
+ container openWithSpec
+]]]
+
+!!! Setting the selection in a tree
+
+Programmatically setting the selection in a ==TreeModel== does not automatically highlight the selected item, and inversely highlighting an item does not automatically select it. Therefore, you need to perform both operations to select and highlight a tree item, as in the example below. Note the last two statements in the ==whenBuiltDo:== block: the first sets the selected item, and the second highlights it.
+
+[[[
+| tree chblock |
+ tree := TreeModel new.
+ chblock := [:cl | | subs node |
+   subs := cl subclasses.
+   node := TreeNodeModel new.
+   node content: cl;
+     hasChildren: [ subs isNotEmpty  ];
+     children: [ subs collect: [:sub | chblock value: sub ] ] ].
+ tree roots: 
+       (Collection subclasses collect: [:cl| chblock value: cl ]). 
+ tree whenBuiltDo: [ |sel|
+   sel := tree roots third.
+   tree selectedItem: sel.
+   sel selected: true.].
+ tree openWithSpec
+]]]
+
+!!! Show a table-like view
 
 There are multiple ways in which a table-like widget can be shown to the user. The most straightforward way is the ==MultiColumnListModel==, for example as below. Note that the display block needs to be set to return the item itself, since the default behavior of the display block turns the array into its ==printString==.
 
@@ -200,6 +226,34 @@ Alternatively, a ==TreeModel== can be used, which allows for more fancy formatti
 ]]]
 
 
+!! Customizing the appearance of a widget
+
+If Spec does not allow you to customize the appearance of a widget,
+but the underlying widget library does, you can send messages to the
+widget just after it has been built. For this, configure the widget
+with the ==whenBuiltDo:== message. The argument is a block that takes
+one argument, which will be an instance of a ==WidgetBuilt== announcement.
+
+For example, the code below assumes the use of Morphic and results in the label being
+rendered in red, and using the Balloon font in Italic.
+
+[[[
+|container|
+  container := DynamicComposableModel new.
+  container instantiateModels:  #(#red LabelModel).
+  container red label: 'I am red'.
+  container red whenBuiltDo: [:ann|
+	  ann widget color: (Color red);
+         font: BalloonMorph balloonFont emphasis: 2].
+  container layout: (SpecLayout composed add: #red; yourself).
+  container openWithSpec
+]]]
+
+@@note Warning: By doing the above you are tightly coupling your UI to the underlying widget library. As a result, your UI may break if there are changes in this library, or if Spec uses another library for its underlying widgets.
+
+
+
+
 !! Non-editable multiline text
 
 The ==TextInputFieldModel== can be configured such that the text it contains is not editable, by disabling it:
@@ -211,25 +265,7 @@ TextInputFieldModel new
 	openWithSpec
 ]]]
 
-!! List items do not update automatically
 
-Adding items to a collection held in a list does ''not'' update the widget. A refresh only happens when the items of the list are set using the ==items:== message. Note that setting the items also sorts them if a sort block is specified.
-
-[[[
-|container count|
- count :=0.
- container := DynamicComposableModel new.
- container instantiateModels:  #(#list ListModel #plus ButtonModel).
- container plus label: '+1'.
- container plus action: [ | items |
-   count := count + 1.
-   items := container list getList asOrderedCollection.
-   items add: count asString.
-   container list items: items ].
- container layout:
-   (SpecRowLayout composed add: #list ; add: #plus ; yourself).
- container openWithSpec
-]]]
 
 !! Get called at periodic intervals 
 
@@ -278,9 +314,6 @@ runSequence: script
       equals: result asString asUppercase ]
 ]]]
 
-!! More to add
 
-TreeModel, see mail thread "TreeModel: Updating the tree selection after a deletion" Thanks to Nicolai Hess\
 
-Check http://www.smalltalkhub.com/#!/~hernan/SpecUIAddOns for interesting things
 
