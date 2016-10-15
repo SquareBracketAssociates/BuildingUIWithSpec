@@ -225,8 +225,13 @@ Alternatively, a ==TreeModel== can be used, which allows for more fancy formatti
   m openWithSpec.
 ]]]
 
+!! Using the underlying widget library
 
-!! Customizing the appearance of a widget
+In this section we show how to use some features of the underlying widget library (Morphic in Pharo 6 and before) in Spec.
+
+@@note Warning: By following these tricks you are tightly coupling your UI to the underlying widget library. As a result, your UI may break if there are changes in this library, or if Spec uses another library for its underlying widgets.
+
+!!! Customizing the appearance of a widget
 
 If Spec does not allow you to customize the appearance of a widget,
 but the underlying widget library does, you can send messages to the
@@ -249,25 +254,8 @@ rendered in red, and using the Balloon font in Italic.
   container openWithSpec
 ]]]
 
-@@note Warning: By doing the above you are tightly coupling your UI to the underlying widget library. As a result, your UI may break if there are changes in this library, or if Spec uses another library for its underlying widgets.
 
-
-
-
-!! Non-editable multiline text
-
-The ==TextInputFieldModel== can be configured such that the text it contains is not editable, by disabling it:
-
-[[[
-TextInputFieldModel new
-	text: ('qwerty\asdfgh\zxcvbn' withCRs );
-	enabled: false;
-	openWithSpec
-]]]
-
-
-
-!! Get called at periodic intervals 
+!!! Get called at periodic intervals 
 
 Morphic implements a `stepping' mechanism that allows a morph to register itself for callbacks that are executed at regular intervals. This allows, e.g. for automatic refreshing of a windows' content every ''n'' milliseconds. Spec also provides support for this, by overriding ==ComposableModel=='s method  ==defaultWindowModelClass== to return a ==TickingWindowModel==. An example of this can be found in the Pharo 5 image in the ==WatchPointWindow== class:
 
@@ -294,26 +282,49 @@ WatchpointWindow >> refreshItems
 
 !! Testing the functionality of a Spec UI
 
-@@todo JF WRITE ME
+It is possible to test Spec UIs by programmatically simulating button clicks, list selections et cetera. Furthermore, this can be performed without having to open the UI at all. 
 
-This code literally runs the tests sequences over the calculator GUI’s key buttons and checks the result in the display input field — pretty cool, no ?
+For example, consider the code below that tests the three buttons of the ==CustomerSatisfaction== UI of Chapter *@cha_first_contact*.
 
 [[[
-setUp
-  calculator := HP35CalculatorUIModel new.
-  calculator openWithSpec
-
-tearDown
-  calculator window close
-
-runSequence: script
-  script pairsDo: [ :key :result |
-    (calculator perform: key) performAction.
-    self
-      assert: calculator display text
-      equals: result asString asUppercase ]
+| cs |
+ cs := CustomerSatisfaction new.
+ cs buildWithSpec.
+ cs buttonHappy performAction.
+ self assert: [cs screen label = 'Happy' ].
+ cs buttonNeutral performAction.
+ self assert:[ cs screen label = 'Neutral' ].
+ cs buttonBad performAction.
+ self assert: [cs screen label = 'Badz' ].
 ]]]
 
+In the third line of code, we build the UI without opening a window. Then, for each button we programmatically click it and check if the label shown on screen matches the expected value. The last test will fail because the label shown on screen sais 'Bad' and not 'Badz'. 
 
+There is however no uniform API for testing the different widgets of Spec, for each widget you must establish which method to call to programmatically simulate the widget manipulation you wish to test. For example, the code below uses list selection to test some behavior of the text field of the ==ProtocolBrowser== of Chapter *@cha_reuse*.
+
+[[[
+| pb | 
+ pb := ProtocolBrowser new.
+ pb buildWithSpec.
+ pb viewer models list setSelectedIndex: 1.
+ self assert: [ pb text text isEmpty ].
+ pb viewer api methods setSelectedIndex: 1.
+ self assert: [(pb text text copyFrom: 1 to: 6) = 'action' ].
+]]]
+
+@@note The previous code is not clean because it heavily relies on the internal structure of the ==ProtocolBrowser== and of the widgets that it reuses. Instead, it would be better to create an API for testing that exposes the internals that are required to be able to write UI tests. A discussion of such API creation is however out of the scope of this text.
+
+@@note If it is required have the UI open while doing the tests, change the send of ==buildWithSpec== to ==openWithSpec== and add a ==pb window close== at the end of the code, this will open, respectively close the UI.
+
+!! Non-editable multiline text
+
+Last but not least, a tiny tip: the ==TextInputFieldModel== can be configured such that the text it contains is not editable, by disabling it.
+
+[[[
+TextInputFieldModel new
+	text: ('qwerty\asdfgh\zxcvbn' withCRs );
+	enabled: false;
+	openWithSpec
+]]]
 
 
