@@ -7,7 +7,6 @@ PDFCHAPTERS =           book-result/AdvancedWidgets/AdvancedWidgets.pdf \
 			book-result/LayoutsContruction/LayoutsContruction.pdf \
 			book-result/ManagingWindow/ManagingWindow.pdf \
 			book-result/Reuse/Reuse.pdf \
-			book-result/SpecInternals/SpecInternals.pdf \
 			book-result/ThreePillarsOfSpec/ThreePillarsOfSpec.pdf \
 			book-result/TipsAndTricks/TipsAndTricks.pdf \
 
@@ -18,7 +17,6 @@ HTMLCHAPTERS =           book-result/AdvancedWidgets/AdvancedWidgets.html \
 			book-result/LayoutsContruction/LayoutsContruction.html \
 			book-result/ManagingWindow/ManagingWindow.html \
 			book-result/Reuse/Reuse.html \
-			book-result/SpecInternals/SpecInternals.html \
 			book-result/ThreePillarsOfSpec/ThreePillarsOfSpec.html \
 			book-result/TipsAndTricks/TipsAndTricks.html \
 

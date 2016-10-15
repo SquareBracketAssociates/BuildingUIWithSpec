@@ -32,6 +32,3 @@ ${inputFile:DynamicSpec/DynamicSpec.pillar}$
 
 ${inputFile:TipsAndTricks/TipsAndTricks.pillar}$
 
-!Spec Internals
-
-${inputFile:SpecInternals/SpecInternals.pillar}$
