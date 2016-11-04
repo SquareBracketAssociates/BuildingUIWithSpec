@@ -9,6 +9,91 @@
 
 @@todo JF add motivating intro
 
+
+!! RadioButtonModel
+
++Screen shot of the washing machine control panel.>file://figures/Wash.png|width=30|label=fig_WashingMachine+
+
+Radio buttons allow the user to select at most one option from a group, and unlike dropdown menus all items of this group are visible on screen. The ==RadioButtonModel== of spec uses ==RadioButtonGroup== to manage the group.
+
+As an example UI we present a basic washing machine control panel, shown in Figure *@fig_WashingMachine*. There are two groups of radio buttons: one for the kind of fabric and one for the temperature of the water (in Celcius). Lastly, there is one more radio button that allows for an extra rinse cycle to be selected. 
+
+The code for the UI is in a ==RadioButtonExample== class, whose definition and layout method are straightforward:
+
+[[[
+ComposableModel subclass: #RadioButtonExample
+	instanceVariableNames: 'rinse f1 f2 f3 t1 t2 t3'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+
+]]]
+
+[[[
+RadioButtonExample class >> defaultSpec
+ ^SpecColumnLayout composed
+    newRow: [:r | 
+      r newColumn: [:c | c add: #f1 ; add: #f2 ; add: #f3 ];
+        newColumn: [:c | c add: #t1 ; add: #t2 ; add: #t3 ]];
+    newRow: [:r | r add: #rinse ];
+    yourself
+]]]
+
+In the ==initializeWidgets== method, we will add the fabric radio buttons ==f1== through ==f3== to a ==fabric== button group and the temperature buttons ==t1== through ==t3== to a ==temperature== button group. Since these button groups are used nowhere else in the UI, we only have them as local variables of the method and not as instance variables of the class.
+
+The code below shows the method. We first create both button groups, then the ==rinse== button, and then the different temperature and fabric buttons are created and added to their group. The ==rinse== button is configured to be de-selectable, and the ==f1== and ==t1== buttons are the default buttons of their respective groups, meaning they will be selected when the UI opens.
+
+[[[
+RadioButtonExample >> initializeWidgets
+  | fabric temperature |
+  fabric := RadioButtonGroup new.
+  temperature := RadioButtonGroup new.
+	
+  rinse := self newRadioButton.
+  rinse label: 'Rinse Extra';
+	  canDeselectByClick: true.
+	
+  f1 := self newRadioButton.
+  f1 label: 'Cotton'.
+  fabric addRadioButton: f1;
+    default: f1.
+	
+  f2 := self newRadioButton.
+  f2 label: 'Synthetic'.
+  fabric addRadioButton: f2.
+	
+  f3 := self newRadioButton.
+  f3 label: 'Delicate'.
+  fabric addRadioButton: f3.
+	
+  t1 := self newRadioButton.
+  t1 label: '60'.
+  temperature addRadioButton: t1;
+    default: t1.
+	
+  t2 := self newRadioButton.
+  t2 label: '40'.
+  temperature addRadioButton: t2.
+	
+  t3 := self newRadioButton.
+  t3 label: '30'.
+  temperature addRadioButton: t3.
+]]]
+
+Lastly, we include some logic that will trigger on button click of the different fabric buttons. If the `Synthetic' button is selected, and the temperature is set to 60 degrees, the temperature will be lowered to 40. If the `Delicate' button is selected, the temperature will be set to 30 degrees and the other fabric buttons will be disabled, as seen in Figure *@fig_WashingMachine*. Conversely, if the `Delicate' button is deselected (because another button was selected), the other fabric buttons are enabled again.
+
+[[[
+RadioButtonExample >> initializePresenter
+
+  f2 activationAction: [ t1 state ifTrue: [t2 state: true.]].
+  f3 activationAction: [
+    t1 disable; state: false.
+    t2 disable; state: false.
+    t3 state: true. ].
+ f3 deactivationAction: [ t1 enable. t2 enable. ]
+]]]
+
+With this functionality, we have demonstrated the main features of ==RadioButtonModel== and ==RadioButtonGroup==. For additional features of these classes, we refer to the source code.
+
 !! TextInputFieldModel
 @sec_textInputFieldModel
 
@@ -135,106 +220,13 @@ DynamicalPopup >> exampleAlternativeToolbar
 +Render of the Popup with a New Toolbar>file://figures/Popup_NewToolbar.png|width=50|label=fig_popup_newtoolbar+
 
 
-!! RadioButtonModel
-
-@@todo JF REWRITE
-
-That example show the use of ==RadioButtonGroupModel== to managed radiobuttons.
-
-Notice that ==MrAndMrsRadioButton== is a subclass of ==ComposableModel== have a subwidget ==RadioButtonGroupModel== which is a subclass of ==DynamicComposableModel==, they are compatible.
-
-[[[
-ComposableModel subclass: #MrAndMrsRadioButton
-instanceVariableNames: 'labelGreeting textName buttonGreet groupRadio'
-classVariableNames: ''
-package: 'Spec-BuildUIWithSpec-AdvancedWidgets'
-]]]
-
-Here, the buttons created are not subwidgets of ==MrAndMrsRadioButton== but of the ''groupRadio''.
-
-==RadioButtonGroupModel== provide :
-- Message ==addRadioButton:== add a RadioButton at the group and do all necessary things to manage it properly :
--- it configures the variables of the button to keep the hierarchy coherent
--- it manages the deselection of other button when one is activated
--- it creates an accessor ==radioX== where X is a number depending of the place of the button (first button added will be radio1, second button will be radio2, ...)
-- Message ==default:== activates the specified button. Here, we use the accessor created by ==addRadioButton:==, it's equivalent at ''default: radioMr''.
-- ValueHolder ==currentActevated== and its accessors, what contains the last activated button, and provide an hook ==whenCurrentActivatedChanged:== which propagate an event when a change happend
-
-[[[
-MrAndMrsRadioButton >> initializeWidgets
-	| radioMr radioMs radioMrs |
-	"Widgets instanciation"
-	self
-		instantiateModels: #(#labelGreeting #LabelModel #textName #TextInputFieldModel #buttonGreet #ButtonModel).
-
-	"Widgets configuration specification"
-	labelGreeting label: 'Enter your name.'.
-	textName autoAccept: true.
-	buttonGreet
-		label: 'Greet Me!';
-		disable.
-
-	"RadioButton creation"
-	radioMr := RadioButtonModel new.
-	radioMs := RadioButtonModel new.
-	radioMrs := RadioButtonModel new.
-	radioMr label: 'Mr.'.
-	radioMs label: 'Ms.'.
-	radioMrs label: 'Mrs.'.
-
-	"Adding the group for RadioButton"
-	groupRadio := self instantiate: RadioButtonGroupModel.
-	groupRadio
-		addRadioButton: radioMr;
-		addRadioButton: radioMs;
-		addRadioButton: radioMrs;
-		default: groupRadio radio1.
-
-	"specification of order of focus"
-	self focusOrder
-		add: textName;
-		add: buttonGreet;
-		add: groupRadio
-]]]
-
-==AbstractWidgetModel==, whom subclasses are basics widgets, provide the accessors ==enabled== and ==enabled:==, and the shortcuts ==enable== and ==disable==. It can be used to create tricks like in the section @sec_noneditable_textfield.
-
-[[[
-MrAndMrsRadioButton >> initializePresenter
-	"Hook for events"
-	textName whenTextChanged: [ buttonGreet enable ].
-
-	"Specification of the Button's Action"
-	buttonGreet action: [ labelGreeting label: 'Hello, ' , groupRadio currentActivated label , ' ' , textName text.
-	buttonGreet disable ]
-]]]
-
-In the code of ==initializePresenter== *@ex_radio_initializepresenter*,
-- Message ==action:== set a block to perform when the button is clicked.
-- ==currentActivated== and its acessors are provided by ==RadioButtonGroupModel==, it contains the button activated.
-
-==SpecColumnLayout== is the object created by ==newColumn:==.
-
-[[[
-MrAndMrsRadioButton >> defaultSpec
-	<spec: #default>
-	^ SpecColumnLayout new
-		add: #labelGreeting;
-		add: #textName;
-		add: #buttonGreet;
-		add: #groupRadio;
-		yourself
-]]]
-
-+Render of MrAndMrsRadioButton>file://figures/MrAndMrsRadioButton.png|width=50|label=fig_MrAndMrsRadioButton+
-
 
 !! Menus
 @sec_littletoolbar
 
 @@todo JF a less in-depth rewrite is feasible
 
-@@todo JF missing explanation of menu on a text field or on a list.
+@@todo JF missing explanation of menu on a text field or on a list. Also, what can we rescue from  ApplicationWithToolbar? Ben sais: "MenuModel can be used in two cases: to define a toolbar, or to define a contextual menu."
 
 This example shows the creation of menu, a menu is the collaboration between three classes:
 - ==MenuModel== containing ==MenuGoupModel== and displaying them spepareted by a splitter.
