@@ -11,6 +11,7 @@
 
 
 !! RadioButtonModel
+@sec_RadioButtonModel
 
 +Screen shot of the washing machine control panel.>file://figures/Wash.png|width=30|label=fig_WashingMachine+
 
@@ -18,7 +19,7 @@ Radio buttons allow the user to select at most one option from a group, and unli
 
 As an example UI we present a basic washing machine control panel, shown in Figure *@fig_WashingMachine*. There are two groups of radio buttons: one for the kind of fabric and one for the temperature of the water (in Celcius). Lastly, there is one more radio button that allows for an extra rinse cycle to be selected. 
 
-The code for the UI is in a ==RadioButtonExample== class, whose definition and layout method are straightforward:
+The code for the UI is in a ==RadioButtonExample== class, whose definition and layout are straightforward:
 
 [[[
 ComposableModel subclass: #RadioButtonExample
@@ -30,12 +31,17 @@ ComposableModel subclass: #RadioButtonExample
 
 [[[
 RadioButtonExample class >> defaultSpec
- ^SpecColumnLayout composed
-    newRow: [:r | 
-      r newColumn: [:c | c add: #f1 ; add: #f2 ; add: #f3 ];
-        newColumn: [:c | c add: #t1 ; add: #t2 ; add: #t3 ]];
-    newRow: [:r | r add: #rinse ];
-    yourself
+	^SpecColumnLayout composed
+		newRow: [:r | 
+			r newColumn: [:c | c add: #f1 ; add: #f2 ; add: #f3 ];
+			newColumn: [:c | c add: #t1 ; add: #t2 ; add: #t3 ]];
+		newRow: [:r | r add: #rinse ];
+		yourself
+]]]
+
+[[[
+RadioButtonExample >> extent
+	^160@150
 ]]]
 
 In the ==initializeWidgets== method, we will add the fabric radio buttons ==f1== through ==f3== to a ==fabric== button group and the temperature buttons ==t1== through ==t3== to a ==temperature== button group. Since these button groups are used nowhere else in the UI, we only have them as local variables of the method and not as instance variables of the class.
@@ -44,39 +50,39 @@ The code below shows the method. We first create both button groups, then the ==
 
 [[[
 RadioButtonExample >> initializeWidgets
-  | fabric temperature |
-  fabric := RadioButtonGroup new.
-  temperature := RadioButtonGroup new.
+	| fabric temperature |
+	fabric := RadioButtonGroup new.
+	temperature := RadioButtonGroup new.
 	
-  rinse := self newRadioButton.
-  rinse label: 'Rinse Extra';
-	  canDeselectByClick: true.
+	rinse := self newRadioButton.
+	rinse label: 'Rinse Extra';
+		canDeselectByClick: true.
 	
-  f1 := self newRadioButton.
-  f1 label: 'Cotton'.
-  fabric addRadioButton: f1;
-    default: f1.
+	f1 := self newRadioButton.
+	f1 label: 'Cotton'.
+	fabric addRadioButton: f1;
+		default: f1.
 	
-  f2 := self newRadioButton.
-  f2 label: 'Synthetic'.
-  fabric addRadioButton: f2.
+	f2 := self newRadioButton.
+	f2 label: 'Synthetic'.
+	fabric addRadioButton: f2.
 	
-  f3 := self newRadioButton.
-  f3 label: 'Delicate'.
-  fabric addRadioButton: f3.
+	f3 := self newRadioButton.
+	f3 label: 'Delicate'.
+	fabric addRadioButton: f3.
 	
-  t1 := self newRadioButton.
-  t1 label: '60'.
-  temperature addRadioButton: t1;
-    default: t1.
+	t1 := self newRadioButton.
+	t1 label: '60'.
+	temperature addRadioButton: t1;
+		default: t1.
 	
-  t2 := self newRadioButton.
-  t2 label: '40'.
-  temperature addRadioButton: t2.
+	t2 := self newRadioButton.
+	t2 label: '40'.
+	temperature addRadioButton: t2.
 	
-  t3 := self newRadioButton.
-  t3 label: '30'.
-  temperature addRadioButton: t3.
+	t3 := self newRadioButton.
+	t3 label: '30'.
+	temperature addRadioButton: t3.
 ]]]
 
 Lastly, we include some logic that will trigger on button click of the different fabric buttons. If the `Synthetic' button is selected, and the temperature is set to 60 degrees, the temperature will be lowered to 40. If the `Delicate' button is selected, the temperature will be set to 30 degrees and the other fabric buttons will be disabled, as seen in Figure *@fig_WashingMachine*. Conversely, if the `Delicate' button is deselected (because another button was selected), the other fabric buttons are enabled again.
@@ -84,15 +90,149 @@ Lastly, we include some logic that will trigger on button click of the different
 [[[
 RadioButtonExample >> initializePresenter
 
-  f2 activationAction: [ t1 state ifTrue: [t2 state: true.]].
-  f3 activationAction: [
-    t1 disable; state: false.
-    t2 disable; state: false.
-    t3 state: true. ].
- f3 deactivationAction: [ t1 enable. t2 enable. ]
+	f2 activationAction: [ t1 state ifTrue: [t2 state: true.]].
+	f3 activationAction: [
+		t1 disable; state: false.
+		t2 disable; state: false.
+		t3 state: true. ].
+	f3 deactivationAction: [ t1 enable. t2 enable. ]
 ]]]
 
 With this functionality, we have demonstrated the main features of ==RadioButtonModel== and ==RadioButtonGroup==. For additional features of these classes, we refer to the source code.
+
+!! TabModel
+@sec_TabModel
+
+A second set of classes that are made to work together are the ==TabManagerModel== and the ==TabModel== classes. In a tabbed UI, the former holds the organisation of the different tabs, and the latter represent the tabs themselves. To show how both these classes cooperate, we will extend the washing machine example from section *@sec_RadioButtonModel* to a washer-dryer machine. It has a tabbed UI, were one tab is for the washing part, a second tab for the spin cycle and drying, and a third tab shows information.
+
+To use tabs, only the ==TabManagerModel== needs to be kept as an instance variable of the UI, and added to the layout:
+
+[[[
+ComposableModel subclass: #TabMgrExample
+	instanceVariableNames: 'tabmgr'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+]]]
+
+[[[
+TabMgrExample >> extent
+	^250@160
+]]]
+
+[[[
+TabMgrExample class >> defaultSpec
+	^SpecLayout composed
+		add: #tabmgr;
+		yourself
+]]]
+
+To show tabs, these need to be added to the tab manager using the ==addTab:== method, as shown below:
+
+[[[
+TabMgrExample >> initializeWidgets
+	| tab |
+	
+	tabmgr := self newTabManager.
+	
+	tab := self newTab.
+	tab model: RadioButtonExample new.
+	tab label: 'Wash'; closeable: false;
+		icon: Smalltalk ui icons smallScreenshot.
+	tabmgr addTab: tab.
+]]]
+
+After creating the ==TabManagerModel==, the code creates a ==TabModel== and configures it to show an instance of the ==RadioButtonExample== class. The ==model:== message takes any ==ComposableModel==, following the spirit of UI reuse in Spec. Lastly, additional attributes of the tab are set: a label, an icon, and the tab is made non-closable.
+
+This is all we need to have a first version of the UI, showing the UI of section *@sec_RadioButtonModel* as a tab. 
+
+The ==TabManagerModel== is dynamic: new tabs can be added and tabs can be removed when the UI is open. To do this, it is sufficient to send the messages ==addTab:== and ==removeTab:== to a ==TabManagerModel==, with as argument the tab to be added, resp. removed. Closable tabs have a close button that allows the used to remove them from the UI as well.
+
+To add the second part of the user interface, for drying the clothes, we extend ==initializeWidgets== as follows:
+
+[[[
+TabMgrExample >> initializeWidgets
+
+	[...]
+
+	tab := self newTab.
+	tab model: (self dryModel).
+	tab label: 'Dry'; closeable: false;
+		icon: Smalltalk ui icons smallNew.
+	tabmgr addTab: tab.
+
+]]]
+
+The tab needs to be configured with an instance of a ComposableModel, which typically means that there is a UI class for each tab in the UI. In some cases it may however be too heavyweight to create a class for a simple UI tab. It is therefore also possible to use dynamic Spec (see Chapter *@cha_dynamic_spec*) to create the contents of a tab.
+
+For example, the code of ==dryModel== configures a ==DynamicComposableModel== to show two sliders. The first selects the maximum speed of the spin cycle, and the second how long the drying cycle should last.
+
+[[[
+TabMgrExample >> dryModel
+	| model |
+
+	model := DynamicComposableModel new.
+	model instantiateModels: #(
+		spin SliderModel
+		dry SliderModel).
+	
+	model spin label: 'Spin speed'; min: 400; max: 1600; quantum: 400.
+	model dry label: 'Dry time'; min: 0; max: 120; quantum: 10.
+	
+	model layout: (
+		SpecColumnLayout composed
+			add: #spin height: 30;
+			add: #dry height: 30;
+			yourself).
+		
+	^model.
+]]]
+
+@@note We strongly discourage the use of ==DynamicComposableModel== for anything except the most simple UIs. Please see Section *@sec_hacking_dynamic* for more considerations about the use of ==DynamicComposableModel==.
+
+Lastly, our UI contains an `info' tab, which allows us to illustrate the ability of ==TabManager== to obtain the selected tab, and take actions on tab selection. The `info' tab will hold a ==status== text field, that we keep as an instance variable and initialize before creating the tab.
+
+[[[
+ComposableModel subclass: #TabMgrExample
+	instanceVariableNames: 'tabmgr status'
+	classVariableNames: ''
+	package: 'Spec-BuildUIWithSpec'
+]]]
+
+[[[
+TabMgrExample >> initializeWidgets
+
+	[...]
+	
+	self createStatus.
+	tab := self newTab.
+	tab model: status.
+	tab label: 'Info'; closeable: false;
+		icon: Smalltalk ui icons smallInfo.
+	tabmgr addTab: tab.
+]]]
+
+In the ==createStatus== method, we instantiate a ==TextModel==, disable it so that the user cannot edit it, and set its initial text:
+
+[[[
+TabMgrExample >> createStatus
+
+	status := TextModel new.
+	status disable;
+		text: 'Welcome to Washing Machine 2.0!\History: Wash ' withCRs.
+]]]
+
+Lastly, in ==initializePresenter== we state that when a tab is selected, the label of the currently selected tab is added to the status text. This in effect creates a navigation history, completing the UI of our washer-dryer machine.
+
+[[[
+TabMgrExample >> initializePresenter
+
+	tabmgr whenTabSelected: [
+		status text: (String streamContents: [:s |
+			s nextPutAll: status text.
+			s nextPutAll: ' > '.
+			s nextPutAll: tabmgr selectedTab label])].
+]]]
+
 
 !! TextInputFieldModel
 @sec_textInputFieldModel
@@ -332,8 +472,3 @@ LittleToolbar >> dynamicalAdding: aGroup
 The figure *@fig_LittleToolbar* show the result after two clicks on the button to add an item and a click on the button displaying a submenu
 
 +Render of LittleToolbar>file://figures/LittleToolbar.png|width=50|label=fig_LittleToolbar+
-
-!! TabModel
-@sec_TabModel
-
-@@todo JF write me

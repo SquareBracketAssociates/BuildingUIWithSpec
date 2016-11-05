@@ -292,6 +292,7 @@ DynamicArrayViewer >> initializeWidgets
 This implementation builds the layout at the same time as the widgets are built. It adds a reference in the layout to each widget just after it is created. At the end of the method, the layout for the UI is set using the ==layout:== method, removing the need to override ==layout== as in the previous implementation.
 
 !! Hacking together a UI in the Playground
+@sec_hacking_dynamic
 
 Thanks to ==DynamicComposableModel==, Spec also allows for a more scripting-like development style, where the entire UI is defined in one giant piece of code, typically built incrementally. This may be useful, e.g. for `quick and dirty' prototyping where you want to omit the creation of a class for the UI as well as the definition of multiple methods. In this section we show how we can hack together a simple UI, scripting style, from within the Playground.
 
