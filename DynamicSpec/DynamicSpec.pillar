@@ -342,7 +342,7 @@ With the widgets defined and instantiated, we can now configure them, as we woul
 The last thing we need to do is to give the UI a layout. This is done by calling the ==layout:== method, giving it an instance of a ==SpecLayout== that specifies the layout. The UI can then be opened and is fully functional.
 
 [[[
-	ui layout := (SpecLayout composed
+	ui layout: (SpecLayout composed
 		newColumn: [ :c |
 			c
 				add: #text height: 25;
