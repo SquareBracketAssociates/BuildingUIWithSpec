@@ -32,13 +32,13 @@
 }
 
 %=================================================================
-\title{Building UIs with Spec}
+\title{The Spec UI framework}
 \author{St\'ephane Ducasse and Johan Fabry}
 %\date{}
 %\date{\gitdate\titlebreak[\smallskip]{ -- }\protect\gitCommitInfo}
 
 \hypersetup{pdfinfo = {
-    Title = {Building UIs with Spec},
+    Title = {The Spec UI framework},
     Author = {St\'ephane Ducasse and Johan Fabry},
     Keywords = {pharo, smalltalk, user interface}}}
 % =================================================================
