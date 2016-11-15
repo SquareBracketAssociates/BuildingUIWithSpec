@@ -226,13 +226,13 @@ Firstly, sending the ==windowIcon:== message to the ==ComposableModel== allows a
 | wm1 wm2 |
  wm1 := WindowExample new.
  wm1 openWithSpec.
- wm1 windowIcon: (wm1 iconNamed: #thumbsDown).
+ wm1 windowIcon: (Smalltalk ui icons iconNamed: #thumbsDown).
  wm2 := WindowExample new.
- wm2 windowIcon: (wm2 iconNamed: #thumbsUp).
+ wm2 windowIcon: (Smalltalk ui icons iconNamed: #thumbsUp).
  wm2 openWithSpec.
 ]]]
 
-Secondly, the icon can be changed by overriding the ==windowIcon== message, as below.
+Secondly, the icon can be changed by overriding the ==windowIcon== message, as below. (The code below is for Pharo 6, for this to work in Pharo 5 replace ==self iconNamed:== with ==Smalltalk ui icons iconNamed:== .)
 
 [[[
 WindowExample >> windowIcon

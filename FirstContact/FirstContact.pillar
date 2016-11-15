@@ -63,7 +63,8 @@ CustomerSatisfaction >> initializeWidgets
 
 @@note An alternative way to instantiate widgets is by using the message ==instantiate:== with a class as argument. For example ==screen := self instantiate: LabelModel.== This allows one to instantiate non-standard widgets, but can of course also be used for the standard widgets.
 
-Second, we configure the buttons of our UI. The message ==label:== defines their label and the message ==icon:== specifies the icon that will be displayed near the label.
+Second, we configure the buttons of our UI. The message ==label:== defines their label and the message ==icon:== specifies the icon that will be displayed near the label. 
+The code below is for Pharo 6, for this to work in Pharo 5 replace ==self iconNamed:== with ==Smalltalk ui icons iconNamed:== .
 
 [[[
 [ ... continued ... ]
