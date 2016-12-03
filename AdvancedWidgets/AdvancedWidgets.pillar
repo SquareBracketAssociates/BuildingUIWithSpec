@@ -233,6 +233,105 @@ TabMgrExample >> initializePresenter
 			s nextPutAll: tabmgr selectedTab label])].
 ]]]
 
+!! Toolbars and Pop-up Menus
+
+Both toolbars and pop-up menus in Spec are the result of a collaboration between three classes:
+- A ==MenuModel== containing different ==MenuGroupModel== instances and displaying them, separated by a splitter.
+- Multiple ==MenuGroupModel== instances, each containing a number of ==MenuItemModel== instances.
+- Various ==MenuItemModel== instances, each representing a menu item with a specific appearance and behaviour.
+
+Spec currently does not provide straightforward support for contextual menus on the UI. It is however easy to add a toolbar to a UI, as it is just another widget that is added to the layout. For example, consider the ==WatchpointWindow== class that is standard in Pharo 5. It has a menu held in its ==menu== instance variable, and its layout method places the toolbar as first widget of a column of widgets:
+
+[[[
+WatchpointWindow >> defaultSpec
+	^ SpecColumnLayout composed
+			add: #menu height: self toolbarHeight;
+			add: #list;
+			add: #inspectIt height: self toolbarHeight
+]]]
+
+The ==MenuModel== class is the only class that should be instantiated
+by the programmer. To create a group, send ==addGroup:== to a
+==MenuModel==, with a block as argument. This will create the group and
+add it to the menu. The block receives one argument: the
+instance of the group that was created. Similarly, sending ==addItem:==
+to that ==MenuGroupModel== creates a new ==MenuItemModel== and adds it to the
+group. The argument of ==addItem:== is also a 1-argument block, and
+this argument is the menu item that is created. While this explanation may sound confusing, the resulting code is quite readable, as will be shown in the example below. 
+
+==MenuItemModel== provides the following methods for configuration:
+- ==name:== sets the text of the menu item. 
+- ==icon:== sets the icon.
+- ==description:== adds a tool-tip.
+- ==shortcut:== adds a shorcut for the item.
+- ==action:== adds a block to execute when the item is selected.
+- ==subMenu:== takes a ==MenuModel== that represents the submenu that corresponds to this item.
+
+Since ==MenuItemModel== is meant to be used both as a toolbar and a menu item, it is possible to create menu items without text or without icons, and the tool-tip works both when used as a toolbar and as a menu item. The last two configuration options: executing an action or opening a submenu are ""not"" mutually exclusive. For example, in a menu hovering over an item with a submenu opens the submenu, but still allows for the menu item itself to be selected.
+
+To show the construction of a menu, we expand our washing machine example of the previous sections. We add a menu for technicians to use when troubleshooting or fixing the machine. To do this, we add a ==menu== instance variable and accessors to the ==TabMgrExample== class as well as a ==populateMenu== method. The ==initializeWidgets== method is appended with a ==self populateMenu== line, and the code of this method is as follows:
+
+[[[
+TabMgrExample  >> populateMenu
+	| submenu |
+
+	menu := MenuModel new.
+	submenu := MenuModel new.
+
+	submenu addGroup: [ :group |
+			group addItem: [ :item |
+				item name: 'Soft Reset';
+					action: [ status text: 'History: Wash '.];
+					icon: Smalltalk ui icons exception].
+			group addItem: [ :item|
+				item name: 'Hard Reset';
+					action: [ GrowlMorph openWithContents: 'Just pull the plug!' ];
+					icon: Smalltalk ui icons smallError ]
+			 ].
+]]]
+
+After defining a ==submenu== temporary variable, the code above initialises both the ==menu== and ==submenu== variables to a fresh ==MenuModel== instance. For the sake of the example, the code first constructs the submenu, adding a soft and hard reset menu item with their respective icons and actions. The code for these menu items is straightforward (we assume the ==GrowlMorph== also works on our washing machine). 
+
+We now continue with the definition of the main menu. As said previously, there is no easy way to create a contextual menu that pops up when the right mouse button is clicked. It is possible to show a pop-up menu by sending ==buildWithSpecAsPopup popUpInWorld== to a ==MenuModel== instance, but binding this code to a right mouse click is not straightforward.
+
+A workaround we use here is to define a menu item that pops up the menu when it is selected. This seems like creating a chicken and egg problem, since there is no way to select the menu item when the menu is not visible! This is however not the case: we can associate a shortcut key to the menu item, so pressing the shortcut reveals the menu.
+
+The code below continues the ==populateMenu== method and populates the main menu. The first item is the menu revealing item. It is triggered by pressing control-r on Windows and Linux, and command-r on Mac, as specified by the ==$r meta== key combination. This menu item also shows how to specify a tooltip. The rest of the code is straightforward.
+
+[[[
+	menu addGroup: [ :group |
+		group addItem: [ :item |
+			item name: 'Reveal this menu';
+				action: [menu buildWithSpecAsPopup popUpInWorld];
+				description: 'This entry exits to have a shortcut for this menu.';
+				shortcut: $r meta
+			].
+		group addItem: [ :item |
+			item name: 'Status Info';
+				action: [ GrowlMorph openWithContents: tabmgr selectedTab label];
+				icon: Smalltalk ui icons help].
+		].
+]]]
+
+Lastly, we add a second group to the main menu, causing a splitter to appear between the above two items and the below item. This last item simply shows the submenu that we created at the beginning of the method.
+
+[[[
+	menu addGroup: [ :group |
+		group addItem: [ :item |
+			item name: 'Actions';
+				subMenu: submenu.
+			 ]
+		].
+	
+	menu applyTo: self. 
+]]]
+
+At the very end of the method, the ==applyTo:== method is sent to the menu, causing the shortcuts defined in it to be registered to the ==TabMgrExample== widget. This is what makes pressing a shortcut of a menu item trigger the action of that menu item.
+
+Nothing else is needed to associate the menu to the UI. There is no need to add the menu in a layout method, since our example does not have a toolbar widget shown. However, in case of adding a toolbar the ==menu== will need to be added to the layout, as we have shown in the ==WatchpointWindow== example at the beginning of this section.
+
+Last but not least, menus are not completely static: menu items can be disabled and enabled by sending ==enabled: false==, resp. ==enabled: true== to them. The structure of a menu can also be changed by adding and removing items and groups. In the example above, since the menu is rebuilt on each pop-up such changes are immediately visible. In contrast, when used as a toolbar the menu is a widget, so the UI will need to be rebuilt as discussed in Chapter *@cha_dynamic_spec*.
+
 
 !! TextInputFieldModel
 @sec_textInputFieldModel
@@ -358,117 +457,3 @@ DynamicalPopup >> exampleAlternativeToolbar
 
 
 +Render of the Popup with a New Toolbar>file://figures/Popup_NewToolbar.png|width=50|label=fig_popup_newtoolbar+
-
-
-
-!! Menus
-@sec_littletoolbar
-
-@@todo JF a less in-depth rewrite is feasible
-
-@@todo JF missing explanation of menu on a text field or on a list. Also, what can we rescue from  ApplicationWithToolbar? Ben sais: "MenuModel can be used in two cases: to define a toolbar, or to define a contextual menu."
-
-This example shows the creation of menu, a menu is the collaboration between three classes:
-- ==MenuModel== containing ==MenuGoupModel== and displaying them spepareted by a splitter.
-- ==MenuGoupModel== containing ==MenuItemModel==.
-- ==MenuItemModel==, each of them will be a button in the menu, they wears their behaviour and their appearence.
-
-The message ==applyTo:== links the shorcuts of the menu at a model. Making them usable, even if the menu is not displayed.
-
-[[[
-LittleToolbar >> initializeWidgets
-	menu := self instantiate: MenuModel.
-	self configMainMenu.
-	menu applyTo: self
-]]]
-
-Here, the layout dislay simply the menu.
-
-[[[
-LittleToolbar >> defaultSpec
-	<spec: #default>
-	^ SpecLayout composed
-		newColumn: [ :column | column add: #menu ];
-		yourself
-]]]
-
-- The message ==addGroup:== is provided by ==MenuModel== to create a new ==MenuGoupModel==.
-- The message ==addItem:== is provided by ==MenuGoupModel== to create a new ==MenuItemModel==.
-
-==MenuItemModel== provides the following methods to control its apperence:
-- ==name:== is the text appearring at in the button.
-- ==icon:== is the icon appearring at in the button.
-- ==description:== is diplayed in a tooltips.
-- ==shortcut:== to add a shorcut to activate the item,the shortcut is diplayed near the name.
-
-And to control the following methods its behaviour, it should be defined only one in the same time:
-- ==subMenu:== to open the specified menu.
-- ==action:== to perform the specified block.
-
-[[[
-LittleToolbar >> configMainMenu
-	menu
-		addGroup: [ :group1 |
-			group1
-				addItem: [ :item |
-					item
-						name: 'File';
-						subMenu: self createSubMenu ].
-			group1
-				addItem: [ :item |
-					item
-						description: 'Open file';
-						icon: (Smalltalk ui icons iconNamed: #openIcon);
-						action: [ self inform: 'Open File' ] ] ];
-		addGroup: [ :group2 |
-			group2
-				addItem: [ :item |
-					item
-						description: 'Add menu item';
-						icon: (Smalltalk ui icons iconNamed: #add);
-						action: [ self dynamicalAdding: group2 ] ] ]
-]]]
-
-==createSubMenu== return a new MenuModel with two items.
-
-[[[
-LittleToolbar >> createSubMenu
-	^ MenuModel new
-		addGroup: [ :group |
-			group
-				addItem: [ :item |
-					item
-						name: 'Save';
-						icon: (Smalltalk ui icons iconNamed: #smallSaveIcon);
-						shortcut: $s meta;
-						action: [ self inform: 'Save' ] ].
-			group
-				addItem: [ :item |
-					item
-						name: 'Print';
-						shortcut: $p meta;
-						icon: (Smalltalk ui icons iconNamed: #smallPrintIcon);
-						action: [ self inform: 'Print' ] ] ]
-]]]
-
-@@todo JF move this to dynamic spec
-
-==dynamicalAdding:== creates a new item, configures the item to remove itself when is clicked and adds the item to the specified group.
-
-[[[
-LittleToolbar >> dynamicalAdding: aGroup
-	aGroup
-		addItem: [ :item |
-			item
-				name: 'Dynamic';
-				icon: (Smalltalk ui icons iconNamed: #delete);
-				action: [ aGroup menuItems remove: item.
-					self needRebuild: false.
-					self buildWithSpec ] ].
-	self needRebuild: false.
-	self buildWithSpec
-]]]
-
-The figure *@fig_LittleToolbar* show the result after two clicks on the button to add an item and a click on the button displaying a submenu
-
-+Render of LittleToolbar>file://figures/LittleToolbar.png|width=50|label=fig_LittleToolbar+
