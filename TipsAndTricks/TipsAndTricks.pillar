@@ -316,15 +316,5 @@ There is however no uniform API for testing the different widgets of Spec, for e
 
 @@note If it is required have the UI open while doing the tests, change the send of ==buildWithSpec== to ==openWithSpec== and add a ==pb window close== at the end of the code, this will open, respectively close the UI.
 
-!! Non-editable multiline text
-
-Last but not least, a tiny tip: the ==TextInputFieldModel== can be configured such that the text it contains is not editable, by disabling it.
-
-[[[
-TextInputFieldModel new
-	text: ('qwerty\asdfgh\zxcvbn' withCRs );
-	enabled: false;
-	openWithSpec
-]]]
 
 

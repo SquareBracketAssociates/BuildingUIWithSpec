@@ -5,12 +5,12 @@
 }
 @cha_advanced_widgets
 
-@@todo JF add motivating intro
+Some Spec user interface elements provide more advanced functionalities and therefore are more complex to configure than, e.g. a button or a label. In this chapter we show four such advanced widgets and present how they can be used and configured. We first discuss text input widgets, then treat radio buttons and tabs, and finish with toolbars and pop-up menus.
 
 !! TextModel
 @sec_texModel
 
-In Spec, the input of text by the user or the showing of multiline text is done using a ==TextModel==. In this section we discuss some typical configurations of this model, as well as the extras provided for the (usually) one-line ==TextInputFieldModel==.
+In Spec, the input of text by the user or the showing of multiline text is done using a ==TextModel==. We now discuss some typical configurations of this model, as well as the extras provided by the one-line ==TextInputFieldModel==.
 
 !!! Non-editable text field
 
@@ -40,9 +40,9 @@ The above example shows the class comment of ==Object==, in a non-editable way. 
 
 The model can also be configured to automatically accept at each keystroke, effectively removing the functionality of the edit flag. This is done by sending it ==autoAccept: true==.
 
-What actually happens on accept is configurable. The default action is to only set the ==text== field of the model to the text held in the user interface. To add to this behaviour, send the model the ==acceptBlock:== message, which takes a one-argument block. The argument of the block is the text held in the user interface. 
+What actually happens in the ==accept== call is configurable. The default action is to set the ==text== field of the model to the text held in the user interface. To add to this behaviour, send the model the ==acceptBlock:== message, which takes a one-argument block. The argument of the block is the text held in the user interface. 
 
-The following example shows how to combine ==autoAccept== and ==acceptBlock:== to create a text field that shows its text as a growl morph whenever it is edited.
+The following example shows how to combine the ==autoAccept== and ==acceptBlock:== messages to create a text field that shows its text as a growl morph whenever it is edited.
 
 [[[
   | cm |
@@ -54,7 +54,7 @@ The following example shows how to combine ==autoAccept== and ==acceptBlock:== t
 
 !!! Keyboard shortcuts
 
-With text entry fields, there is sometimes also a need to provide keyboard shortcuts for actions that go beyond the usal copy-and-paste actions. Defining such custom actions is possible by using the ==bindKeyCombination:action:== method. For example, the code below opens an inspector on the text when command-i is pressed. Note that we need to set auto-accept to ==true== for ==text== to always hold the characters that were entered in the widget.
+With text entry fields, there is sometimes also a need to provide keyboard shortcuts for actions that go beyond the usal copy-and-paste actions. Defining such custom actions is done using the ==bindKeyCombination:action:== message. For example, the code below opens an inspector on the text when command-i is pressed. Note that we need to set auto-accept to ==true== for ==text== to always hold the characters that were entered in the widget.
 
 [[[
   | cm |
@@ -74,20 +74,18 @@ The ==bindKeyCombination:action:== method is actually defined in ==ComposableMod
 
 !!! Single-line input field extras
 
-==TextInputField== is a subclass of ==TextModel== that is ment for single-line inputs. Pressing enter or return does not cause a carriage return, instead the accept action of the field is executed. This widget is however still able to display multiple lines of text, for example if multi-line text is pasted in. But it will not show a scrollbar if it runs out of vertical space for the text.
+==TextInputFieldModel== is a subclass of ==TextModel== that is meant for single-line inputs. Pressing enter or return does not cause a carriage return, instead the accept action of the field is executed. This widget is however still able to display multiple lines of text, for example if multi-line text is pasted in. But it will not show a scrollbar if it runs out of vertical space for the text.
 
 It also adds a few features that are useful:
 - A ghost text can be set with the ==ghostText:== message.
 - Password fields that show only stars are specified by sending the ==beEncrypted== message.
 - Entry completion can be added by using the ==entryCompletion:== message. The argument must be an ==EntryCompletion== instance, and we refer to that class for examples. 
-- Sending ==acceptOnCR: false== to the field inhibits the accept action to be executed when enter or return is pressed, and as a consequence the user can entre multiple lines of text.
+- Sending ==acceptOnCR: false== to the field inhibits the accept action to be executed when enter or return is pressed, and as a consequence the user can enter multiple lines of text.
 
 
 
 !! RadioButtonModel
 @sec_RadioButtonModel
-
-+Screen shot of the washing machine control panel.>file://figures/Wash.png|width=30|label=fig_WashingMachine+
 
 Radio buttons allow the user to select at most one option from a group, and unlike dropdown menus all items of this group are visible on screen. The ==RadioButtonModel== of spec uses ==RadioButtonGroup== to manage the group.
 
@@ -118,6 +116,8 @@ RadioButtonExample >> extent
 	^160@150
 ]]]
 
++Screen shot of the washing machine control panel.>file://figures/Wash.png|width=30|label=fig_WashingMachine+
+
 In the ==initializeWidgets== method, we will add the fabric radio buttons ==f1== through ==f3== to a ==fabric== button group and the temperature buttons ==t1== through ==t3== to a ==temperature== button group. Since these button groups are used nowhere else in the UI, we only have them as local variables of the method and not as instance variables of the class.
 
 The code below shows the method. We first create both button groups, then the ==rinse== button, and then the different temperature and fabric buttons are created and added to their group. The ==rinse== button is configured to be de-selectable, and the ==f1== and ==t1== buttons are the default buttons of their respective groups, meaning they will be selected when the UI opens.
@@ -134,8 +134,7 @@ RadioButtonExample >> initializeWidgets
 	
 	f1 := self newRadioButton.
 	f1 label: 'Cotton'.
-	fabric addRadioButton: f1;
-		default: f1.
+	fabric addRadioButton: f1; default: f1.
 	
 	f2 := self newRadioButton.
 	f2 label: 'Synthetic'.
@@ -147,8 +146,7 @@ RadioButtonExample >> initializeWidgets
 	
 	t1 := self newRadioButton.
 	t1 label: '60'.
-	temperature addRadioButton: t1;
-		default: t1.
+	temperature addRadioButton: t1;	default: t1.
 	
 	t2 := self newRadioButton.
 	t2 label: '40'.
@@ -207,7 +205,6 @@ TabMgrExample >> initializeWidgets
 	| tab |
 	
 	tabmgr := self newTabManager.
-	
 	tab := self newTab.
 	tab model: RadioButtonExample new.
 	tab label: 'Wash'; closeable: false;
@@ -225,7 +222,6 @@ To add the second part of the user interface, for drying the clothes, we extend 
 
 [[[
 TabMgrExample >> initializeWidgets
-
 	[...]
 
 	tab := self newTab.
@@ -356,12 +352,11 @@ TabMgrExample  >> populateMenu
 			group addItem: [ :item |
 				item name: 'Soft Reset';
 					action: [ status text: 'History: Wash '.];
-					icon: Smalltalk ui icons exception].
+					icon: Smalltalk ui icons exception ].
 			group addItem: [ :item|
 				item name: 'Hard Reset';
 					action: [ GrowlMorph openWithContents: 'Just pull the plug!' ];
-					icon: Smalltalk ui icons smallError ]
-			 ].
+					icon: Smalltalk ui icons smallError ] ].
 ]]]
 
 After defining a ==submenu== temporary variable, the code above initialises both the ==menu== and ==submenu== variables to a fresh ==MenuModel== instance. For the sake of the example, the code first constructs the submenu, adding a soft and hard reset menu item with their respective icons and actions. The code for these menu items is straightforward (we assume the ==GrowlMorph== also works on our washing machine). 
@@ -378,13 +373,11 @@ The code below continues the ==populateMenu== method and populates the main menu
 			item name: 'Reveal this menu';
 				action: [menu buildWithSpecAsPopup popUpInWorld];
 				description: 'This entry exits to have a shortcut for this menu.';
-				shortcut: $r meta
-			].
+				shortcut: $r meta ].
 		group addItem: [ :item |
 			item name: 'Status Info';
 				action: [ GrowlMorph openWithContents: tabmgr selectedTab label];
-				icon: Smalltalk ui icons help].
-		].
+				icon: Smalltalk ui icons help] ].
 ]]]
 
 Lastly, we add a second group to the main menu, causing a splitter to appear between the above two items and the below item. This last item simply shows the submenu that we created at the beginning of the method.
@@ -393,9 +386,7 @@ Lastly, we add a second group to the main menu, causing a splitter to appear bet
 	menu addGroup: [ :group |
 		group addItem: [ :item |
 			item name: 'Actions';
-				subMenu: submenu.
-			 ]
-		].
+				subMenu: submenu ]].
 	
 	menu applyTo: self. 
 ]]]
@@ -405,3 +396,7 @@ At the very end of the method, the ==applyTo:== method is sent to the menu, caus
 Nothing else is needed to associate the menu to the UI. There is no need to add the menu in a layout method, since our example does not have a toolbar widget shown. However, in case of adding a toolbar the ==menu== will need to be added to the layout, as we have shown in the ==WatchpointWindow== example at the beginning of this section.
 
 Last but not least, menus are not completely static: menu items can be disabled and enabled by sending ==enabled: false==, resp. ==enabled: true== to them. The structure of a menu can also be changed by adding and removing items and groups. In the example above, since the menu is rebuilt on each pop-up such changes are immediately visible. In contrast, when used as a toolbar the menu is a widget, so the UI will need to be rebuilt as discussed in Chapter *@cha_dynamic_spec*.
+
+!! Conclusion
+
+In this chapter we have shown how to configure and use more advanced widgets. We have discussed ==TextModel== and its subclass ==TextInputFieldModel==, ==RadioButtonModel== and its grouping functionality, ==TabModel== and the tab manager, and the various classes around ==MenuModel==. In some examples we have used dynamic spec, and this is discussed in the next chapter.
