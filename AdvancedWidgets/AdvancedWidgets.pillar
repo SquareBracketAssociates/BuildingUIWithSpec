@@ -29,7 +29,7 @@ The above example shows the class comment of the class ==Object==, in a non-edit
 
 !!! Remove the yellow triangle, perform an action at each edit
 
-==TextModel== provides visual feedback when the text has been edited by placing a yellow triangle in the top right of the field. Also, if the widget is removed, e.g. by closing the window it contains, a confirmation dialog will be presented to the user. This `has been edited' flag is reset by calling the ==accept== message on the model. It means that sending the message ==accept== will make sure that the changed text is not lost and that the user is not notified about possible loss.
+==TextModel== provides visual feedback when the text has been edited by placing a yellow triangle in the top right of the field. Also, if the widget is removed, e.g. by closing the window it contains, a confirmation dialog will be presented to the user. This `has been edited' flag is reset by calling the ==accept== message on the model. Sending the message ==accept== means telling the widget to make sure that the changed text is not lost if the widget is closed, which is why the user is not notified about a possible loss.
 
 For an example, execute the code below, and when the UI opens type a few characters. After 3 seconds the triangle will disappear and closing the window does not require confirmation of the user.
 
@@ -56,7 +56,11 @@ The following example shows how to combine the ==autoAccept== and ==acceptBlock:
 
 !!! Keyboard shortcuts
 
-With text entry fields, there is sometimes also a need to provide keyboard shortcuts for actions that go beyond the usal copy-and-paste actions. Defining such custom actions is done using the ==bindKeyCombination:action:== message. For example, the code below opens an inspector on the text when command-i is pressed. Note that we need to set auto-accept to ==true== for ==text== to always hold the characters that were entered in the widget.
+With text entry fields, there is sometimes also a need to provide keyboard shortcuts for actions that go beyond the usal copy-and-paste actions. Defining such custom actions is done using the ==bindKeyCombination:action:== message.
+
+@@note A keyboard shortcut does not need to be a key in combination with a modifier like command. For example it can be simply the letter ==x==, or the space character. 
+
+For example, the code below opens an inspector on the text when command-i is pressed. Note that we need to set auto-accept to ==true== for ==text== to always hold the characters that were entered in the widget.
 
 [[[
   | cm |
@@ -72,7 +76,6 @@ The ==bindKeyCombination:action:== method is actually defined in ==ComposableMod
 	self bindKeyCombination: Character space toAction: [ self action ].
 ]]]
 
-@@note A keyboard shortcut does not necessarily need to be a key in combination with a modifier like command or space. 
 
 !!! Single-line input field extras
 
@@ -178,7 +181,10 @@ With this functionality, we have demonstrated the main features of ==RadioButton
 !! TabModel
 @sec_TabModel
 
-A second set of classes that are made to work together are the ==TabManagerModel== and the ==TabModel== classes. In a tabbed UI, the former holds the organisation of the different tabs, and the latter represents the tabs themselves. To show how these two classes cooperate, we will extend the washing machine example from Section *@sec_RadioButtonModel* to a washer-dryer machine. It has a tabbed UI, were one tab is for the washing part, a second tab for the spin cycle and drying, and a third tab shows information.
+A second set of classes that are made to work together are the ==TabManagerModel== and the ==TabModel== classes. In a tabbed UI, the former holds the organisation of the different tabs, and the latter represents the tabs themselves. To show how these two classes cooperate, we will extend the washing machine example from Section *@sec_RadioButtonModel* to a washer-dryer machine, shown in Figure *@fig_WasherDryer*. It has a tabbed UI, were one tab is for the washing part, a second tab for the spin cycle and drying, and a third tab shows information.
+
++Screen shot of the washer-dryer machine control panel.>file://figures/TabMgr.png|width=50|label=fig_WasherDryer+
+
 
 To use tabs, only the ==TabManagerModel== needs to be kept as an instance variable of the UI, and added to the layout:
 
@@ -242,19 +248,15 @@ TabMgrExample >> dryModel
 	| model |
 
 	model := DynamicComposableModel new.
-	model instantiateModels: #(
-		spin SliderModel
-		dry SliderModel).
+	model instantiateModels: #(spin SliderModel dry SliderModel).
 	
 	model spin label: 'Spin speed'; min: 400; max: 1600; quantum: 400.
 	model dry label: 'Dry time'; min: 0; max: 120; quantum: 10.
 	
 	model layout: (
 		SpecColumnLayout composed
-			add: #spin height: 30;
-			add: #dry height: 30;
+			add: #spin height: 30;	add: #dry height: 30;
 			yourself).
-		
 	^model.
 ]]]
 
