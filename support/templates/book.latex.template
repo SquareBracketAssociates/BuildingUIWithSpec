@@ -33,13 +33,13 @@
 
 %=================================================================
 \title{The Spec UI framework}
-\author{St\'ephane Ducasse and Johan Fabry}
+\author{Johan Fabry and St\'ephane Ducasse}
 %\date{}
 %\date{\gitdate\titlebreak[\smallskip]{ -- }\protect\gitCommitInfo}
 
 \hypersetup{pdfinfo = {
     Title = {The Spec UI framework},
-    Author = {St\'ephane Ducasse and Johan Fabry},
+    Author = {Johan Fabry and St\'ephane Ducasse},
     Keywords = {pharo, smalltalk, user interface}}}
 % =================================================================
 \begin{document}
@@ -52,7 +52,7 @@
 \cleartoverso
 {\small
 
-  Copyright 2016 by Stéphane Ducasse and Johan Fabry.
+  Copyright 2016 by Johan Fabry and Stéphane Ducasse.
 
   The contents of this book are protected under the Creative Commons
   Attribution-ShareAlike 3.0 Unported license.
@@ -97,8 +97,8 @@
     \multirow{2}{*}{\includegraphics[width=2em]{support/latex/sbabook/sba-logo.pdf}}
     & Published by Square Bracket Associates, Switzerland. \\
     & \url{http://squarebracketassociates.org} \\[\smallskipamount]
-    & ISBN xxx-x-xxx-xxxxx-x \\
-    & First Edition, August 2016.\\
+    & ISBN XXX-X-XXX-XXXX-X \\
+    & First Edition, January 2017.\\
   \end{tabular}
   \medskip
 
