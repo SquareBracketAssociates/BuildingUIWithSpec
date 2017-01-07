@@ -24,8 +24,7 @@ ComposableModel subclass: #WindowExample
 WindowExample >> initializeWidgets
    button1 := self newButton.
    button2 := self newButton.
-   button1 label: '+'.
-   button2 label: '-'.
+   button1 label: '+'.  button2 label: '-'.
 ]]]
 [[[
 WindowExample class >>defaultSpec
