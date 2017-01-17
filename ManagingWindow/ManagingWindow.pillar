@@ -135,6 +135,8 @@ It is also possible to perform an action whenever a window is closed, by sending
  we window whenClosedDo: [ self inform: 'Bye bye!' ].
 ]]]
 
+You can also try a couple of alternatives to ==self inform:==, either ==UITheme builder message:== or the ==UIManager default message:==.
+
 
 !! Window size and decoration
 @sec_win_size_decoration
