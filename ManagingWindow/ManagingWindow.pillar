@@ -132,7 +132,7 @@ It is also possible to perform an action whenever a window is closed, by sending
 | we |
  we := WindowExample new. 
  we openWithSpec.
- we window whenClosedDo: [ UIManager default inform: 'Bye bye!' ].
+ we window whenClosedDo: [ self inform: 'Bye bye!' ].
 ]]]
 
 
