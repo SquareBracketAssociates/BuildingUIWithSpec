@@ -52,7 +52,7 @@
 \cleartoverso
 {\small
 
-  Copyright 2016 by Johan Fabry and Stéphane Ducasse.
+  Contents copyright 2017 by Johan Fabry and Stéphane Ducasse.\\Cover copyright 2017 by Johan Fabry.
 
   The contents of this book are protected under the Creative Commons
   Attribution-ShareAlike 3.0 Unported license.
@@ -97,7 +97,7 @@
     \multirow{2}{*}{\includegraphics[width=2em]{support/latex/sbabook/sba-logo.pdf}}
     & Published by Square Bracket Associates, Switzerland. \\
     & \url{http://squarebracketassociates.org} \\[\smallskipamount]
-    & ISBN XXX-X-XXX-XXXX-X \\
+    & ISBN 978-1-326-92746-2 \\
     & First Edition, January 2017.\\
   \end{tabular}
   \medskip
