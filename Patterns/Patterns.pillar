@@ -127,7 +127,7 @@ GameItemDisplayer new
 	openWithSpec
 ]]]
 
-+First simple input field.>file://figures/Game1.png|width=80|label=game2+
++Now editing a domain object.>file://figures/Game2.png|width=80|label=game2+
 
 !! Conclusion
 
