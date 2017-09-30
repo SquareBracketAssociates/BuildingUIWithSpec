@@ -9,6 +9,7 @@ PDFCHAPTERS =           book-result/AdvancedWidgets/AdvancedWidgets.pdf \
 			book-result/Reuse/Reuse.pdf \
 			book-result/ThreePillarsOfSpec/ThreePillarsOfSpec.pdf \
 			book-result/TipsAndTricks/TipsAndTricks.pdf \
+			book-result/Patterns/Patterns.pdf \
 
 HTMLCHAPTERS =           book-result/AdvancedWidgets/AdvancedWidgets.html \
 			book-result/DynamicSpec/DynamicSpec.html \
