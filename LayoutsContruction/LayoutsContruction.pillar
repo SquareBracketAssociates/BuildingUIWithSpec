@@ -28,7 +28,7 @@ Each of them has their advantages and disadvantages depending on the kind of UI 
 To illustrate these layouts, we use an example class that has two buttons, a list and a text field, the non-layout code of which is below:
 
 [[[
-ComposableModel subclass: #LayoutExample
+ComposablePresenter subclass: #LayoutExample
 	instanceVariableNames: 'list button button2 text'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
@@ -226,7 +226,7 @@ LayoutExample >> columnOf50
 
 Alternatively, inside of a column layout and a row layout, ==add:height:==, respectively ==add:width:==, can also be used to state the height, respectively the width, of that specific widget.
 
-@@note It is considered a bad practice to hardcode the size of widgets in pixels, as some changes (e.g., in font size) can invalidate this number. To alleviate this, ==ComposableModel class== provides accessors for practical sizes in its ==defaults== protocol.
+@@note It is considered a bad practice to hardcode the size of widgets in pixels, as some changes (e.g., in font size) can invalidate this number. To alleviate this, ==ComposablePresenter class== provides accessors for practical sizes in its ==defaults== protocol.
 
 An example of the use of accessors that compute height is ==toolbarHeight==, which we used in the protocol method browser, shown in Figure *@fig_protocollist*. This accessor depends on the font size and is also useful for sizing button rows.
 
