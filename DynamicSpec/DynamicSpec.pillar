@@ -1,4 +1,4 @@
-{
+Presenter{
 	"metadata" : {
 		"title" : "Dynamic Spec"
 	}
@@ -28,7 +28,7 @@ To show the use of these two methods, we create an example user interface that i
 We need to set up the UI before we can talk about changing it after it is opened. We start with the class definition, window size and title definition, and functionality for setting the contents of the list:
 
 [[[
-ComposableModel subclass: #DynamicViewer
+ComposablePresenter subclass: #DynamicViewer
 	instanceVariableNames: 'list view button state'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
@@ -174,7 +174,7 @@ DynamicViewer >> widgetFor: aDatum
 
 !! Dynamically populating a UI with widgets
 
-It is not always possible to determine beforehand how many widgets will be shown in a UI, and instead this needs to be decided when the UI is opened. Spec also provides support for this. Dynamic population is done by subclassing ==DynamicComposableModel== (instead of ==ComposableModel==), using its ==assign:to:== method to dynamically create virtual instance variables for the different widgets and by defining an instance-side layout. 
+It is not always possible to determine beforehand how many widgets will be shown in a UI, and instead this needs to be decided when the UI is opened. Spec also provides support for this. Dynamic population is done by subclassing ==DynamicComposablePresenter== (instead of ==ComposablePresenter==), using its ==assign:to:== method to dynamically create virtual instance variables for the different widgets and by defining an instance-side layout. 
 
 !!! Adapting the multi-data viewer
 
@@ -204,10 +204,10 @@ DynamicViewer >> widgetFor: aDatum
 
 !!! Implementing the widget for showing array contents
 
-We now implement the widget that will show the detailed contents of an array. It is a subclass of ==DynamicComposableModel==, with an instance variable ==collection== that holds the array and ==label== that holds the label at the top.
+We now implement the widget that will show the detailed contents of an array. It is a subclass of ==DynamicComposablePresenter==, with an instance variable ==collection== that holds the array and ==label== that holds the label at the top.
 
 [[[
-DynamicComposableModel subclass: #DynamicArrayViewer
+DynamicComposablePresenter subclass: #DynamicArrayViewer
 	instanceVariableNames: 'collection label'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
@@ -224,9 +224,9 @@ DynamicArrayViewer class >> on: aCollection
 	^inst.
 ]]]
 
-The ==initializeWidgets== method iterates over the collection and instantiates a ==TextModel== for each of its items. This is then added to the UI using the ==assign:to:== method, as shown below.
+The ==initializeWidgets== method iterates over the collection and instantiates a ==TextPresenter== for each of its items. This is then added to the UI using the ==assign:to:== method, as shown below.
 
-==assign:to:== takes an instance of a ==ComposableModel== and a symbol that will be used to refer to that instance. Spec virtually creates a variable together with its (virtual) accessor methods. For example, the code below will cause the generation of accessors ==txt_1==, ==txt_2==, etc. as well as ==txt_1:==, ==txt_2:==, etc.
+==assign:to:== takes an instance of a ==ComposablePresenter== and a symbol that will be used to refer to that instance. Spec virtually creates a variable together with its (virtual) accessor methods. For example, the code below will cause the generation of accessors ==txt_1==, ==txt_2==, etc. as well as ==txt_1:==, ==txt_2:==, etc.
 
 [[[
 DynamicArrayViewer >> initializeWidgets
@@ -242,7 +242,7 @@ DynamicArrayViewer >> initializeWidgets
 
 @@note The generation of these virtual accessors allows the widgets to be referred to in the rest of the code through an accessor, as if it was a normal variable. 
 
-Now the only thing left to do is to define a layout for the widgets of this UI. In addition to the class-side layout features of ==ComposableModel==, ==DynamicComposableModel== also allows a layout to be specified at instance side. This can be done either by overriding the ==layout== method to return the required ==SpecLayout== instance, or using the ==layout:== accessor to set the layout. These two options are similar to what is possible with window title and size, as discussed in Chapter *@cha_managing_windows*.
+Now the only thing left to do is to define a layout for the widgets of this UI. In addition to the class-side layout features of ==ComposablePresenter==, ==DynamicComposablePresenter== also allows a layout to be specified at instance side. This can be done either by overriding the ==layout== method to return the required ==SpecLayout== instance, or using the ==layout:== accessor to set the layout. These two options are similar to what is possible with window title and size, as discussed in Chapter *@cha_managing_windows*.
 
 In our example, we need to define a layout at instance side since the number of widgets differs per instance. We choose to override the ==layout== method, as shown below. This code creates a column and adds all widgets that were created in ==initializeWidgets==. We can see that the dynamically created widgets are referred to by their name ==txt_1==, ==txt_2==, etc. , reconstructed by iterating over the collection. This is a sub-optimal implementation and we will show an alternative implementation at the end of this chapter.
 
@@ -256,7 +256,7 @@ DynamicArrayViewer >> layout
 	^ col 
 ]]]
 
-This is all that is required to dynamically populate a UI. Note that this UI can also be opened stand-alone as it is a subclass of ==ComposableModel==. For example, the snippet of code below will open it with the same contents as in Figure *@fig_MultiDataArray*.
+This is all that is required to dynamically populate a UI. Note that this UI can also be opened stand-alone as it is a subclass of ==ComposablePresenter==. For example, the snippet of code below will open it with the same contents as in Figure *@fig_MultiDataArray*.
 
 [[[
 (DynamicArrayViewer on:
@@ -270,7 +270,7 @@ This is all that is required to dynamically populate a UI. Note that this UI can
 
 Above we have seen that ==initializeWidgets== and ==layout== do double work when creating the names of the virtual variables of the widgets. We can avoid this if instead of overriding the ==layout== method, we use the ==layout:== accessor inside of ==initializeWidgets== as follows:
 
-[[[
+[[[Presenter
 DynamicArrayViewer >> initializeWidgets
 	| col |
 	col := SpecColumnLayout composed.
@@ -294,31 +294,31 @@ This implementation builds the layout at the same time as the widgets are built.
 !! Hacking together a UI in the Playground
 @sec_hacking_dynamic
 
-Thanks to ==DynamicComposableModel==, Spec also allows for a more scripting-like development style, where the entire UI is defined in one giant piece of code, typically built incrementally. This may be useful, e.g. for `quick and dirty' prototyping where you want to omit the creation of a class for the UI as well as the definition of multiple methods. In this section we show how we can hack together a simple UI, scripting style, from within the Playground.
+Thanks to ==DynamicComposablePresenter==, Spec also allows for a more scripting-like development style, where the entire UI is defined in one giant piece of code, typically built incrementally. This may be useful, e.g. for `quick and dirty' prototyping where you want to omit the creation of a class for the UI as well as the definition of multiple methods. In this section we show how we can hack together a simple UI, scripting style, from within the Playground.
 
 The UI we build here is a simple example showing a number and two buttons, one to increment the number and one to decrement it. This example is adapted from code present in the Pharo 5 image: ==DynamicSpecExample >> openOnInteger== by Torsten Bergmann, for which we give our thanks.
 
-We start our example code by instantiating a ==DynamicComposableModel== and setting the title and size of the window for our UI by using the ==title:== and ==extent:== methods (see Chapter *@cha_managing_windows*). Note that the local variable ==num== will hold the number shown in the UI.
+We start our example code by instantiating a ==DynamicComposablePresenter== and setting the title and size of the window for our UI by using the ==title:== and ==extent:== methods (see Chapter *@cha_managing_windows*). Note that the local variable ==num== will hold the number shown in the UI.
 
 [[[
 	| ui num |
 	
 	num := 0.
-	ui := DynamicComposableModel new.
+	ui := DynamicComposablePresenter new.
 	ui title: 'I am dynamic'.
 	ui extent: 250@70.
 ]]]
 
-We then add the widgets to the UI, using the ==instantiateModels:== method. This method takes as argument a collection of pairs. The first element of the pair is the name of the widget, i.e., the name of the instance variable if this would be a normal, static, UI. The second element of the pair is a subclass of ==ComposableModel==, determining the type of the widget. 
+We then add the widgets to the UI, using the ==instantiatePresenters:== method. This method takes as argument a collection of pairs. The first element of the pair is the name of the widget, i.e., the name of the instance variable if this would be a normal, static, UI. The second element of the pair is a subclass of ==ComposablePresenter==, determining the type of the widget. 
 
 [[[	
-	ui instantiateModels: #( 
-		text LabelModel
-		plus ButtonModel
-		minus ButtonModel ).
+	ui instantiatePresenters: #( 
+		text LabelPresenter
+		plus ButtonPresenter
+		minus ButtonPresenter ).
 ]]]
 
-Hence this UI will hold a ==text== widget, which is a ==LabelModel== instance, as well as two ==ButtonModel== widgets, in ==plus== and ==minus==, respectively. Fundamentally, the code above is the only change with respect to what we have seen before. This is because, as in the ==assign:to:== method shown in the previous section, Spec also automatically generates the (virtual) accessors for the widgets, making it possible to just use accessors in the remainder of the code.
+Hence this UI will hold a ==text== widget, which is a ==LabelPresenter== instance, as well as two ==ButtonPresenter== widgets, in ==plus== and ==minus==, respectively. Fundamentally, the code above is the only change with respect to what we have seen before. This is because, as in the ==assign:to:== method shown in the previous section, Spec also automatically generates the (virtual) accessors for the widgets, making it possible to just use accessors in the remainder of the code.
 
 With the widgets defined and instantiated, we can now configure them, as we would do in a normal ==initializeWidgets== or ==initializePresenter== method:
 
