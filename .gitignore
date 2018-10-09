@@ -8,3 +8,5 @@ pharo-vm/
 pillar
 pillarPostExport.sh
 mustache
+
+\.DS_Store

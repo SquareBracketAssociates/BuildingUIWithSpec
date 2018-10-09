@@ -6,7 +6,7 @@
 @cha_managing_windows
 
 
-In this book so far we have talked about reuse of ==ComposableModel==s, discussed the fundamental functioning of Spec and presented how to layout the widgets of a user interface. Yet what is still missing for a working user interface is showing all these widgets inside of a window. In our examples until now we have only shown a few of the features of Spec for managing windows, basically restricting ourself to opening a window.
+In this book so far we have talked about reuse of ==ComposablePresenter==s, discussed the fundamental functioning of Spec and presented how to layout the widgets of a user interface. Yet what is still missing for a working user interface is showing all these widgets inside of a window. In our examples until now we have only shown a few of the features of Spec for managing windows, basically restricting ourself to opening a window.
 
 In this chapter we provide a more complete overview of how Spec allows for the managing of windows. We show opening and closing, the built-in dialog box facility, sizing of windows and all kinds of window decoration.
 
@@ -15,7 +15,7 @@ In this chapter we provide a more complete overview of how Spec allows for the m
 To illustrate the window configuration options that are available, we use a simple ==WindowExample== class that has two buttons placed side by side. These buttons do not have any behavior associated yet, this will be added in an example further down this chapter.
 
 [[[
-ComposableModel subclass: #WindowExample
+ComposablePresenter subclass: #WindowExample
    instanceVariableNames: 'button1 button2'
    classVariableNames: ''
    package: 'Spec-BuildUIWithSpec'
@@ -39,7 +39,7 @@ A user interface can be opened as a normal window, or opened as a dialog box, i.
 
 !!!Opening a window
 
-As we have shown in previous sections, to open a user interface you need to instantiate the ==ComposableModel== for that interface and send it the ==openWithSpec== message. This creates an instance of ==WindowModel== containing the user interface and shows it in a window on screen.
+As we have shown in previous sections, to open a user interface you need to instantiate the ==ComposablePresenter== for that interface and send it the ==openWithSpec== message. This creates an instance of ==WindowPresenter== containing the user interface and shows it in a window on screen.
 
 We have also seen the ==openWithSpec:== method, notably in Chapter *@cha_layout_construction*, that takes the name of a layout message as argument. Instead of using the default layout (whose lookup is described in Section *@sec_layoutmethod*), the opened UI will use the layout returned by that method. A second variant is ==openWithSpecLayout:== that takes a ==SpecLayout== instance (or an instance of its subclasses).
 
@@ -63,9 +63,9 @@ Spec provides for an easy way to open a UI as a simple dialog box with ''Ok'' an
  diag := we openDialogWithSpec.
 ]]]
 
-The result of this (e.g. assigned to the ==diag== variable above) is an instance of the  ==DialogWindowModel== class (a subclass of ==WindowModel==). For convenience,  ==openDialogWithSpec== has the same variants as ==openWindowWithSpec== that take a specific layout as argument, either as a message name or as a ==SpecLayout== instance.
+The result of this (e.g. assigned to the ==diag== variable above) is an instance of the  ==DialogWindowPresenter== class (a subclass of ==WindowPresenter==). For convenience,  ==openDialogWithSpec== has the same variants as ==openWindowWithSpec== that take a specific layout as argument, either as a message name or as a ==SpecLayout== instance.
 
-The ==DialogWindowModel== instance (==diag== in the example above) can also be configured in multiple ways. To execute code when the user clicks on a button, send it the ==okAction:== or ==cancelAction:== message with a zero-argument block. If the block returns ==false== the window will not be closed (if it returns anything else it will be closed). This closing logic allows for the validation of the contents of the dialog box, only allowing it to be closed if validation succeeds. Complimentarily, the ''OK'' button can be grayed out by sending the ==okButtonEnabled: false== message, and enabled again with a ==true== argument.
+The ==DialogWindowPresenter== instance (==diag== in the example above) can also be configured in multiple ways. To execute code when the user clicks on a button, send it the ==okAction:== or ==cancelAction:== message with a zero-argument block. If the block returns ==false== the window will not be closed (if it returns anything else it will be closed). This closing logic allows for the validation of the contents of the dialog box, only allowing it to be closed if validation succeeds. Complimentarily, the ''OK'' button can be grayed out by sending the ==okButtonEnabled: false== message, and enabled again with a ==true== argument.
 
 Also, the message ==cancelled== will return ==true== if the box was closed by clicking on the ''Cancel'' button.
 
@@ -89,7 +89,7 @@ Windows are not alone on the screen, and they probably will not live forever. He
 
 A modal window is a window that takes control of the entire Pharo user interface, making it impossible for the user to select another window while it is open. This is especially useful for dialog boxes, but may also be needed for other kinds of windows.
 
-Spec allows any window to be made modal by sending the message ==modalRelativeTo: World== to the ==WindowModel== that corresponds to the opened ==ComposableModel==. To get a handle on the ==WidowModel==, send the ==window== message (after the UI has been opened with ==openWithSpec==). 
+Spec allows any window to be made modal by sending the message ==modalRelativeTo: World== to the ==WindowPresenter== that corresponds to the opened ==ComposablePresenter==. To get a handle on the ==WidowPresenter==, send the ==window== message (after the UI has been opened with ==openWithSpec==). 
 
 [[[
 | we |
@@ -102,7 +102,7 @@ Spec allows any window to be made modal by sending the message ==modalRelativeTo
 
 !!! Preventing window close
 
-Spec provides for the possibility to check if a window can effectively be closed when the user clicks on the close box. To use it, this feature must first be turned on, by sending ==askOkToClose: true== to the ==ComposableModel==. This can be done for example by changing our ==WindowExample== as follows:
+Spec provides for the possibility to check if a window can effectively be closed when the user clicks on the close box. To use it, this feature must first be turned on, by sending ==askOkToClose: true== to the ==ComposablePresenter==. This can be done for example by changing our ==WindowExample== as follows:
 
 [[[
 WindowExample >> initializeWidgets
@@ -113,7 +113,7 @@ WindowExample >> initializeWidgets
    self askOkToClose: true.
 ]]]
 
-The behavior of the close button however is still not changed, closing a window is still possible. This is because we have not defined the implementation of what to check on window close. This is most easily done by overriding the ==okToChange== method of ==ComposableModel==, for example as below:
+The behavior of the close button however is still not changed, closing a window is still possible. This is because we have not defined the implementation of what to check on window close. This is most easily done by overriding the ==okToChange== method of ==ComposablePresenter==, for example as below:
 
 [[[
 WindowExample >> okToChange
@@ -126,7 +126,7 @@ Of course the example ==okToChange== method above is extremely simplistic and no
 
 !!! Acting on window close
 
-It is also possible to perform an action whenever a window is closed, by sending the ==whenClosedDo:== message to the UI's ==WindowModel==. For example, below we specify a goodbye message to deliver when our example UI is closed.
+It is also possible to perform an action whenever a window is closed, by sending the ==whenClosedDo:== message to the UI's ==WindowPresenter==. For example, below we specify a goodbye message to deliver when our example UI is closed.
 
 [[[
 | we |
@@ -144,7 +144,7 @@ We now focus on sizing a window before and after opening it, and then talk about
 !!! Setting initial size and changing size
 
 To set the initial size of a window when it opens, either override the ==extent==
-method of the corresponding ==ComposableModel== so that it returns a Point, or send the
+method of the corresponding ==ComposablePresenter== so that it returns a Point, or send the
 instance the ==extent:== message before opening, for example like this:
 
 [[[
@@ -168,7 +168,7 @@ WindowExample >> initializeWidgets
 
 !!! Fixed size
 
-The size of a window can be made fixed, so that the user cannot resize it by dragging the sides or corners. To configure this we however need to talk to the underlying widget library (==Morphic== in Pharo 5).  We get the ==Morphic== window of our example (via its ==WindowModel==) and instruct it to be unresizable as follows: 
+The size of a window can be made fixed, so that the user cannot resize it by dragging the sides or corners. To configure this we however need to talk to the underlying widget library (==Morphic== in Pharo 5).  We get the ==Morphic== window of our example (via its ==WindowPresenter==) and instruct it to be unresizable as follows: 
 
 [[[
 | wewin |
@@ -178,7 +178,7 @@ The size of a window can be made fixed, so that the user cannot resize it by dra
 
 !!! Removing window decoration
 
-Sometimes it makes sense to have a window without decoration, i.e. without control widgets. Currently this configuration cannot be performed on the ==ComposableModel== of that window, but the underlying widget library may allow it. Below we show how to get the ==Morphic== window of our example and instruct it to remove the different control widgets:
+Sometimes it makes sense to have a window without decoration, i.e. without control widgets. Currently this configuration cannot be performed on the ==ComposablePresenter== of that window, but the underlying widget library may allow it. Below we show how to get the ==Morphic== window of our example and instruct it to remove the different control widgets:
 
 [[[
 | wewin |
@@ -190,7 +190,7 @@ Sometimes it makes sense to have a window without decoration, i.e. without contr
     removeMenuBox
 ]]]
 
-@@note This window is still closable using the halo menus or by calling ==close== on the ==WindowModel== instance (==wewin== in the example above).
+@@note This window is still closable using the halo menus or by calling ==close== on the ==WindowPresenter== instance (==wewin== in the example above).
 
 
 !! The final details: title, icon and about text
@@ -199,7 +199,7 @@ You can provide some textual information about the widow by providing a title an
 
 !!! Setting and changing the title
 
-By default, the title of a new window is '''Untitled window'''. This can be changed by overriding the ==title== method (of ==ComposableModel==) and returning a string that will be used as a title. For example, we can title our example user interface as follows:
+By default, the title of a new window is '''Untitled window'''. This can be changed by overriding the ==title== method (of ==ComposablePresenter==) and returning a string that will be used as a title. For example, we can title our example user interface as follows:
 
 [[[
 WindowExample >> title
@@ -219,7 +219,7 @@ In addition, you can set the title of any UI after it has been opened (even if i
 
 At the bottom of the main Pharo window there is a window taskbar, allowing the user to switch between windows by clicking on the buttons that represent each window. These buttons also have an icon that is ment to represent the windows' kind. This icon can also be configured through Spec, in two different ways.
 
-Firstly, sending the ==windowIcon:== message to the ==ComposableModel== allows an icon to be set per window, as below. Note that it does not matter if the message is sent before or after the window is opened.
+Firstly, sending the ==windowIcon:== message to the ==ComposablePresenter== allows an icon to be set per window, as below. Note that it does not matter if the message is sent before or after the window is opened.
 
 [[[
 | wm1 wm2 |
@@ -243,7 +243,7 @@ WindowExample >> windowIcon
 !!! Setting the about text
 
 To set the about text of a window, either override the ==aboutText== method of the corresponding
-==ComposableModel== so that it returns the new about text, or send the instance the ==aboutText:== message before opening, for example like below.
+==ComposablePresenter== so that it returns the new about text, or send the instance the ==aboutText:== message before opening, for example like below.
 
 [[[
 | we |

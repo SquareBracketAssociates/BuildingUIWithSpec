@@ -15,12 +15,12 @@ To allow this, defining a user interface consists of defining the ''model'' of t
 These UI elements are instantiated by Spec, taking into account the underlying UI framework.
 
 In the end, it is the composition of the model and the UI elements that makes up the resulting user interface that is shown.
-This also explains the name of the root component of Spec: since all UIs are constructed through ''composition'' of other UI's, and it is sufficient to define the ''model'' to define the UI, the root class of all UIs is named ==ComposableModel==.
-Consequently, to define a new user interface, a subclass of ==ComposableModel== needs to be created.
+This also explains the name of the root component of Spec: since all UIs are constructed through ''composition'' of other UI's, and it is sufficient to define the ''model'' to define the UI, the root class of all UIs is named ==ComposablePresenter==.
+Consequently, to define a new user interface, a subclass of ==ComposablePresenter== needs to be created.
 
-Considering the construction and orchestration of the different widgets in a user interface, Spec is inspired by the Model-View-Presenter pattern. The model that is defined in Spec corresponds to a presenter in the MVP triad. Note that because of this, future versions of Spec may rename the ==ComposableModel== into ==ComposablePresenter== for naming consistency.
+Considering the construction and orchestration of the different widgets in a user interface, Spec is inspired by the Model-View-Presenter pattern. The model that is defined in Spec corresponds to a presenter in the MVP triad.Presenter
 
-Fundamentally, it is built around three concerns that materialize themselves as the following three methods in ==ComposableModel==:
+Fundamentally, it is built around three concerns that materialize themselves as the following three methods in ==ComposablePresenter==:
 - ==initializeWidgets== treats the widgets themselves
 - ==initializePresenter== treats the interactions between widgets
 - ==defaultSpec== treats the layout of the widgets
@@ -54,9 +54,9 @@ Indeed, without this final step keyboard navigation will not work reliably.
 
 The instantiation of the model for a widget can be done in two ways: through the use of a creation method or through the use of the ==instantiate:== method.
 
-- Considering the first option, the framework provides unary messages for the creation of all basic widgets. The format of these messages is ==new[Widget]==, for example ==newButton== creates a button widget, and ==newList== creates a list widget. The complete list of available widget creation methods can be found in the class ==ComposableModel== in the protocol ==widgets==.
+- Considering the first option, the framework provides unary messages for the creation of all basic widgets. The format of these messages is ==new[Widget]==, for example ==newButton== creates a button widget, and ==newList== creates a list widget. The complete list of available widget creation methods can be found in the class ==ComposablePresenter== in the protocol ==widgets==.
 
-- The second option is more general: to reuse a ==ComposableModel== subclass (other than the ones handled by the first option) the widget needs to be instantiated using the ==instantiate:== method. For example, to reuse a ==MessageBrowser==  widget, the code is ==self instantiate: MessageBrowser.==
+- The second option is more general: to reuse a ==ComposablePresenter== subclass (other than the ones handled by the first option) the widget needs to be instantiated using the ==instantiate:== method. For example, to reuse a ==MessageBrowser==  widget, the code is ==self instantiate: MessageBrowser.==
 
 
 !! Defining UI Layouts
@@ -77,7 +77,7 @@ Put differently, typically all the instances of the same user interface have the
 For the same UI, multiple layouts can be described, and when the UI is built the use of a specific layout can be indicated. To do this, instead of calling ==openWithSpec== (as we have done until now), use the ==openWithSpec:== message with the name of the layout method as argument. For example, consider the following artificial example of a two button UI that has two different layout methods:
 
 [[[
-ComposableModel subclass: #TwoButtons
+ComposablePresenter subclass: #TwoButtons
 	instanceVariableNames: 'button1 button2'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
@@ -138,7 +138,7 @@ To use an alternative layout for the widget that is being reused, use the ==add:
 It takes as extra argument the name of the layout method to use, as we show below:
 
 [[[
-ComposableModel subclass: #TBAndListH
+ComposablePresenter subclass: #TBAndListH
 	instanceVariableNames: 'buttons list'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'

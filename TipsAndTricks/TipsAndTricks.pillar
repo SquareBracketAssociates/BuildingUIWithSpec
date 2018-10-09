@@ -25,7 +25,7 @@ Spec widget that can be used in your UI.
 As an example, below we show the code that turns the ==CalendarMorph== into a plain Spec UI, opened with ==SpecCalendar new openWithSpec==:
 
 [[[
-ComposableModel subclass: #SpecCalendar
+ComposablePresenter subclass: #SpecCalendar
 	instanceVariableNames: 'morph'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
@@ -55,7 +55,7 @@ SpecCalendar >> title
 !!! Include a Glamour UI in a Spec UI
 
 
-User interfaces written in Glamour can also be embedded in a Spec UI thanks to a bridge class ==GlamourPresentationModel==. This is a ==ComposableModel== subclass that wraps Glamour user interfaces such as the Playground or the Inspector.
+User interfaces written in Glamour can also be embedded in a Spec UI thanks to a bridge class ==GlamourPresentationPresenter==. This is a ==ComposablePresenter== subclass that wraps Glamour user interfaces such as the Playground or the Inspector.
 
 For this functionality to work in Pharo 5 you should first load the integration package:
 
@@ -66,13 +66,13 @@ Gofer it
 		load
 ]]]
 
-The ==GlamourPresentationModel== by default wraps the Playground, which means that we can open a Spec window on a Glamour Playground as follows: ==GlamourPresentationModel new openWithSpec==.
+The ==GlamourPresentationPresenter== by default wraps the Playground, which means that we can open a Spec window on a Glamour Playground as follows: ==GlamourPresentationPresenter new openWithSpec==.
 
-To use another Glamour UI, the ==GlamourPresentationModel== must be configured before it is opened, sending it the ==presentationClass:startOn:== message, with as arguments the class of the Glamour UI and the data to be shown in the UI. For example, below we open the inspector on 42 (in a Spec window).
+To use another Glamour UI, the ==GlamourPresentationPresenter== must be configured before it is opened, sending it the ==presentationClass:startOn:== message, with as arguments the class of the Glamour UI and the data to be shown in the UI. For example, below we open the inspector on 42 (in a Spec window).
 
 [[[
 | cm |
- cm := GlamourPresentationModel new.
+ cm := GlamourPresentationPresenter new.
  cm presentationClass: GTInspector startOn: 42.
  cm openWithSpec
 ]]]
@@ -81,7 +81,7 @@ The GT Playground is a bit unusual in the data that it opens on, this data must 
 
 [[[
 | cm |
- cm := GlamourPresentationModel new.
+ cm := GlamourPresentationPresenter new.
  cm presentationClass: GTPlayground startOn: (GTPlayPage new saveContent: '42').
  cm openWithSpec
 ]]]
@@ -89,9 +89,9 @@ The GT Playground is a bit unusual in the data that it opens on, this data must 
 
 !!! Make a Spec presentation for the GT Inspector
 
-The inverse of the previous tip can also be realized, in a way: It is possible to write code for a GT Inspector tab such that the tab shows a Spec UI. To do this the ==display:== block of the tab should evaluate to a ==ComposableModel== instance that has been set up completely by sending it the ==buildWithSpec== message.
+The inverse of the previous tip can also be realized, in a way: It is possible to write code for a GT Inspector tab such that the tab shows a Spec UI. To do this the ==display:== block of the tab should evaluate to a ==ComposablePresenter== instance that has been set up completely by sending it the ==buildWithSpec== message.
 
-For example, the code next is for a tab for ==OrderedCollection==, showing all items in the collection as a ListModel.
+For example, the code next is for a tab for ==OrderedCollection==, showing all items in the collection as a ListPresenter.
 
 [[[
 OrderedCollection >> gtInspectorItemsAsListIn: composite
@@ -99,7 +99,7 @@ OrderedCollection >> gtInspectorItemsAsListIn: composite
 	 composite spec
 	 	 title: 'AsList';
 	 	 display: [ :elt | | cm |
-	 	 	 cm := ListModel new.
+	 	 	 cm := ListPresenter new.
 	 	 	 cm items: self.
 	 	 	 cm buildWithSpec.
 	 	 	 cm]
@@ -114,7 +114,7 @@ Object >> gtInspectorRecursive: composite
 	 composite spec
 	 	 title: 'Recursion!';
 	 	 display: [ :elt | | cm |
-	 	 	 cm := GlamourPresentationModel new.
+	 	 	 cm := GlamourPresentationPresenter new.
 	 	 	 cm presentationClass: GTInspector startOn: self.
 	 	 	 cm buildWithSpec.
 	 	 	 cm]
@@ -127,17 +127,17 @@ In this section we group all tips that treat lists, trees and tables.
 
 !!! A scrollable list of widgets
 
-==ListModel== can show more than just text, it can also visualize any
+==ListPresenter== can show more than just text, it can also visualize any
 kind of widget. To do this, in the ==displayBlock:== send the widgets the ==buildWithSpec== message. This allows to create, e.g. a scrollable list of buttons that show the comments of the classes in the ''Files'' package, as shown in Figure *@fig_scrollable_buttons*.
 
 [[[
-ListModel new
+ListPresenter new
 	displayBlock: [ :x | x buildWithSpec ];
 	items:
 		('Files' asPackage classes
 			collect: [ :cls |
-				ButtonModel new	icon: cls systemIcon; label: cls name;
-					action: [TextModel new text: cls comment; openWithSpec]]);
+				ButtonPresenter new	icon: cls systemIcon; label: cls name;
+					action: [TextPresenter new text: cls comment; openWithSpec]]);
 	openWithSpec
 ]]]
 
@@ -151,8 +151,8 @@ Adding items to a collection held in a list does ''not'' update the widget. A re
 [[[
 |container count|
  count :=0.
- container := DynamicComposableModel new.
- container instantiateModels:  #(#list ListModel #plus ButtonModel).
+ container := DynamicComposablePresenter new.
+ container instantiatePresenters:  #(#list ListPresenter #plus ButtonPresenter).
  container plus label: '+1'.
  container plus action: [ | items |
    count := count + 1.
@@ -166,14 +166,14 @@ Adding items to a collection held in a list does ''not'' update the widget. A re
 
 !!! Setting the selection in a tree
 
-Programmatically setting the selection in a ==TreeModel== does not automatically highlight the selected item, and inversely highlighting an item does not automatically select it. Therefore, you need to perform both operations to select and highlight a tree item, as in the example below. Note the last two statements in the ==whenBuiltDo:== block: the first sets the selected item, and the second highlights it.
+Programmatically setting the selection in a ==TreePresenter== does not automatically highlight the selected item, and inversely highlighting an item does not automatically select it. Therefore, you need to perform both operations to select and highlight a tree item, as in the example below. Note the last two statements in the ==whenBuiltDo:== block: the first sets the selected item, and the second highlights it.
 
 [[[
 | tree chblock |
- tree := TreeModel new.
+ tree := TreePresenter new.
  chblock := [:cl | | subs node |
    subs := cl subclasses.
-   node := TreeNodeModel new.
+   node := TreeNodePresenter new.
    node content: cl;
      hasChildren: [ subs isNotEmpty  ];
      children: [ subs collect: [:sub | chblock value: sub ] ] ].
@@ -188,10 +188,10 @@ Programmatically setting the selection in a ==TreeModel== does not automatically
 
 !!! Show a table-like view
 
-There are multiple ways in which a table-like widget can be shown to the user. The most straightforward way is the ==MultiColumnListModel==, for example as below. Note that the display block needs to be set to return the item itself, since the default behavior of the display block turns the array into its ==printString==.
+There are multiple ways in which a table-like widget can be shown to the user. The most straightforward way is the ==MultiColumnListPresenter==, for example as below. Note that the display block needs to be set to return the item itself, since the default behavior of the display block turns the array into its ==printString==.
 
 [[[
-MultiColumnListModel new
+MultiColumnListPresenter new
 	items: {
 		{'Origin' . 'Destination' . 'Start Time' . 'Stop Time'} .
 		{'Santiago' . 'Paris' . '15:30' . '11:15'} .
@@ -200,25 +200,25 @@ MultiColumnListModel new
 	openWithSpec.
 ]]]
 
-Alternatively, a ==TreeModel== can be used, which allows for more fancy formatting options. (This example thanks to Nicolai Hess)
+Alternatively, a ==TreePresenter== can be used, which allows for more fancy formatting options. (This example thanks to Nicolai Hess)
 
 [[[
 |r m col1 col2 col3|
  r := FileLocator vmDirectory.
- m := TreeModel new.
+ m := TreePresenter new.
  m roots: r allFiles.
  m rootNodeHolder: [ :item |
-    TreeNodeModel new
+    TreeNodePresenter new
         content: item;
         icon: Smalltalk ui icons smallLeftFlushIcon ].
  m title: r fullName.
- col1 := TreeColumnModel new
+ col1 := TreeColumnPresenter new
     displayBlock: [ :node | node content basename ];
     headerLabel:'Name'.
- col2 := TreeColumnModel new
+ col2 := TreeColumnPresenter new
     displayBlock: [ :node | node content creationTime ];
     headerLabel:'Time'.
- col3 := TreeColumnModel new
+ col3 := TreeColumnPresenter new
     displayBlock: [ :node | node content permissions];
     headerLabel:'Permissions'.
   m columns: {col1. col2 . col3}.
@@ -244,8 +244,8 @@ rendered in red, and using the Balloon font in Italic.
 
 [[[
 |container|
-  container := DynamicComposableModel new.
-  container instantiateModels:  #(#red LabelModel).
+  container := DynamicComposablePresenter new.
+  container instantiatePresenters:  #(#red LabelPresenter).
   container red label: 'I am red'.
   container red whenBuiltDo: [:ann|
 	  ann widget color: (Color red);
@@ -257,11 +257,11 @@ rendered in red, and using the Balloon font in Italic.
 
 !!! Get called at periodic intervals 
 
-Morphic implements a `stepping' mechanism that allows a morph to register itself for callbacks that are executed at regular intervals. This allows, e.g. for automatic refreshing of a windows' content every ''n'' milliseconds. Spec also provides support for this, by overriding ==ComposableModel=='s method  ==defaultWindowModelClass== to return a ==TickingWindowModel==. An example of this can be found in the Pharo 5 image in the ==WatchPointWindow== class:
+Morphic implements a `stepping' mechanism that allows a morph to register itself for callbacks that are executed at regular intervals. This allows, e.g. for automatic refreshing of a windows' content every ''n'' milliseconds. Spec also provides support for this, by overriding ==ComposablePresenter=='s method  ==defaultWindowModelClass== to return a ==TickingWindowPresenter==. An example of this can be found in the Pharo 5 image in the ==WatchPointWindow== class:
 
 [[[
 WatchpointWindow >> defaultWindowModelClass
-	^ TickingWindowModel 
+	^ TickingWindowPresenter 
 ]]]
 
 With this override set, every ==stepTime== milliseconds the ==step== method will be called by the Morphic infrastructure. The default implementation of ==step== does nothing, and ==stepTime== returns 1000. So at least ==step== should be overriden to implement the required action. For example, the ==WatchPointWindow==  does not override ==stepTime== and implements ==step== as below, refreshing the list that is shown. 

@@ -17,21 +17,21 @@ In this chapter, you will learn how we can build a new UI by reusing already def
 
 
 To show how Spec enables the composition and reuse of user interfaces, in this chapter we build the user interface shown in Figure *@fig_protocol_browser* as a composition of four parts:
-# The ""WidgetClassList"": a widget containing a ==ListModel== specifically for displaying the subclasses of ==AbstractWidgetModel==.
-# The ""ProtocolMethodList"": a widget composed of a ==ListModel== and a ==LabelModel== for displaying methods of a protocol.
-# The ""ProtocolViewer"":  a composition of one ==WidgetClassList== and two ==ProtocolMethodList==, it will browse the methods in the protocols ==api== and ==api-events== of all subclasses of ==AbstractWidgetModel==.
-# The ""ProtocolBrowser"" : reuses a ==ProtocolViewer==, changes its layout and adds a ==TextModel== to see the source code of the methods.
+# The ""WidgetClassList"": a widget containing a ==ListPresenter== specifically for displaying the subclasses of ==AbstractWidgetPresenter==.
+# The ""ProtocolMethodList"": a widget composed of a ==ListPresenter== and a ==LabelPresenter== for displaying methods of a protocol.
+# The ""ProtocolViewer"":  a composition of one ==WidgetClassList== and two ==ProtocolMethodList==, it will browse the methods in the protocols ==api== and ==api-events== of all subclasses of ==AbstractWidgetPresenter==.
+# The ""ProtocolBrowser"" : reuses a ==ProtocolViewer==, changes its layout and adds a ==TextPresenter== to see the source code of the methods.
 
 
 !! Creating a basic UI to be reused as a widget
 @sec_WidgetClassList
 
 The first custom UI we build should display a list of all subclasses of
-==AbstractWidgetModel==. This UI will later be reused as a widget for a more complete UI. The code is as follows (we do not include code for accessors):
+==AbstractWidgetPresenter==. This UI will later be reused as a widget for a more complete UI. The code is as follows (we do not include code for accessors):
 
-First we create a subclass of ==ComposableModel== with one instance variable ==list== which will hold an instance of ==ListModel==.
+First we create a subclass of ==ComposablePresenter== with one instance variable ==list== which will hold an instance of ==ListPresenter==.
 [[[
-ComposableModel subclass: #WidgetClassList
+ComposablePresenter subclass: #WidgetClassList
 	instanceVariableNames: 'list'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec
@@ -42,7 +42,7 @@ In the method ==initializeWidgets==, we create the list and populate it with the
 [[[
 WidgetClassList >> initializeWidgets
 	list := self newList.
-	list items: (AbstractWidgetModel allSubclasses
+	list items: (AbstractWidgetPresenter allSubclasses
 		 							 sorted: [:a :b | a name < b name ]).
 	self focusOrder add: list.
 
@@ -81,7 +81,7 @@ Now, whoever reuses this widget can parameterize it with a block that will be ex
 The UI we build now will show a list of all methods of a given protocol, and it combines two widgets: a list and a label. Considering reuse, there is no difference with the previous UI. This is because the reuse of a UI as a widget is ""not impacted at all"" by the number of widgets it contains (nor by their position). Large and complex UIs are reused in the same way as simple widgets.
 
 [[[
-ComposableModel subclass: #ProtocolMethodList
+ComposablePresenter subclass: #ProtocolMethodList
 	instanceVariableNames: 'label methods'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
@@ -146,7 +146,7 @@ The third user interface we build is a composition of the two previous user inte
 This UI is composed of a ==WidgetClassList== and two ==ProtocolMethodList== and specifies that when a model class is selected in the ==WidgetClassList==, the methods in the protocols ==api== and ==api-events== will be shown in the two ==ProtocolMethodList== widgets.
 
 [[[
-ComposableModel subclass: #ProtocolViewer
+ComposablePresenter subclass: #ProtocolViewer
 	instanceVariableNames: 'models api events'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
@@ -236,14 +236,14 @@ Sometimes, when you want to reuse an existing UI as a widget, the layout of that
 Our last user interface reuses the ==ProtocolViewer== with a different layout and adds a text zone to edit the source code of the selected method.
 
 [[[
-ComposableModel subclass: #ProtocolBrowser
+ComposablePresenter subclass: #ProtocolBrowser
 	instanceVariableNames: 'text viewer'
 	classVariableNames: ''
 	package: 'Spec-BuildUIWithSpec'
 ]]]
 [[[
 ProtocolBrowser >> initializeWidgets
-	text := self instantiate: TextModel.
+	text := self instantiate: TextPresenter.
 	viewer := self instantiate: ProtocolViewer.
 	text
 		aboutToStyle: true;
