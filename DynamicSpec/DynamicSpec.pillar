@@ -270,7 +270,7 @@ This is all that is required to dynamically populate a UI. Note that this UI can
 
 Above we have seen that ==initializeWidgets== and ==layout== do double work when creating the names of the virtual variables of the widgets. We can avoid this if instead of overriding the ==layout== method, we use the ==layout:== accessor inside of ==initializeWidgets== as follows:
 
-[[[Presenter
+[[[
 DynamicArrayViewer >> initializeWidgets
 	| col |
 	col := SpecColumnLayout composed.

@@ -15,7 +15,7 @@ In this chapter we provide a more complete overview of how Spec allows for the m
 To illustrate the window configuration options that are available, we use a simple ==WindowExample== class that has two buttons placed side by side. These buttons do not have any behavior associated yet, this will be added in an example further down this chapter.
 
 [[[
-ComposablePresenter subclass: #WindowExamplePresenter
+ComposablePresenter subclass: #WindowExample
    instanceVariableNames: 'button1 button2'
    classVariableNames: ''
    package: 'Spec-BuildUIWithSpec'
