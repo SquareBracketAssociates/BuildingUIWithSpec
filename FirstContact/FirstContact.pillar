@@ -32,7 +32,14 @@ ComposableModel subclass: #CustomerSatisfaction
 The instance variables of the class hold the widgets that the UI
 contains. In this case we have three buttons and a text screen. Accessors for these instance variables also need to be defined, the Spec interpreter will use them in the UI construction process.
 
-@@note Always remember to generate the accessors for the instance variables of the widgets of the UI.
+@@note Always remember to generate the accessors for the instance variables of the widgets of the UI. For example, the accessor for ==buttonHappy== would be
+
+[[[
+CustomerSatisfaction >> buttonHappy
+	^ buttonHappy
+]]].
+
+In Pharo 7, accessors can be generated automatically by right clicking on the class name and selecting the `Generate accessors' command.
 
 The methods of the class provide their initialization and configuration, e.g.
 labels and actions, as well as the logic of their interaction. The
