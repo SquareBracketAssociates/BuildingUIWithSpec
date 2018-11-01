@@ -39,6 +39,7 @@ CustomerSatisfaction >> buttonHappy
 	^ buttonHappy
 ]]].
 
+In Pharo 5 and 6, accessors can be generated automatically by right clicking on the class name and selecting the `Refactoring -> Class refactoring -> Generate accessors' command.
 In Pharo 7, accessors can be generated automatically by right clicking on the class name and selecting the `Generate accessors' command.
 
 The methods of the class provide their initialization and configuration, e.g.
