@@ -37,6 +37,11 @@ SpecCalendar >> initializeWidgets
 ]]]
 
 [[[
+SpecCalendar >> morph
+	^morph
+]]]
+
+[[[
 SpecCalendar class >> defaultSpec
 	^SpecLayout composed add: #morph; yourself
 ]]]
